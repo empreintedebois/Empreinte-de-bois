@@ -1,12 +1,12 @@
 [
-  { "code": "M01", "name": "M01", "enabled": true, "image": "image.png" },
-  { "code": "M02", "name": "M02", "enabled": true, "image": "image.png" },
-  { "code": "M03", "name": "M03", "enabled": true, "image": "image.png" },
-  { "code": "M04", "name": "M04", "enabled": true, "image": "image.gif" },
-  { "code": "M05", "name": "M05", "enabled": true, "image": "image.png" },
-  { "code": "M06", "name": "M06", "enabled": false, "image": "image.png" },
-  { "code": "M07", "name": "M07", "enabled": false, "image": "image.png" },
-  { "code": "M08", "name": "M08", "enabled": false, "image": "image.png" },
-  { "code": "M09", "name": "M09", "enabled": false, "image": "image.png" },
-  { "code": "M10", "name": "M10", "enabled": false, "image": "image.png" }
+  { "code": "M01", "name": "01_Bois Rond Sapin", "enabled": true, "image": "image.png" },
+  { "code": "M02", "name": "02_Bois Rond Cp ", "enabled": true, "image": "image.png" },
+  { "code": "M03", "name": "03_Simili Rond Blanc", "enabled": true, "image": "image.png" },
+  { "code": "M04", "name": "03_Simili Rond Rouge", "enabled": true, "image": "image.gif" },
+  { "code": "M05", "name": "05_Bois Carrée Sapin", "enabled": true, "image": "image.png" },
+  { "code": "M06", "name": "06_Bois Carrée Noyer", "enabled": true , "image": "image.png" },
+  { "code": "M07", "name": "07_Bois Carrée Creux", "enabled": true , "image": "image.png" },
+  { "code": "M08", "name": "08_Metal Carte de visite", "enabled": true, "image": "image.png" },
+  { "code": "M09", "name": "09_Support Divers", "enabled": true, "image": "image.png" },
+  { "code": "M10", "name": "10_Decoupe/Planche", "enabled": true, "image": "image.png" }
 ]
