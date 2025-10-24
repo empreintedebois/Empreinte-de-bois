@@ -1,0 +1,433 @@
+/*
+  Feuille de style pour Empreinte de Bois.
+
+  Ce thème conserve l'inspiration sombre et naturelle du projet initial
+  tout en ajoutant une mise en page responsive qui répond aux demandes :
+  un bandeau fixe, un fond immobile, des images avec ombre portée sans cadre,
+  un bloc matériaux et un formulaire épuré mais complet.
+*/
+
+/* Palette de couleurs inspirée du bois et des matériaux naturels */
+:root {
+  --background-color: #0e0b07;
+  --card-color: #1b140f;
+  --ring-color: #3e3123;
+  --text-color: #f5e9d7;
+  --muted-color: #a79a8a;
+  --accent-color: #8c6239;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+/* Fond fixe qui reste immobile lors du défilement */
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-image: url("assets/hero-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  filter: brightness(0.4);
+}
+
+/* Bandeau titre fixe */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid var(--ring-color);
+  z-index: 999;
+}
+.top-bar .top-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.top-bar .logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+.top-bar .site-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Contenu principal avec marge supérieure pour compenser la hauteur du bandeau */
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  padding-top: 100px; /* espace pour le bandeau fixe */
+}
+
+/* Section d'introduction */
+.intro-text {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--muted-color);
+  margin-bottom: 2rem;
+}
+
+/* Slider horizontal pour les réalisations */
+.realisations-slider {
+  /*
+    Augmente la marge inférieure du carrousel pour s'assurer que la liste des
+    supports (« bandeaux ») apparaisse nettement en dessous du bloc galerie.
+    Dans certaines configurations d'affichage, les images hautes pouvaient
+    empiéter visuellement sur le titre « Supports disponibles ». En ajoutant
+    davantage d'espace après le carrousel, on évite tout chevauchement.
+  */
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
+}
+.realisations-slider h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--text-color);
+}
+/* === Slider horizontal pour les réalisations === */
+/*
+   La wrapper occupe toute la largeur de la fenêtre grâce à une technique de marges négatives. Les flèches de
+   navigation sont positionnées aux extrémités de cette zone et restent visibles quel que soit le format de page.
+   Les images sont affichées en entier avec des marges latérales via le conteneur interne. La hauteur du slider
+   s'adapte automatiquement à la hauteur de l'image grâce à l'utilisation du flux normal plutôt que d'un positionnement
+   absolu.
+*/
+.slider-wrapper {
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+  overflow: visible;
+}
+/* Conteneur qui centre le slider et ajoute des marges latérales */
+.slider-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  position: relative;
+}
+/* Le conteneur des slides utilise le flux normal. */
+/* Le conteneur du slider est positionné en relatif pour permettre aux slides de se superposer. On définit une hauteur minimale pour éviter le collapse avant le chargement des images. */
+.slider-container {
+  position: relative;
+  width: 100%;
+  /* Hauteur du carrousel fixée à 60% de la hauteur de la fenêtre pour éviter que le contenu suivant ne se superpose */
+  height: 60vh;
+}
+/* Les slides sont superposées et leur opacité est animée afin de créer un fondu au noir d'une seconde lors du changement d'image. */
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+/* Les images s'adaptent à la largeur disponible et conservent leur ratio. Une ombre subtile les met en valeur. */
+.slide img {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Ajoute un vignettage en superposant un dégradé radial sombre sur chaque slide */
+.slide::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* Vignettage adouci pour que les images apparaissent plus claires */
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.6) 100%);
+  border-radius: inherit;
+}
+/* Styles des boutons de navigation du slider */
+.slider-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 0.25rem;
+  background: rgba(255, 255, 255, 0.7);
+  color: #000;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.slider-nav.prev {
+  left: 1rem;
+}
+.slider-nav.next {
+  right: 1rem;
+}
+.slider-nav:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Section des supports avec accordéons */
+.materials-section {
+  /*
+    Augmente la marge inférieure du carrousel pour s'assurer que la liste des
+    supports (« bandeaux ») apparaisse nettement en dessous du bloc galerie.
+    Dans certaines configurations d'affichage, les images hautes pouvaient
+    empiéter visuellement sur le titre « Supports disponibles ». En ajoutant
+    davantage d'espace après le carrousel, on évite tout chevauchement.
+  */
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+.materials-section h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--text-color);
+}
+.accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.accordion-item {
+  border: 1px solid var(--ring-color);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--card-color);
+  color: var(--text-color);
+}
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--card-color);
+  cursor: pointer;
+}
+.accordion-header:hover {
+  background: #241b13;
+}
+.accordion-header .material-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.accordion-header .arrow {
+  color: var(--accent-color);
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+}
+.accordion-item.active .accordion-header .arrow {
+  transform: rotate(180deg);
+}
+.accordion-content {
+  display: none;
+  padding: 1rem;
+  background: var(--card-color);
+}
+.accordion-item.active .accordion-content {
+  display: block;
+}
+.product-detail {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+/* Dans le contenu d'un accordéon, l'image occupe la moitié du bandeau et reste carrée (aspect ratio 1/1).
+   Le texte occupe l'autre moitié et adopte une taille de police plus grande pour une meilleure lisibilité. */
+.product-detail img {
+  width: 50%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+.product-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 1rem;
+}
+.product-title {
+  font-size: 1.3rem;
+  color: var(--accent-color);
+  text-decoration: underline;
+  margin-bottom: 0.5rem;
+}
+.product-dimensions,
+.product-extra {
+  font-size: 1rem;
+  color: var(--muted-color);
+  margin-bottom: 0.3rem;
+}
+
+/* Section contact */
+.contact-section {
+  background: var(--card-color);
+  border: 1px solid var(--ring-color);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+.contact-section h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+.contact-section .form-group {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+.contact-section label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+}
+.contact-section input[type="email"],
+.contact-section input[type="text"],
+.contact-section input[type="number"] {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--ring-color);
+  background: var(--background-color);
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+.contact-section input[type="range"] {
+  width: 100%;
+}
+.contact-section .range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  color: var(--muted-color);
+}
+
+/* Styles pour le second curseur "Texture" */
+.texture-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  color: var(--muted-color);
+}
+.texture-samples {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+  gap: 0.25rem;
+}
+.texture-sample {
+  width: 32px;
+  height: 20px;
+  border: 1px solid var(--ring-color);
+  border-radius: 0.25rem;
+}
+.texture-sample.aplat {
+  background: #000;
+}
+.texture-sample.degrade {
+  background: linear-gradient(to right, #000, #fff);
+}
+.texture-sample.pointille {
+  background-image: radial-gradient(#000 25%, transparent 25%), radial-gradient(#000 25%, transparent 25%);
+  background-position: 0 0, 4px 4px;
+  background-size: 8px 8px;
+  background-color: #fff;
+}
+.contact-section .checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+.contact-section input[type="checkbox"],
+.contact-section input[type="radio"] {
+  margin-right: 0.3rem;
+}
+.contact-section button {
+  display: block;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--accent-color);
+  color: var(--background-color);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.contact-section button:hover {
+  background: #a17048;
+}
+.contact-section .contact-info {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted-color);
+}
+.contact-section .contact-info a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+/* Responsive : empiler le portfolio en colonne sur mobile */
+@media (max-width: 768px) {
+  .portfolio {
+    flex-direction: column;
+  }
+}
