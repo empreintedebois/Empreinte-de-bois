@@ -162,6 +162,14 @@ async function initSite() {
       const header = document.createElement('div');
       header.className = 'accordion-header';
 
+      // Ajout d'une case à cocher pour sélectionner ce support. Cette case
+      // permet à l'utilisateur de choisir explicitement un matériau. Lorsqu'elle
+      // est cochée, elle remplit le champ masqué "selected-material" et la
+      // variable selectedMaterialLabel. Une seule case peut être cochée à la fois.
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'material-checkbox';
+
       const nameSpan = document.createElement('span');
       nameSpan.className = 'material-name';
       nameSpan.textContent = data.name;
@@ -170,6 +178,8 @@ async function initSite() {
       arrowSpan.className = 'arrow';
       arrowSpan.innerHTML = '&#x25BC;';
 
+      // Construction de l'en-tête : coche + nom + flèche
+      header.appendChild(checkbox);
       header.appendChild(nameSpan);
       header.appendChild(arrowSpan);
 
@@ -214,6 +224,23 @@ async function initSite() {
       item.appendChild(header);
       item.appendChild(content);
       accordionList.appendChild(item);
+
+      // Gestion de la case à cocher : ne pas déclencher l'ouverture de l'accordéon
+      // lorsque l'utilisateur coche/décoche. Mise à jour de la sélection.
+      checkbox.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        // Désélectionner les autres cases
+        accordionList.querySelectorAll('.material-checkbox').forEach((cb) => {
+          if (cb !== checkbox) cb.checked = false;
+        });
+        if (checkbox.checked) {
+          if (selectedMaterialInput) selectedMaterialInput.value = item.dataset.code || '';
+          selectedMaterialLabel = item.dataset.label || '';
+        } else {
+          if (selectedMaterialInput) selectedMaterialInput.value = '';
+          selectedMaterialLabel = '';
+        }
+      });
     });
 
     const accordionItems = accordionList.querySelectorAll('.accordion-item');
@@ -221,18 +248,15 @@ async function initSite() {
     let selectedMaterialLabel = '';
 
     accordionItems.forEach((item) => {
-      const header = item.querySelector('.accordion-header');
-      header.addEventListener('click', () => {
+    const header = item.querySelector('.accordion-header');
+    header.addEventListener('click', () => {
         const isActive = item.classList.contains('active');
+        // Fermer tous les panneaux sauf celui-ci si on est en train d'ouvrir
         accordionItems.forEach((i) => i.classList.remove('active'));
         if (!isActive) {
           item.classList.add('active');
-          if (selectedMaterialInput) selectedMaterialInput.value = item.dataset.code || '';
-          selectedMaterialLabel = item.dataset.label || '';
-        } else {
-          if (selectedMaterialInput) selectedMaterialInput.value = '';
-          selectedMaterialLabel = '';
         }
+        // Ne modifie plus la sélection ; celle-ci est gérée par les cases à cocher
       });
     });
 
@@ -257,7 +281,6 @@ async function initSite() {
       const traitementSlider = document.getElementById('traitement');
       const textureSlider = document.getElementById('texture');
       const quantiteField = document.getElementById('quantite');
-      const renduChoice = document.querySelector("input[name='rendu']:checked");
       const emailField = document.getElementById('email');
       const personaliseCheckbox = document.getElementById('personnalise');
 
@@ -269,7 +292,9 @@ async function initSite() {
       const traitement = traitementSlider ? traitementLabels[parseInt(traitementSlider.value, 10)] : '';
       const texture = textureSlider ? textureLabels[parseInt(textureSlider.value, 10)] : '';
       const quantite = quantiteField && quantiteField.value ? quantiteField.value : '1';
-      const rendu = renduChoice ? renduChoice.value : '';
+      // Le choix du rendu (mat/brillant/satiné) a été retiré du formulaire ;
+      // la variable correspondante est donc vide.
+      const rendu = '';
       const email = emailField && emailField.value ? emailField.value.trim() : '';
 
       const bodyLines = [];
@@ -281,7 +306,7 @@ async function initSite() {
       if (!personaliseCheckbox || !personaliseCheckbox.checked) {
         bodyLines.push(`Support : ${selectedMaterialLabel || 'Non précisé'}`);
       }
-      if (rendu) bodyLines.push(`Rendu : ${rendu}`);
+      // Le champ de rendu ayant été supprimé, on ne l'ajoute plus au corps du message.
       bodyLines.push(`Quantité : ${quantite}`);
       bodyLines.push('');
       bodyLines.push('Télécharger les images');

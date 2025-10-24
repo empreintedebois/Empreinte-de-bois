@@ -29,7 +29,9 @@ header {
   background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  /* Centrer le logo et le titre au milieu du bandeau */
+  justify-content: center;
+  gap: 0.75rem;
   padding: 0 1.5rem;
   z-index: 1000;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
@@ -53,7 +55,9 @@ header h1 {
   width: 100%;
   height: 60vh;
   overflow: hidden;
-  background: radial-gradient(circle at center, #222, #000);
+  /* Suppression du fond en dégradé pour éviter le vignettage sombre
+     et laisser simplement transparaître le fond de page. */
+  background: transparent;
 }
 
 /* --- Slider compatible GIF animé (ne coupe jamais l'animation) --- */
@@ -81,7 +85,8 @@ header h1 {
   display: block;
   margin: 0 auto;
   border-radius: 0.75rem;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+  /* Adoucir l'ombre portée pour ne pas donner un effet de vignettage */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
   image-rendering: auto;
   backface-visibility: hidden;
 }
@@ -143,6 +148,14 @@ header h1 {
   cursor: pointer;
 }
 
+/* Style pour les cases à cocher dans les bandeaux matériels.
+   On ajoute un léger espacement à droite et on utilise la couleur
+   d'accentuation du thème pour la case cochée. */
+.material-checkbox {
+  margin-right: 0.5rem;
+  accent-color: var(--accent-color);
+}
+
 .material-name {
   font-weight: 600;
   font-size: 1.1rem;
@@ -172,7 +185,7 @@ header h1 {
   width: 45%;
   max-width: 300px;
   border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   object-fit: cover;
 }
 
@@ -198,6 +211,66 @@ header h1 {
   font-size: 0.9rem;
   color: #bbb;
   margin-bottom: 0.2rem;
+}
+
+/* ---- Styles pour les curseurs et leurs libellés dans le formulaire ---- */
+/* Aligner les étiquettes sous les curseurs (type de fichier et texture) */
+.range-labels,
+.texture-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-top: 0.4rem;
+  color: #b3a89b;
+}
+
+/* Permet aux libellés des curseurs de se répartir sur toute la largeur du formulaire.
+   Chaque libellé occupe un tiers de la ligne et est centré. */
+.range-labels span {
+  flex: 1;
+  text-align: center;
+}
+
+/* Assure un alignement centré pour chaque libellé de texture.
+   Chaque span prend un tiers de la largeur, ce qui évite que le
+   texte « Dégradé » ne se colle au slider. */
+.texture-labels span {
+  flex: 1;
+  text-align: center;
+}
+
+/* Disposer les petits carrés de texture sur une ligne avec espacement */
+.texture-samples {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+/* Aligne les carrés de texture avec les libellés : chaque carré occupe la même largeur. */
+.texture-samples .texture-sample {
+  flex: 1;
+  display: block;
+  margin: 0;
+}
+
+.texture-sample {
+  width: 32px;
+  height: 20px;
+  border: 1px solid var(--ring-color);
+  border-radius: 0.25rem;
+}
+.texture-sample.aplat {
+  background: #000;
+}
+.texture-sample.degrade {
+  background: linear-gradient(to right, #000, #fff);
+}
+.texture-sample.pointille {
+  background-image: radial-gradient(#000 25%, transparent 25%), radial-gradient(#000 25%, transparent 25%);
+  background-position: 0 0, 4px 4px;
+  background-size: 8px 8px;
+  background-color: #fff;
 }
 
 /* ---- FORMULAIRE ---- */
@@ -264,4 +337,31 @@ form button[type="submit"]:hover {
   header h1 {
     font-size: 1rem;
   }
+}
+
+/* Ajoute un espacement en haut du contenu pour ne pas cacher le texte sous le bandeau fixe */
+main {
+  /* Laisse de l'espace sous le bandeau fixe pour éviter le chevauchement */
+  padding-top: 100px;
+}
+
+/* Centre les titres h2 des différentes sections */
+.realisations-slider h2,
+.materials-section h2,
+.contact-section h2 {
+  text-align: center;
+}
+
+/* Mise en forme du bloc d'introduction sous le bandeau */
+.intro {
+  max-width: 800px;
+  margin: 0 auto 2rem auto;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.intro-text {
+  font-size: 1rem;
+  color: #d0c5b5;
+  line-height: 1.5;
 }

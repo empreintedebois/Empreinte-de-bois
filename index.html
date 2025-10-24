@@ -30,13 +30,16 @@
       </div>
     </header>
     <main>
-      <!-- Texte d'introduction centré et plus discret -->
+      <!-- Texte d'introduction placé sous le bandeau pour présenter l'atelier.
+           Ce paragraphe est centré et précède le carrousel afin de respecter le
+           souhait de mettre le corps de texte en premier. -->
       <section class="intro">
         <p class="intro-text">
-          Des créations uniques gravées avec passion et précision. Faites-nous part de vos
-          envies et nous donnerons vie à vos projets.
+          Des créations uniques gravées avec passion et précision. Faites‑nous part de vos envies
+          et nous donnerons vie à vos projets.
         </p>
       </section>
+
       <!-- Slider horizontal présentant les réalisations précédentes -->
       <section class="realisations-slider">
         <h2>Nos&nbsp;réalisations</h2>
@@ -92,12 +95,12 @@
           </div>
           <!-- Champ caché pour stocker le support sélectionné via la liste déroulante -->
           <input type="hidden" id="selected-material" name="selectedMaterial" />
-          <div class="form-group">
-            <p>Choisissez le rendu :</p>
-            <label><input type="radio" name="rendu" value="Mat" checked />Mat</label>
-            <label><input type="radio" name="rendu" value="Brillant" />Brillant</label>
-            <label><input type="radio" name="rendu" value="Satiné" />Satiné</label>
-          </div>
+          <!--
+            Le choix de rendu (Mat, Brillant, Satiné) a été retiré pour simplifier
+            le formulaire comme demandé. Si vous souhaitez rétablir cette
+            fonctionnalité, ajoutez ici des boutons radio et gérez-les dans le
+            script.js.
+          -->
           <div class="form-group">
             <label for="quantite">Quantité</label>
             <input type="number" id="quantite" name="quantite" min="1" value="1" />
