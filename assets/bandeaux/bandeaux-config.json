@@ -1,0 +1,12 @@
+[
+  { "code": "M01", "name": "M01", "enabled": true, "image": "image.png" },
+  { "code": "M02", "name": "M02", "enabled": true, "image": "image.png" },
+  { "code": "M03", "name": "M03", "enabled": true, "image": "image.png" },
+  { "code": "M04", "name": "M04", "enabled": true, "image": "image.gif" },
+  { "code": "M05", "name": "M05", "enabled": true, "image": "image.png" },
+  { "code": "M06", "name": "M06", "enabled": false, "image": "image.png" },
+  { "code": "M07", "name": "M07", "enabled": false, "image": "image.png" },
+  { "code": "M08", "name": "M08", "enabled": false, "image": "image.png" },
+  { "code": "M09", "name": "M09", "enabled": false, "image": "image.png" },
+  { "code": "M10", "name": "M10", "enabled": false, "image": "image.png" }
+]
