@@ -13,10 +13,36 @@ html, body {
   width: 100%;
   height: 100%;
   font-family: 'Poppins', sans-serif;
-  background: #0d0d0d;
+  /* Fond légèrement translucide pour laisser apparaître le motif du fond hero */
+  /* Laisse transparaître davantage l'image de fond */
+  background: rgba(13, 13, 13, 0.6);
   color: #e5e5e5;
   scroll-behavior: smooth;
   overflow-x: hidden;
+}
+
+/* ---------------------------------------------------------
+   Arrière‑plan héroïque
+
+   La classe .background applique l'image hero-bg.png en fond fixe
+   sur toute la page. Le filtre brightness est volontairement
+   augmenté pour que le motif reste visible. Le z-index négatif
+   place l'élément sous le reste du contenu. Si cette classe
+   n'est pas définie, l'image ne s'affiche pas et la page reste
+   noire, ce qui est le cas actuellement.  
+--------------------------------------------------------- */
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-image: url('assets/hero-bg.png');
+  background-size: cover;
+  background-position: center;
+  /* Éclaircir l'image pour qu'elle soit visible derrière le contenu */
+  filter: brightness(0.6);
 }
 
 /* ---- HEADER ---- */
@@ -29,9 +55,8 @@ header {
   background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
-  /* Centrer le logo et le titre au milieu du bandeau */
+  /* Centrer globalement le conteneur interne */
   justify-content: center;
-  gap: 0.75rem;
   padding: 0 1.5rem;
   z-index: 1000;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
@@ -46,6 +71,23 @@ header h1 {
   font-size: 1.2rem;
   font-weight: 600;
   letter-spacing: 1px;
+  /* Empêcher le retour à la ligne pour garder le titre sur une seule ligne */
+  white-space: nowrap;
+}
+
+/*
+  Aligner le logo et le titre sur une seule ligne à l'intérieur du bandeau. La
+  classe .top-bar correspond au header dans l'HTML et .top-content est
+  l'élément qui contient l'image du logo et le titre. Sans cette règle,
+  l'élément .top-content est traité comme un bloc simple et le titre peut
+  passer à la ligne sur les petits écrans. Ici on impose un conteneur flex
+  qui ne se replie pas et qui conserve un espacement régulier.
+*/
+.top-bar .top-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
 }
 
 /* ---- SLIDER CONTAINER ---- */
@@ -58,6 +100,26 @@ header h1 {
   /* Suppression du fond en dégradé pour éviter le vignettage sombre
      et laisser simplement transparaître le fond de page. */
   background: transparent;
+}
+
+/*
+  Pour que les images du slider ne collent pas aux bords de l'écran, on
+  encapsule le conteneur dans .slider-inner. Celle‑ci limite la largeur
+  maximale et ajoute un padding horizontal. La wrapper conserve une
+  largeur pleine page afin que les flèches de navigation restent
+  positionnées aux extrémités. Ces classes sont présentes dans
+  l'HTML mais n'avaient pas de style défini, ce qui laissait les
+  images s'étirer sur toute la largeur.
+*/
+.slider-wrapper {
+  position: relative;
+  width: 100%;
+}
+.slider-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  position: relative;
 }
 
 /* --- Slider compatible GIF animé (ne coupe jamais l'animation) --- */
