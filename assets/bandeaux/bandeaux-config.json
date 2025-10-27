@@ -1,5 +1,5 @@
 [
-  { "code": "M01", "name": "01_Bois Rond Sapin", "enabled": true, "image": "image.png" },
+  { "code": "M01", "name": "01_Bois Rond Sapin", "enabled": true, "image": "image.gif" },
   { "code": "M02", "name": "02_Bois Rond Cp ", "enabled": true, "image": "image.png" },
   { "code": "M03", "name": "03_Simili Rond Blanc", "enabled": true, "image": "image.png" },
   { "code": "M04", "name": "04_Simili Rond Rouge", "enabled": true, "image": "image.png" },
