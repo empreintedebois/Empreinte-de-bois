@@ -50,7 +50,12 @@
     if(uh>1.0) A.push(`Temps unitaire > 1h (${r2(uh)} h). Vérification recommandée.`);
     if(unit>1000) A.push(`Prix unitaire élevé (${r2(unit)} €). Devis manuel conseillé.`);
     if(unit<0.5 && unit*q<(C.quantite.min_facturation||8)) A.push("Prix unitaire très faible — minimum forfaitaire s'appliquera.");
-    document.getElementById('prix_unitaire').textContent = `${r2(unit)} €`; document.getElementById('prix_total').textContent = `${r2(tot)} €`; document.getElementById('t_unitaire').textContent = `${r3(uh)}`; document.getElementById('t_total').textContent = `${r2(th)}`;
+
+    document.getElementById('prix_unitaire').textContent = `${r2(unit)} €`;
+    document.getElementById('prix_total').textContent = `${r2(tot)} €`;
+    document.getElementById('t_unitaire').textContent = `${r3(uh)}`;
+    document.getElementById('t_total').textContent = `${r2(th)}`;
+
     const box=document.getElementById('alerts'); box.innerHTML=""; A.forEach(a=>{ const d=document.createElement('div'); d.className="alert"; d.textContent=a; box.appendChild(d); });
   }
   function bind(){

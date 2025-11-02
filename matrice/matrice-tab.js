@@ -18,7 +18,7 @@
     const backdrop = panel.querySelector('.x-backdrop');
     function open(){ panel.hidden = false; document.body.style.overflow = 'hidden'; }
     function close(){ panel.hidden = true; document.body.style.overflow = ''; }
-    tab.addEventListener('click', open);
+    tab.addEventListener('click', ()=>{ if(panel.hidden) open(); else close(); });
     closeBtn.addEventListener('click', close);
     backdrop.addEventListener('click', e => { if (e.target.dataset.close) close(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !panel.hidden) close(); });
