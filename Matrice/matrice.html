@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Matrice — Devis Gravure & Découpe Laser</title>
+  <title>Matrice — Devis Gravure & Découpe</title>
   <link rel="stylesheet" href="matrice.css"/>
+  <script src="config.js"></script>
 </head>
 <body>
   <header class="wrap">
     <div class="header card">
-      <h1>Matrice — Devis Gravure / Découpe Laser</h1>
-      <p class="sub">Page dédiée. Fond noir. Blocs centrés. Recalcul en temps réel.</p>
+      <h1 id="title">Matrice — Devis Gravure / Découpe</h1>
+      <p class="sub">Blocs centrés. Calcul en temps réel. Configurable via <code>config.js</code>.</p>
     </div>
   </header>
 
@@ -22,31 +23,15 @@
         <h3>1) Matière</h3>
         <div class="row">
           <label for="materiau_type">Type</label>
-          <select id="materiau_type">
-            <option value="bois">Bois</option>
-            <option value="acrylique">Acrylique</option>
-            <option value="acier">Acier</option>
-            <option value="alu">Aluminium</option>
-            <option value="inox">Inox</option>
-            <option value="verre">Verre</option>
-          </select>
+          <select id="materiau_type"></select>
         </div>
         <div class="row">
           <label for="materiau_texture">Texture</label>
-          <select id="materiau_texture">
-            <option value="standard">Standard</option>
-            <option value="rugueux">Rugueux</option>
-            <option value="miroir">Miroir</option>
-          </select>
+          <select id="materiau_texture"></select>
         </div>
         <div class="row">
           <label for="materiau_traitement">Traitement</label>
-          <select id="materiau_traitement">
-            <option value="aucun">Aucun</option>
-            <option value="peint">Peint</option>
-            <option value="anodise">Anodisé</option>
-            <option value="verni">Verni</option>
-          </select>
+          <select id="materiau_traitement"></select>
         </div>
         <div class="row row-inline">
           <label for="epaisseur_mm">Épaisseur (mm)</label>
@@ -66,10 +51,7 @@
         <div class="row">
           <label class="chk"><input type="checkbox" id="fixations"/> Fixations / gabarit requis</label>
           <label for="tolerance" class="inline">Tolérance</label>
-          <select id="tolerance">
-            <option value="standard">Standard</option>
-            <option value="haute">Haute</option>
-          </select>
+          <select id="tolerance"></select>
         </div>
       </div>
 
@@ -85,23 +67,11 @@
         <h3>4) Opération</h3>
         <div class="row">
           <label for="operation_type">Type d’opération</label>
-          <select id="operation_type">
-            <option value="decoupe">Découpe</option>
-            <option value="gravure">Gravure</option>
-            <option value="gravure_profonde">Gravure profonde</option>
-            <option value="marquage">Marquage</option>
-          </select>
+          <select id="operation_type"></select>
         </div>
         <div class="row">
           <label for="complexite_type">Complexité graphique</label>
-          <select id="complexite_type">
-            <option value="simple">Simple (texte / formes)</option>
-            <option value="moyenne">Moyenne (illustration détaillée)</option>
-            <option value="aplat">Aplat (zones pleines)</option>
-            <option value="image_NB">Image N&B</option>
-            <option value="photo_gris">Photo niveaux de gris</option>
-            <option value="elevee">Élevée (très complexe)</option>
-          </select>
+          <select id="complexite_type"></select>
         </div>
       </div>
 
@@ -114,7 +84,8 @@
       </div>
 
       <div class="actions">
-        <button id="resetBtn" type="button">Réinitialiser</button>
+        <button id="resetBtn" type="button" class="btn btn-brown">Réinitialiser</button>
+        <div id="presetBtns" class="stack"></div>
       </div>
     </section>
 
@@ -131,7 +102,7 @@
       <h3>Contact</h3>
       <form id="contactForm" class="contact">
         <div class="row">
-          <label for="name">Nom</label>
+          <label for="name">Nom</rect></label>
           <input id="name" type="text" placeholder="Votre nom"/>
         </div>
         <div class="row">
@@ -142,13 +113,14 @@
           <label for="message">Message</label>
           <textarea id="message" rows="4" placeholder="Précisez votre besoin…"></textarea>
         </div>
-        <button type="submit">Envoyer par email</button>
+        <button type="submit" class="btn btn-brown">Envoyer par email</button>
       </form>
+      <p class="copy" id="copyNotice"></p>
     </aside>
   </main>
 
   <footer class="wrap footer">
-    <small>Estimation indicative — modèle interne.</small>
+    <small id="footerNotice">Estimation indicative — modèle interne.</small>
   </footer>
 
   <script src="matrice.js"></script>
