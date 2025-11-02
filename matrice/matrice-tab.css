@@ -1,22 +1,42 @@
+:
 :root{
   --x-bg:#0a0b0d; --x-card:#111318; --x-border:rgba(255,255,255,.12); --x-ink:#fff;
   --x-brown:#8b5a3c; --x-brown-2:#a46e4d; --x-brown-3:#6d452e; --x-brown-ink:#ffeede;
-  --x-tab-side:right; --x-tab-offset: 50vh;
 }
-.x-tab{ position: fixed; z-index: 2000; top: calc(var(--x-tab-offset) - 34px); inset-inline-end: 0;
-  transform: translateY(-50%); writing-mode: vertical-rl; text-orientation: mixed;
-  background: var(--x-brown); color: var(--x-brown-ink); border: 1px solid rgba(139,90,60,.5); border-inline-start: none;
-  border-radius: 10px 0 0 10px; padding: 8px 6px; font: 600 12px/1 Inter,system-ui,Arial,sans-serif; letter-spacing: .3px; cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0,0,0,.28); opacity: .88;
+
+/* Bouton discret dans le header */
+.x-matrix-btn{
+  appearance:none; border:none; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  height:34px; padding:0 10px; border-radius:8px;
+  background:var(--x-brown); color:var(--x-brown-ink);
+  border:1px solid rgba(139,90,60,.5);
+  box-shadow:0 2px 10px rgba(139,90,60,.2);
+  font:600 13px/1 Inter,system-ui,Arial,sans-serif;
 }
-.x-tab:hover{ background: var(--x-brown-2); opacity:1 } .x-tab:active{ background: var(--x-brown-3) }
-.x-tab::before{ content: "⌗"; writing-mode: horizontal-tb; display:block; text-align:center; font-size:12px; margin-bottom:4px }
-.x-panel[hidden]{ display:none !important } .x-panel{ position: fixed; inset:0; z-index:2001; display:grid; place-items:center }
+.x-matrix-btn:hover{ background:var(--x-brown-2) }
+.x-matrix-btn:active{ background:var(--x-brown-3); transform:translateY(1px) }
+.x-matrix-btn svg{ width:16px; height:16px; display:block }
+
+/* Panel superposé */
+.x-panel[hidden]{ display:none !important }
+.x-panel{ position:fixed; inset:0; z-index:2001; display:grid; place-items:center }
 .x-backdrop{ position:absolute; inset:0; background: rgba(0,0,0,.55) }
-.x-dialog{ position:relative; width:min(1100px,92vw); max-height:86vh; background:linear-gradient(180deg,#0a0b0d 0%,#0b0d12 100%);
-  border:1px solid var(--x-border); border-radius:14px; overflow:hidden; box-shadow:0 24px 70px rgba(0,0,0,.6) }
+.x-dialog{
+  position:relative; width:min(1100px,92vw); max-height:88vh;
+  background:linear-gradient(180deg,#0a0b0d 0%,#0b0d12 100%);
+  border:1px solid var(--x-border); border-radius:14px; overflow:hidden;
+  box-shadow:0 24px 70px rgba(0,0,0,.6)
+}
 .x-head{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px; color:#f2f2f2; background:rgba(255,255,255,.04); border-bottom:1px solid rgba(255,255,255,.08) }
 .x-close{ width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.07); color:#fff; cursor:pointer }
 .x-close:hover{ background: rgba(255,255,255,.12) }
-.x-body{ padding:10px 10px 12px 10px } .x-frame{ display:block; width:100%; height:76vh; border:none; border-radius:10px; background:#0a0b0d }
-@media (max-width: 768px){ .x-tab{ top:auto; inset-inline-end:10px; bottom:10px; writing-mode:horizontal-tb; border-radius:10px; padding:10px 12px } .x-tab::before{ display:none } .x-frame{ height:78vh } }
+.x-body{ padding:10px 10px 12px 10px }
+.x-frame{ display:block; width:100%; height:78vh; border:none; border-radius:10px; background:#0a0b0d }
+
+/* Mobile */
+@media (max-width: 820px){
+  .x-dialog{ width:96vw; max-height:92vh }
+  .x-frame{ height:82vh }
+  .x-matrix-btn{ height:32px; padding:0 8px; font-size:12px }
+}
