@@ -1,429 +1,114 @@
-/* =========================================================
-   Styles du site Empreinte de Bois
-   ========================================================= */
-
-/* ---- RESET ---- */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ========== Base ========= */
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+:root{
+  --bg:#0a0b0d;
+  --fg:#e9ecf2;
+  --muted:#aab2c6;
+  --card:#111318;
+  --card2:#151922;
+  --stroke:#202535;
+  /* Brown system */
+  --brown:#8b5a3c;        /* primaire */
+  --brown-2:#a46e4d;      /* hover */
+  --brown-3:#6d452e;      /* active/dark */
+  --ink:#ffeede;          /* texte sur brun */
+  --warn:#ffc35a; --warn-ink:#2d1e00;
 }
 
-html, body {
-  width: 100%;
-  height: 100%;
-  font-family: 'Poppins', sans-serif;
-  /* Fond légèrement translucide pour laisser apparaître le motif du fond hero */
-  /* Laisse transparaître davantage l'image de fond */
-  background: rgba(13, 13, 13, 0.6);
-  color: #e5e5e5;
-  scroll-behavior: smooth;
-  overflow-x: hidden;
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45}
+
+/* ========== Header (fixe) ========== */
+.top-bar{
+  position: sticky; top: 0; z-index: 1000;
+  background: linear-gradient(180deg, #0a0b0df2 0%, #0a0b0de6 100%);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  min-height: 64px;
 }
-
-/* ---------------------------------------------------------
-   Arrière‑plan héroïque
-
-   La classe .background applique l'image hero-bg.png en fond fixe
-   sur toute la page. Le filtre brightness est volontairement
-   augmenté pour que le motif reste visible. Le z-index négatif
-   place l'élément sous le reste du contenu. Si cette classe
-   n'est pas définie, l'image ne s'affiche pas et la page reste
-   noire, ce qui est le cas actuellement.  
---------------------------------------------------------- */
-.background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  background-image: url('assets/hero-bg.png');
-  background-size: cover;
-  background-position: center;
-  /* Éclaircir l'image pour qu'elle soit visible derrière le contenu */
-  filter: brightness(0.6);
+.top-content{
+  display:flex; align-items:center; justify-content:center;
+  gap:12px; padding:12px 16px; position:relative;
 }
+.site-title{margin:0;font-size:1.125rem;letter-spacing:.4px;color:var(--fg);}
 
-/* ---- HEADER ---- */
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  /* Centrer globalement le conteneur interne */
-  justify-content: center;
-  padding: 0 1.5rem;
-  z-index: 1000;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+/* Bouton "Matrice" à gauche */
+.matrice-open{
+  position: absolute; left: 12px; top: 10px; height: 42px;
+  display:inline-flex; align-items:center; gap:8px; padding:0 12px;
 }
+.matrice-open .ico{ display:block }
+.matrice-open .label{ font-weight:600; letter-spacing:.2px }
 
-header img.logo {
-  height: 45px;
-  width: auto;
+/* ========== Layout ========= */
+.container{max-width:1100px;margin:0 auto;padding:20px}
+.card{background:var(--card2);border:1px solid var(--stroke);border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.35);padding:16px}
+.stack{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+
+/* ========== Buttons (brown) ========= */
+.btn{
+  appearance:none; border:none; cursor:pointer; text-decoration:none;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 14px; border-radius:10px; font-weight:600; letter-spacing:.2px;
+  transition:.18s transform, .18s background-color, .18s box-shadow, .18s border-color, .18s color;
 }
-
-header h1 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  /* Empêcher le retour à la ligne pour garder le titre sur une seule ligne */
-  white-space: nowrap;
+.btn-brown{
+  background:var(--brown); color:var(--ink);
+  border:1px solid rgba(139,90,60,.5);
+  box-shadow: 0 2px 10px rgba(139,90,60,.25);
 }
-
-/*
-  Aligner le logo et le titre sur une seule ligne à l'intérieur du bandeau. La
-  classe .top-bar correspond au header dans l'HTML et .top-content est
-  l'élément qui contient l'image du logo et le titre. Sans cette règle,
-  l'élément .top-content est traité comme un bloc simple et le titre peut
-  passer à la ligne sur les petits écrans. Ici on impose un conteneur flex
-  qui ne se replie pas et qui conserve un espacement régulier.
-*/
-.top-bar .top-content {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: nowrap;
+.btn-brown:hover{ background:var(--brown-2) }
+.btn-brown:active{ background:var(--brown-3); transform: translateY(1px) }
+.btn-ghost{
+  background:rgba(255,255,255,0.06); color:#fff;
+  border:1px solid rgba(255,255,255,0.18);
 }
+.btn-ghost:hover{ background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.35) }
 
-/* ---- SLIDER CONTAINER ---- */
-.slider-container {
+/* ========== Modal ========= */
+.modal[hidden]{ display:none !important; }
+.modal{
+  position: fixed; inset: 0; z-index: 2000;
+  display: grid; place-items: center;
+}
+.modal-backdrop{
+  position: absolute; inset:0;
+  background: rgba(0,0,0,0.65);
+}
+.modal-dialog{
   position: relative;
-  margin-top: 60px;
-  width: 100%;
-  height: 60vh;
+  width: min(1100px, 92vw);
+  background: linear-gradient(180deg, #0a0b0d 0%, #0b0d12 100%); /* même fond que le site */
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55);
   overflow: hidden;
-  /* Suppression du fond en dégradé pour éviter le vignettage sombre
-     et laisser simplement transparaître le fond de page. */
-  background: transparent;
+}
+.modal-header{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.modal-header h3{
+  margin: 0; font-size: 1rem; color: #f2f2f2; letter-spacing: .3px;
+}
+.modal-close{ width:32px;height:32px;border-radius:8px }
+
+.modal-body{ padding: 10px 10px 12px 10px; }
+.matrice-frame{
+  display: block; width: 100%;
+  height: 72vh; border: none; border-radius: 10px;
+  background: #0a0b0d;
 }
 
-/*
-  Pour que les images du slider ne collent pas aux bords de l'écran, on
-  encapsule le conteneur dans .slider-inner. Celle‑ci limite la largeur
-  maximale et ajoute un padding horizontal. La wrapper conserve une
-  largeur pleine page afin que les flèches de navigation restent
-  positionnées aux extrémités. Ces classes sont présentes dans
-  l'HTML mais n'avaient pas de style défini, ce qui laissait les
-  images s'étirer sur toute la largeur.
-*/
-.slider-wrapper {
-  position: relative;
-  width: 100%;
-}
-.slider-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  position: relative;
-}
+/* Empêcher le scroll du body quand la modale est ouverte */
+body.modal-open{ overflow: hidden; }
 
-/* --- Slider compatible GIF animé (ne coupe jamais l'animation) --- */
-.slide {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 1s ease-in-out;
-  will-change: opacity;
-  backface-visibility: hidden;
-}
-
-.slide.active {
-  opacity: 1;
-  pointer-events: auto;
-  z-index: 2;
-}
-
-/* Empêche l'arrêt des GIF : ils restent en mémoire et continuent de bouger */
-.slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-  border-radius: 0.75rem;
-  /* Adoucir l'ombre portée pour ne pas donner un effet de vignettage */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-  image-rendering: auto;
-  backface-visibility: hidden;
-}
-
-/* ---- NAVIGATION DU SLIDER ---- */
-.slider-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: white;
-  cursor: pointer;
-  font-size: 1.5rem;
-  line-height: 40px;
-  text-align: center;
-  transition: all 0.25s ease;
-  z-index: 3;
-}
-
-.slider-nav:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-50%) scale(1.1);
-}
-
-.slider-nav.prev { left: 15px; }
-.slider-nav.next { right: 15px; }
-
-/* ---- ACCORDÉONS (Matières) ---- */
-.accordion-list {
-  width: 90%;
-  max-width: 1100px;
-  margin: 2rem auto 4rem auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.accordion-item {
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 0.5rem;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.03);
-  transition: background 0.3s ease;
-}
-
-.accordion-item.active {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.accordion-header {
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-}
-
-/* Style pour les cases à cocher dans les bandeaux matériels.
-   On ajoute un léger espacement à droite et on utilise la couleur
-   d'accentuation du thème pour la case cochée. */
-.material-checkbox {
-  margin-right: 0.5rem;
-  accent-color: var(--accent-color);
-}
-
-.material-name {
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-
-.accordion-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.accordion-item.active .accordion-content {
-  max-height: 800px;
-  transition: max-height 0.6s ease;
-}
-
-.product-detail {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  padding: 1rem;
-  gap: 1.2rem;
-}
-
-.product-detail img {
-  width: 45%;
-  max-width: 300px;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  object-fit: cover;
-}
-
-.product-text {
-  flex: 1;
-}
-
-.product-title {
-  color: #ffd700;
-  font-size: 1.2rem;
-  font-weight: 600;
-  text-decoration: underline;
-  margin-bottom: 0.5rem;
-}
-
-.product-dimensions {
-  color: #ccc;
-  font-size: 0.9rem;
-  margin-bottom: 0.3rem;
-}
-
-.product-extra {
-  font-size: 0.9rem;
-  color: #bbb;
-  margin-bottom: 0.2rem;
-}
-
-/* ---- Styles pour les curseurs et leurs libellés dans le formulaire ---- */
-/* Aligner les étiquettes sous les curseurs (type de fichier et texture) */
-.range-labels,
-.texture-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  margin-top: 0.4rem;
-  color: #b3a89b;
-}
-
-/* Permet aux libellés des curseurs de se répartir sur toute la largeur du formulaire.
-   Chaque libellé occupe un tiers de la ligne et est centré. */
-.range-labels span {
-  flex: 1;
-  text-align: center;
-}
-
-/* Assure un alignement centré pour chaque libellé de texture.
-   Chaque span prend un tiers de la largeur, ce qui évite que le
-   texte « Dégradé » ne se colle au slider. */
-.texture-labels span {
-  flex: 1;
-  text-align: center;
-}
-
-/* Disposer les petits carrés de texture sur une ligne avec espacement */
-.texture-samples {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.4rem;
-  margin-top: 0.3rem;
-}
-
-/* Aligne les carrés de texture avec les libellés : chaque carré occupe la même largeur. */
-.texture-samples .texture-sample {
-  flex: 1;
-  display: block;
-  margin: 0;
-}
-
-.texture-sample {
-  width: 32px;
-  height: 20px;
-  border: 1px solid var(--ring-color);
-  border-radius: 0.25rem;
-}
-.texture-sample.aplat {
-  background: #000;
-}
-.texture-sample.degrade {
-  background: linear-gradient(to right, #000, #fff);
-}
-.texture-sample.pointille {
-  background-image: radial-gradient(#000 25%, transparent 25%), radial-gradient(#000 25%, transparent 25%);
-  background-position: 0 0, 4px 4px;
-  background-size: 8px 8px;
-  background-color: #fff;
-}
-
-/* ---- FORMULAIRE ---- */
-form {
-  width: 90%;
-  max-width: 700px;
-  margin: 2rem auto;
-  background: rgba(0, 0, 0, 0.35);
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-}
-
-form label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-form input[type="text"],
-form input[type="email"],
-form input[type="number"] {
-  width: 100%;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  font-size: 1rem;
-}
-
-form button[type="submit"] {
-  display: inline-block;
-  background: #ffd700;
-  color: #000;
-  font-weight: 600;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-form button[type="submit"]:hover {
-  background: #fff176;
-}
-
-/* ---- RESPONSIVE ---- */
-@media (max-width: 768px) {
-  .slider-container {
-    height: 45vh;
-  }
-
-  .product-detail {
-    flex-direction: column;
-  }
-
-  .product-detail img {
-    width: 100%;
-    max-width: none;
-  }
-
-  header h1 {
-    font-size: 1rem;
-  }
-}
-
-/* Ajoute un espacement en haut du contenu pour ne pas cacher le texte sous le bandeau fixe */
-main {
-  /* Laisse de l'espace sous le bandeau fixe pour éviter le chevauchement */
-  padding-top: 100px;
-}
-
-/* Centre les titres h2 des différentes sections */
-.realisations-slider h2,
-.materials-section h2,
-.contact-section h2 {
-  text-align: center;
-}
-
-/* Mise en forme du bloc d'introduction sous le bandeau */
-.intro {
-  max-width: 800px;
-  margin: 0 auto 2rem auto;
-  padding: 0 1rem;
-  text-align: center;
-}
-
-.intro-text {
-  font-size: 1rem;
-  color: #d0c5b5;
-  line-height: 1.5;
+/* Mobile */
+@media (max-width: 768px){
+  .matrice-open{ left: 8px; top: 10px; height: 40px; padding: 0 10px }
+  .matrice-open .label{ display:none }
+  .modal-dialog{ width: 96vw }
+  .matrice-frame{ height: 78vh }
 }
