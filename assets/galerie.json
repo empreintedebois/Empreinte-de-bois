@@ -1,0 +1,18 @@
+[
+  {
+    "src": "assets/galerie/photo_01.jpg",
+    "alt": "Exemple 1"
+  },
+  {
+    "src": "assets/galerie/photo_02.jpg",
+    "alt": "Exemple 2"
+  },
+  {
+    "src": "assets/galerie/photo_03.jpg",
+    "alt": "Exemple 3"
+  },
+  {
+    "src": "assets/galerie/photo_04.jpg",
+    "alt": "Exemple 4"
+  }
+]
