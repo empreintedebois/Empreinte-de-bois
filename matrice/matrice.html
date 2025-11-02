@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Matrice — Devis Gravure & Découpe</title>
+  <link rel="stylesheet" href="matrice.css"/>
+  <script src="config.js"></script>
+</head>
+<body>
+  <header class="wrap">
+    <div class="header card">
+      <h1 id="title">Matrice — Devis Gravure / Découpe</h1>
+      <p class="sub">Calcul en temps réel. Configurable via <code>config.js</code>.</p>
+    </div>
+  </header>
+
+  <main class="wrap grid">
+    <section class="card form">
+      <h2>Paramètres</h2>
+      <div class="fieldset">
+        <h3>1) Matière</h3>
+        <div class="row"><label for="materiau_type">Type</label><select id="materiau_type"></select></div>
+        <div class="row"><label for="materiau_texture">Texture</label><select id="materiau_texture"></select></div>
+        <div class="row"><label for="materiau_traitement">Traitement</label><select id="materiau_traitement"></select></div>
+        <div class="row row-inline"><label for="epaisseur_mm">Épaisseur (mm)</label><input type="number" id="epaisseur_mm" value="3" min="0" step="0.1"/><label class="chk"><input type="checkbox" id="masquage"/> Masquage de protection</label></div>
+      </div>
+      <div class="fieldset">
+        <h3>2) Format</h3>
+        <div class="row row-inline"><label for="largeur_mm">Largeur (mm)</label><input type="number" id="largeur_mm" value="200" min="1" step="1"/><label for="hauteur_mm">Hauteur (mm)</label><input type="number" id="hauteur_mm" value="100" min="1" step="1"/></div>
+        <div class="row"><label class="chk"><input type="checkbox" id="fixations"/> Fixations / gabarit requis</label><label for="tolerance" class="inline">Tolérance</label><select id="tolerance"></select></div>
+      </div>
+      <div class="fieldset">
+        <h3>3) Quantité</h3>
+        <div class="row"><label for="quantite">Nombre d’unités</label><input type="number" id="quantite" value="5" min="1" step="1"/></div>
+      </div>
+      <div class="fieldset">
+        <h3>4) Opération</h3>
+        <div class="row"><label for="operation_type">Type d’opération</label><select id="operation_type"></select></div>
+        <div class="row"><label for="complexite_type">Complexité graphique</label><select id="complexite_type"></select></div>
+      </div>
+      <div class="fieldset">
+        <h3>5) Implication opérateur</h3>
+        <div class="row row-wrap"><label class="chk"><input type="checkbox" id="prototype"/> Prototype / itérations</label><label class="chk"><input type="checkbox" id="fichier_non_optimal"/> Fichier non optimisé</label></div>
+      </div>
+      <div class="actions"><button id="resetBtn" type="button" class="x-btn x-btn-brown">Réinitialiser</button><div id="presetBtns" class="stack"></div></div>
+    </section>
+    <aside class="card quote">
+      <h2>Devis estimé</h2>
+      <div class="summary-grid">
+        <div>Prix unitaire</div><div id="prix_unitaire">—</div>
+        <div>Prix total</div><div id="prix_total">—</div>
+        <div>Temps unitaire (h)</div><div id="t_unitaire">—</div>
+        <div>Temps total (h)</div><div id="t_total">—</div>
+      </div>
+      <div id="alerts" class="alerts"></div>
+      <h3>Contact</h3>
+      <form id="contactForm" class="contact">
+        <div class="row"><label for="name">Nom</label><input id="name" type="text" placeholder="Votre nom"/></div>
+        <div class="row"><label for="email">Email</label><input id="email" type="email" placeholder="votre@email.fr"/></div>
+        <div class="row"><label for="message">Message</label><textarea id="message" rows="4" placeholder="Précisez votre besoin…"></textarea></div>
+        <button type="submit" class="x-btn x-btn-brown">Envoyer par email</button>
+      </form>
+      <p class="copy" id="copyNotice"></p>
+    </aside>
+  </main>
+  <footer class="wrap footer"><small id="footerNotice">Estimation indicative — modèle interne.</small></footer>
+  <script src="matrice.js"></script>
+</body>
+</html>
