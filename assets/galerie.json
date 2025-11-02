@@ -1,18 +1,18 @@
 [
   {
-    "src": "assets/galerie/galerie01.jpg.png",
+    "src": "assets/galerie/galerie01.png",
     "alt": "Exemple 1"
   },
   {
-    "src": "assets/galerie/photo_02.jpg",
+    "src": "assets/galerie/galerie02.png",
     "alt": "Exemple 2"
   },
   {
-    "src": "assets/galerie/photo_03.jpg",
+    "src": "assets/galerie/galerie03.png",
     "alt": "Exemple 3"
   },
   {
-    "src": "assets/galerie/photo_04.jpg",
+    "src": "assets/galerie/galerie04.png",
     "alt": "Exemple 4"
   }
 ]
