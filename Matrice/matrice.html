@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Matrice — Devis Gravure & Découpe Laser</title>
+  <link rel="stylesheet" href="matrice.css"/>
+</head>
+<body>
+  <header class="wrap">
+    <div class="header card">
+      <h1>Matrice — Devis Gravure / Découpe Laser</h1>
+      <p class="sub">Page dédiée. Fond noir. Blocs centrés. Recalcul en temps réel.</p>
+    </div>
+  </header>
+
+  <main class="wrap grid">
+    <section class="card form">
+      <h2>Paramètres</h2>
+
+      <div class="fieldset">
+        <h3>1) Matière</h3>
+        <div class="row">
+          <label for="materiau_type">Type</label>
+          <select id="materiau_type">
+            <option value="bois">Bois</option>
+            <option value="acrylique">Acrylique</option>
+            <option value="acier">Acier</option>
+            <option value="alu">Aluminium</option>
+            <option value="inox">Inox</option>
+            <option value="verre">Verre</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="materiau_texture">Texture</label>
+          <select id="materiau_texture">
+            <option value="standard">Standard</option>
+            <option value="rugueux">Rugueux</option>
+            <option value="miroir">Miroir</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="materiau_traitement">Traitement</label>
+          <select id="materiau_traitement">
+            <option value="aucun">Aucun</option>
+            <option value="peint">Peint</option>
+            <option value="anodise">Anodisé</option>
+            <option value="verni">Verni</option>
+          </select>
+        </div>
+        <div class="row row-inline">
+          <label for="epaisseur_mm">Épaisseur (mm)</label>
+          <input type="number" id="epaisseur_mm" value="3" min="0" step="0.1"/>
+          <label class="chk"><input type="checkbox" id="masquage"/> Masquage de protection</label>
+        </div>
+      </div>
+
+      <div class="fieldset">
+        <h3>2) Format</h3>
+        <div class="row row-inline">
+          <label for="largeur_mm">Largeur (mm)</label>
+          <input type="number" id="largeur_mm" value="200" min="1" step="1"/>
+          <label for="hauteur_mm">Hauteur (mm)</label>
+          <input type="number" id="hauteur_mm" value="100" min="1" step="1"/>
+        </div>
+        <div class="row">
+          <label class="chk"><input type="checkbox" id="fixations"/> Fixations / gabarit requis</label>
+          <label for="tolerance" class="inline">Tolérance</label>
+          <select id="tolerance">
+            <option value="standard">Standard</option>
+            <option value="haute">Haute</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fieldset">
+        <h3>3) Quantité</h3>
+        <div class="row">
+          <label for="quantite">Nombre d’unités</label>
+          <input type="number" id="quantite" value="5" min="1" step="1"/>
+        </div>
+      </div>
+
+      <div class="fieldset">
+        <h3>4) Opération</h3>
+        <div class="row">
+          <label for="operation_type">Type d’opération</label>
+          <select id="operation_type">
+            <option value="decoupe">Découpe</option>
+            <option value="gravure">Gravure</option>
+            <option value="gravure_profonde">Gravure profonde</option>
+            <option value="marquage">Marquage</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="complexite_type">Complexité graphique</label>
+          <select id="complexite_type">
+            <option value="simple">Simple (texte / formes)</option>
+            <option value="moyenne">Moyenne (illustration détaillée)</option>
+            <option value="aplat">Aplat (zones pleines)</option>
+            <option value="image_NB">Image N&B</option>
+            <option value="photo_gris">Photo niveaux de gris</option>
+            <option value="elevee">Élevée (très complexe)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fieldset">
+        <h3>5) Implication opérateur</h3>
+        <div class="row row-wrap">
+          <label class="chk"><input type="checkbox" id="prototype"/> Prototype / itérations</label>
+          <label class="chk"><input type="checkbox" id="fichier_non_optimal"/> Fichier non optimisé</label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="resetBtn" type="button">Réinitialiser</button>
+      </div>
+    </section>
+
+    <aside class="card quote">
+      <h2>Devis estimé</h2>
+      <div class="summary-grid">
+        <div>Prix unitaire</div><div id="prix_unitaire">—</div>
+        <div>Prix total</div><div id="prix_total">—</div>
+        <div>Temps unitaire (h)</div><div id="t_unitaire">—</div>
+        <div>Temps total (h)</div><div id="t_total">—</div>
+      </div>
+      <div id="alerts" class="alerts"></div>
+
+      <h3>Contact</h3>
+      <form id="contactForm" class="contact">
+        <div class="row">
+          <label for="name">Nom</label>
+          <input id="name" type="text" placeholder="Votre nom"/>
+        </div>
+        <div class="row">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="votre@email.fr"/>
+        </div>
+        <div class="row">
+          <label for="message">Message</label>
+          <textarea id="message" rows="4" placeholder="Précisez votre besoin…"></textarea>
+        </div>
+        <button type="submit">Envoyer par email</button>
+      </form>
+    </aside>
+  </main>
+
+  <footer class="wrap footer">
+    <small>Estimation indicative — modèle interne.</small>
+  </footer>
+
+  <script src="matrice.js"></script>
+</body>
+</html>
