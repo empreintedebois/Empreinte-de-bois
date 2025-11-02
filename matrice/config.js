@@ -1,4 +1,3 @@
-// Configuration centrale (modifiable)
 window.CONFIG = {
   ui: { title: "Matrice — Devis Gravure / Découpe", emailSubjectPrefix: "Demande devis — ", copyNotice: "Estimation indicative — modèle interne." },
   options: {
