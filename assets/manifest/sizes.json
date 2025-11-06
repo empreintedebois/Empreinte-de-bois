@@ -460,5 +460,131 @@
         "path": "assets/hero-bg_w1024.webp"
       }
     ]
+  },
+  "assets/skins/blocks/brush-light.png": {
+    "w": 1800,
+    "h": 1000,
+    "variants": [
+      {
+        "w": 640,
+        "h": 356,
+        "path": "assets/skins/blocks/brush-light_w640.webp"
+      },
+      {
+        "w": 1280,
+        "h": 711,
+        "path": "assets/skins/blocks/brush-light_w1280.webp"
+      },
+      {
+        "w": 1800,
+        "h": 1000,
+        "path": "assets/skins/blocks/brush-light_w1800.webp"
+      }
+    ]
+  },
+  "assets/skins/blocks/brush-dark.png": {
+    "w": 1800,
+    "h": 1000,
+    "variants": [
+      {
+        "w": 640,
+        "h": 356,
+        "path": "assets/skins/blocks/brush-dark_w640.webp"
+      },
+      {
+        "w": 1280,
+        "h": 711,
+        "path": "assets/skins/blocks/brush-dark_w1280.webp"
+      },
+      {
+        "w": 1800,
+        "h": 1000,
+        "path": "assets/skins/blocks/brush-dark_w1800.webp"
+      }
+    ]
+  },
+  "assets/galerie/galerie03.jpg": {
+    "w": 736,
+    "h": 736,
+    "variants": [
+      {
+        "w": 640,
+        "h": 640,
+        "path": "assets/galerie/galerie03_w640.webp"
+      },
+      {
+        "w": 736,
+        "h": 736,
+        "path": "assets/galerie/galerie03_w736.webp"
+      },
+      {
+        "w": 736,
+        "h": 736,
+        "path": "assets/galerie/galerie03_w736.webp"
+      }
+    ]
+  },
+  "assets/skins/blocks/halo.png": {
+    "w": 1800,
+    "h": 1000,
+    "variants": [
+      {
+        "w": 640,
+        "h": 356,
+        "path": "assets/skins/blocks/halo_w640.webp"
+      },
+      {
+        "w": 1280,
+        "h": 711,
+        "path": "assets/skins/blocks/halo_w1280.webp"
+      },
+      {
+        "w": 1800,
+        "h": 1000,
+        "path": "assets/skins/blocks/halo_w1800.webp"
+      }
+    ]
+  },
+  "assets/galerie/galerie01.gif": {
+    "w": 600,
+    "h": 400,
+    "variants": [
+      {
+        "w": 600,
+        "h": 400,
+        "path": "assets/galerie/galerie01_w600.webp"
+      },
+      {
+        "w": 600,
+        "h": 400,
+        "path": "assets/galerie/galerie01_w600.webp"
+      },
+      {
+        "w": 600,
+        "h": 400,
+        "path": "assets/galerie/galerie01_w600.webp"
+      }
+    ]
+  },
+  "assets/galerie/galerie03.png": {
+    "w": 900,
+    "h": 600,
+    "variants": [
+      {
+        "w": 640,
+        "h": 427,
+        "path": "assets/galerie/galerie03_w640.webp"
+      },
+      {
+        "w": 900,
+        "h": 600,
+        "path": "assets/galerie/galerie03_w900.webp"
+      },
+      {
+        "w": 900,
+        "h": 600,
+        "path": "assets/galerie/galerie03_w900.webp"
+      }
+    ]
   }
 }
