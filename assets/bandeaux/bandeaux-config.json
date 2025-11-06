@@ -1,12 +1,26 @@
 [
-  { "code": "M01", "name": "01_Bois Rond Sapin", "enabled": true, "image": "image.gif" },
-  { "code": "M02", "name": "02_Bois Rond Cp ", "enabled": true, "image": "image.png" },
-  { "code": "M03", "name": "03_Simili Rond Blanc", "enabled": true, "image": "image.png" },
-  { "code": "M04", "name": "04_Simili Rond Rouge", "enabled": true, "image": "image.png" },
-  { "code": "M05", "name": "05_Bois Carrée Sapin", "enabled": true, "image": "image.png" },
-  { "code": "M06", "name": "06_Bois Carrée Noyer", "enabled": true , "image": "image.png" },
-  { "code": "M07", "name": "07_Bois Carrée Creux", "enabled": true , "image": "image.png" },
-  { "code": "M08", "name": "08_Metal Carte de visite", "enabled": true, "image": "image.png" },
-  { "code": "M09", "name": "09_Support Divers", "enabled": true, "image": "image.png" },
-  { "code": "M10", "name": "10_Decoupe/Planche", "enabled": true, "image": "image.png" }
+  {
+    "code": "M01",
+    "name": "Contreplaqu\u00e9 bouleau",
+    "enabled": true,
+    "image": "image.png"
+  },
+  {
+    "code": "M02",
+    "name": "Acrylique noir",
+    "enabled": true,
+    "image": "image.png"
+  },
+  {
+    "code": "M03",
+    "name": "Inox bross\u00e9",
+    "enabled": true,
+    "image": "image.png"
+  },
+  {
+    "code": "M04",
+    "name": "Verre d\u00e9poli",
+    "enabled": true,
+    "image": "image.png"
+  }
 ]
