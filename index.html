@@ -9,19 +9,24 @@
 </head>
 <body>
   <div class="background" aria-hidden="true"></div>
+
+  <a class="ribbon-matrice" href="matrice/index.html" title="Matrice">MATRICE</a>
+
   <header class="top-bar">
     <div class="top-inner">
       <img class="logo" src="assets/logo.png" alt="Logo"/>
       <h1 class="site-title">Empreinte de Bois</h1>
     </div>
   </header>
+
   <main>
-    <section id="intro" class="section s-black angled-bottom block-wrap">
+    <section id="intro" class="section s-transparent block-wrap" data-skin="">
       <div class="block panel center">
         <p class="lede">Des créations uniques gravées avec passion et précision. Faites‑nous part de vos envies et nous leur donnerons vie.</p>
       </div>
     </section>
-    <section id="galerie" class="section s-transparent angled-both block-wrap">
+
+    <section id="galerie" class="section s-transparent block-wrap" data-skin="">
       <div class="block panel">
         <h2 class="section-title title-skin">Nos réalisations</h2>
         <div class="slider-frame">
@@ -33,14 +38,16 @@
         </div>
       </div>
     </section>
-    <section id="supports" class="section s-white angled-top block-wrap">
-      <div class="block panel">
+
+    <section id="supports" class="section s-transparent block-wrap" data-skin="">
+      <div class="block panel light">
         <h2 class="section-title title-skin">Supports disponibles</h2>
         <div class="accordion-list" id="accordion"></div>
       </div>
     </section>
-    <section id="preferences" class="section s-transparent angled-both block-wrap">
-      <div class="block panel">
+
+    <section id="preferences" class="section s-transparent block-wrap" data-skin="">
+      <div class="block panel light">
         <h2 class="section-title title-skin">Préférences de traitement</h2>
         <div class="form-card">
           <label for="traitement" class="label">Type de fichier</label>
@@ -50,12 +57,17 @@
           <label for="texture" class="label">Texture</label>
           <input id="texture" type="range" min="0" max="2" step="1" value="0"/>
           <div class="texture-labels"><span>Aplat</span><span>Dégradé</span><span>Pointillé</span></div>
-          <div class="texture-samples"><span class="sample aplat"></span><span class="sample degrade"></span><span class="sample pointille"></span></div>
+          <div class="texture-samples">
+            <span class="sample aplat"></span>
+            <span class="sample degrade"></span>
+            <span class="sample pointille"></span>
+          </div>
         </div>
       </div>
     </section>
-    <section id="contact" class="section s-white angled-bottom block-wrap">
-      <div class="block panel">
+
+    <section id="contact" class="section s-transparent block-wrap" data-skin="">
+      <div class="block panel light">
         <h2 class="section-title title-skin">Demande de gravure</h2>
         <form id="contact-form">
           <div class="grid-2">
@@ -85,6 +97,7 @@
       </div>
     </section>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>
