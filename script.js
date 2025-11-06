@@ -1,30 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
   initSkins().then(()=>initSite().catch(console.error));
 });
-async function initSite(){ await buildSlider(); await buildAccordion(); bindForm(); }
+
+async function initSite(){
+  await buildSlider();
+  await buildAccordion();
+  bindForm();
+}
+
 async function initSkins(){
   try{
-    const res=await fetch('assets/skins/blocks/blocks-config.json');
+    const res = await fetch('assets/skins/blocks/blocks-config.json');
     if(!res.ok) return;
-    const cfg=await res.json();
-    const ids=['intro','galerie','supports','preferences','contact'];
-    const skin=n=>`assets/skins/blocks/${n}.png`;
-    ids.forEach(id=>{
-      const el=document.getElementById(id); if(!el) return;
-      const key=(id in cfg)?cfg[id]:(id==='supports'?'brush-light':'brush-dark');
-      el.style.setProperty('--skin-url', `url('${skin(key)}')`);
-      el.style.setProperty('--title-skin-url', `url('${skin(cfg.titles||'brush-light')}')`);
+    const cfg = await res.json();
+    const secIds = ['intro','galerie','supports','preferences','contact'];
+    const skinTo = n => `assets/skins/blocks/${n}.png`;
+    secIds.forEach(id => {
+      const el = document.getElementById(id);
+      if(!el) return;
+      const key = id in cfg ? cfg[id] : (id==='supports'?'brush-light':'brush-dark');
+      el.style.setProperty('--skin-url', `url('${skinTo(key)}')`);
+      el.style.setProperty('--title-skin-url', `url('${skinTo(cfg.titles||'brush-light')}')`);
     });
   }catch(e){}
 }
+
 async function buildSlider(){
   const slider=document.getElementById('slider'); if(!slider) return;
-  const exts=['.gif','.webp','.jpg','.jpeg','.png']; const max=80; const urls=[];
-  try{ const r=await fetch('assets/galerie/galerie-config.json'); if(r.ok){ const a=await r.json(); a.forEach(f=>urls.push('assets/galerie/'+f)); } }catch(e){}
-  if(urls.length===0){ const p=await probe('assets/galerie/galerie', exts, max); urls.push(...p); }
-  if(urls.length===0){ urls.push('assets/galerie/galerie01.gif'); }
+  const exts=['.gif','.webp','.jpg','.jpeg','.png']; const max=80;
+  const urls=await probe('assets/galerie/galerie', exts, max);
+  if(urls.length===0){
+    try{ const r=await fetch('assets/galerie/galerie-config.json'); if(r.ok){ const arr=await r.json(); arr.forEach(f=>urls.push('assets/galerie/'+f)); } }catch(e){}
+  }
   await Promise.all(urls.map(preload));
-  urls.forEach((src,i)=>{ const s=document.createElement('div'); s.className='slide'+(i===0?' active':''); const im=document.createElement('img'); im.src=src; im.alt='Réalisation '+String(i+1).padStart(2,'0'); s.appendChild(im); slider.appendChild(s); });
+  urls.forEach((src,i)=>{
+    const s=document.createElement('div'); s.className='slide'+(i===0?' active':'');
+    const im=document.createElement('img'); im.src=src; im.alt='Réalisation '+String(i+1).padStart(2,'0');
+    s.appendChild(im); slider.appendChild(s);
+  });
   const slides=[...slider.querySelectorAll('.slide')]; let current=0; const show=i=>slides.forEach((el,idx)=>el.classList.toggle('active', idx===i));
   const prev=document.querySelector('.slider-nav.prev'), next=document.querySelector('.slider-nav.next');
   if(prev&&next){ prev.addEventListener('click',()=>{current=(current-1+slides.length)%slides.length;show(current);}); next.addEventListener('click',()=>{current=(current+1)%slides.length;show(current);}); }
@@ -35,6 +48,7 @@ function probe(prefix, exts, max){
 }
 function test(url){ return new Promise(res=>{ const i=new Image(); let done=false; const f=o=>{if(!done){done=true;res(o);}}; i.onload=()=>f(true); i.onerror=()=>f(false); i.src=url+(url.includes('?')?'&':'?')+'v='+Date.now(); }); }
 function preload(u){ return new Promise(r=>{ const i=new Image(); i.onload=i.onerror=()=>r(); i.src=u; }); }
+
 async function buildAccordion(){
   const root=document.getElementById('accordion'); if(!root) return;
   let cfg=[]; try{ const r=await fetch('assets/bandeaux/bandeaux-config.json'); if(r.ok) cfg=await r.json(); }catch(e){}
@@ -68,6 +82,7 @@ async function buildAccordion(){
     cb.addEventListener('change',()=>{ if(cb.checked){ items.forEach(x=>{ const o=x.querySelector('.material-checkbox'); if(o!==cb) o.checked=false; }); selected.value=it.dataset.label||it.dataset.code||''; }else{ if(selected.value===(it.dataset.label||it.dataset.code)) selected.value=''; } });
   });
 }
+
 function bindForm(){
   const form=document.getElementById('contact-form'); if(!form) return;
   form.addEventListener('submit',e=>{

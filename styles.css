@@ -4,8 +4,6 @@
   --brown-warm:#C49A6C;
   --white-warm:#F7F5EF;
   --ink:#0A0A0A;
-  --skin-url:url('assets/skins/blocks/brush-dark.png');
-  --title-skin-url:url('assets/skins/blocks/brush-light.png');
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -18,14 +16,14 @@ body{
 .background{
   position:fixed;inset:0;z-index:-2;
   background:url('assets/hero-bg.png') center/cover no-repeat fixed;
-  filter:brightness(.72) saturate(1.05);
+  filter:brightness(.65) saturate(1.05);
 }
 .ribbon-matrice{
   position:fixed;top:62px;right:-44px;z-index:1100;
   transform:rotate(45deg);
   background:var(--brown);color:#fff;text-decoration:none;
-  padding:10px 60px;font-weight:900;letter-spacing:.6px;border:2px solid #D8C3AD;
-  box-shadow:0 10px 24px rgba(0,0,0,.5);
+  padding:10px 60px;font-weight:900;letter-spacing:.6px;border:2px solid rgba(255,255,255,.2);
+  box-shadow:0 6px 16px rgba(0,0,0,.45);
 }
 .top-bar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,10,10,.75);backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.12)}
 .top-inner{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;justify-content:center}
@@ -41,18 +39,20 @@ main{padding-top:74px}
   overflow:visible;
 }
 .block.panel::before{
-  content:'';position:absolute;inset:-44px;z-index:-1;
-  background:var(--skin-url), radial-gradient(1200px 600px at 50% 50%, rgba(196,154,108,.15), rgba(10,10,10,0));
-  background-position:center; background-size:cover; background-repeat:no-repeat;
+  content:'';position:absolute;inset:-40px;z-index:-1;
+  background:var(--skin-url) center/cover no-repeat;
   opacity:1; transform:scale(1.02);
   filter:drop-shadow(0 14px 24px rgba(0,0,0,.55));
   pointer-events:none;
 }
 .title-skin{position:relative;display:inline-block;padding:6px 16px;border-radius:10px}
 .title-skin::before{content:'';position:absolute;inset:-16px;z-index:-1;background:var(--title-skin-url) center/contain no-repeat;opacity:.95;pointer-events:none}
+
 .block.panel.light .section-title,.block.panel.light .lede,.block.panel.light,.block.panel.light .field label{color:#1a1a1a}
-.lede{font-size:1.08rem;color:var(--white-warm);text-align:center}
+.lede{font-size:1.08rem;color:var(--white-warm)}
 .section-title{text-align:center;font-size:1.6rem;font-weight:900;letter-spacing:.4px;margin:4px 0 14px}
+
+/* Gallery */
 .slider-frame{position:relative;max-width:1100px;margin:0 auto}
 .slider-inner{padding:0 64px}
 @media (max-width:840px){.slider-inner{padding:0 20px}}
@@ -62,6 +62,8 @@ main{padding-top:74px}
 .slide img{width:100%;height:100%;object-fit:contain;display:block}
 .slider-nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.15);color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.7rem;z-index:3}
 .slider-nav.prev{left:14px}.slider-nav.next{right:14px}
+
+/* Supports */
 .accordion-list{display:flex;flex-direction:column;gap:16px;margin-top:6px}
 .accordion-item{border-radius:12px;overflow:hidden;border:1px solid rgba(0,0,0,.08);background:var(--white-warm)}
 .accordion-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;background:var(--white-warm)}
@@ -76,6 +78,8 @@ main{padding-top:74px}
 .product-text{flex:1}
 .product-title{color:var(--brown-warm);text-decoration:underline;font-weight:900;margin:.25rem 0}
 .product-extra{color:#444;font-size:.98rem}
+
+/* Form */
 .form-card{border-radius:12px;border:2px dashed rgba(78,59,47,.25);background:rgba(255,255,255,.85);padding:16px}
 .label{font-weight:900;margin-bottom:8px;display:block;color:#1a1a1a}
 .range-labels,.texture-labels{display:flex;justify-content:space-between;font-size:.9rem;color:#333;margin-top:6px}
@@ -90,6 +94,7 @@ main{padding-top:74px}
 .btn{display:inline-block;margin-top:10px;padding:12px 16px;border-radius:10px;border:2px solid var(--brown);text-decoration:none;color:#fff;background:var(--brown);font-weight:900}
 .btn.primary{background:var(--brown-warm);border-color:var(--brown-warm);color:#111}
 .contact-foot{font-size:.95rem;margin-top:8px;color:#222}
+
 @media (max-width:840px){
   .logo{height:34px}.site-title{font-size:1.05rem}
   .section{padding:44px 0}
