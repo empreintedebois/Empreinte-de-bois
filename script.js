@@ -194,3 +194,12 @@ function bindForm(){
     window.location.href = href;
   });
 }
+
+
+// Add: subtle shadow on scroll for fixed header
+document.addEventListener('scroll', () => {
+  const h = document.querySelector('.top-bar, header');
+  if(!h) return;
+  const sc = window.scrollY || document.documentElement.scrollTop;
+  h.style.boxShadow = sc > 10 ? '0 10px 24px rgba(0,0,0,.35)' : 'none';
+});

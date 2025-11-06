@@ -122,3 +122,23 @@ form{margin-top:8px}
   .product-detail img{width:100%;max-width:none}
   .grid-2{grid-template-columns:1fr}
 }
+
+
+/* === Additions: structure & brush blocks (non-destructif) === */
+:root{
+  --col-bg:#0b0b0b;
+  --col-text:#ffffff;
+  --col-brown:#5c3a21;
+}
+.container{max-width:1100px;margin:0 auto;padding:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);
+  background:linear-gradient(#1d1d1d,#141414);cursor:pointer;text-decoration:none;color:var(--col-text)}
+.btn:hover{transform:translateY(-1px)}
+.brush{position:relative;padding:18px;border-radius:18px;background:rgba(255,255,255,.04);
+  outline:1px dashed rgba(255,255,255,.12);box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 12px 24px rgba(0,0,0,.35)}
+.brush::before{content:"";position:absolute;inset:-8px;z-index:-1;background:
+  radial-gradient(120px 60px at 20% -10%, rgba(255,255,255,.08), transparent 70%),
+  radial-gradient(160px 80px at 90% 110%, rgba(255,255,255,.06), transparent 70%);filter:blur(2px)}
+/* Header fix shadow on scroll (works with existing .top-bar) */
+.top-bar{backdrop-filter:saturate(120%) blur(6px)}
+:focus-visible{outline:3px solid #5c3a21;outline-offset:2px}

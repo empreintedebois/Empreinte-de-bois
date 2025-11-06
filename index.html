@@ -1,117 +1,106 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Empreinte de Bois</title>
-  <link rel="preload" href="assets/hero-bg.png" as="image" />
-  <link rel="stylesheet" href="styles.css" />
-</head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Empreinte de Bois</title>
+<link as="image" href="assets/hero-bg.png" rel="preload"/>
+<link href="styles.css" rel="stylesheet"/>
+<meta content="Atelier de gravure et découpe laser : créations en bois personnalisées, signalétique, cadeaux. Cherbourg." name="description"/><meta content="Empreinte de Bois" property="og:title"/><meta content="Créations gravées avec passion et précision." property="og:description"/><meta content="website" property="og:type"/><meta content="#5c3a21" name="theme-color"/></head>
 <body>
-  <div class="background" aria-hidden="true"></div>
-  <header class="top-bar" role="banner">
-    <div class="top-inner">
-      <img class="logo" src="assets/logo.png" alt="Logo Empreinte de Bois" />
-      <h1 class="site-title">Empreinte de Bois</h1>
-    </div>
-  </header>
-
-  <main>
-    <section class="section s-black angled-bottom">
-      <div class="container narrow center">
-        <p class="lede">Gravure & fabrication — du sur‑mesure, un fond fixe, des blocs anguleux, et une galerie dynamique.</p>
-      </div>
-    </section>
-
-    <section class="section s-transparent angled-both">
-      <div class="container">
-        <h2 class="section-title">Nos réalisations</h2>
-        <div class="slider-wrapper">
-          <button class="slider-nav prev" aria-label="Précédent">‹</button>
-          <div class="slider-inner">
-            <div class="slider-container" id="slider"></div>
-          </div>
-          <button class="slider-nav next" aria-label="Suivant">›</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="section s-white angled-top">
-      <div class="container">
-        <h2 class="section-title">Supports disponibles</h2>
-        <div class="accordion-list" id="accordion"></div>
-      </div>
-    </section>
-
-    <section class="section s-black angled-both">
-      <div class="container">
-        <h2 class="section-title">Matrice — en construction</h2>
-        <p class="muted">La matrice détaillée arrive bientôt. En attendant, vous pouvez accéder au prototype.</p>
-        <p><a class="btn" href="matrice/matrice.html">Ouvrir la matrice</a></p>
-      </div>
-    </section>
-
-    <section class="section s-transparent angled-top">
-      <div class="container narrow">
-        <h2 class="section-title">Préférences de traitement</h2>
-        <div class="form-card">
-          <label for="traitement" class="label">Type de fichier</label>
-          <input id="traitement" type="range" min="0" max="2" step="1" value="0" />
-          <div class="range-labels">
-            <span>Photo</span><span>Illustration</span><span>DXF</span>
-          </div>
-
-          <div class="spacer"></div>
-
-          <label for="texture" class="label">Texture</label>
-          <input id="texture" type="range" min="0" max="2" step="1" value="0" />
-          <div class="texture-labels">
-            <span>Aplat</span><span>Dégradé</span><span>Pointillé</span>
-          </div>
-          <div class="texture-samples">
-            <span class="sample aplat" title="Aplat"></span>
-            <span class="sample degrade" title="Dégradé"></span>
-            <span class="sample pointille" title="Pointillé"></span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section s-white angled-bottom">
-      <div class="container narrow">
-        <h2 class="section-title">Demande de gravure</h2>
-        <form id="contact-form">
-          <div class="grid-2">
-            <div class="field">
-              <label for="email">Votre e‑mail</label>
-              <input id="email" type="email" placeholder="vous@exemple.com" required />
-            </div>
-            <div class="field">
-              <label for="subject">Objet</label>
-              <input id="subject" type="text" placeholder="Objet de la demande" />
-            </div>
-          </div>
-
-          <div class="grid-2">
-            <div class="field">
-              <label for="quantite">Quantité</label>
-              <input id="quantite" type="number" min="1" value="1" />
-            </div>
-            <div class="field">
-              <label for="commentaire">Message (optionnel)</label>
-              <input id="commentaire" type="text" placeholder="Quelques précisions…" />
-            </div>
-          </div>
-
-          <input type="hidden" id="selected-material" value="" />
-
-          <button type="submit" class="btn primary">Préparer l’e‑mail</button>
-          <p class="contact-foot">contact : <a href="mailto:empreinte.de.bois@gmail.com">empreinte.de.bois@gmail.com</a></p>
-        </form>
-      </div>
-    </section>
-  </main>
-
-  <script src="script.js"></script>
+<div aria-hidden="true" class="background"></div>
+<header class="top-bar" role="banner">
+<div class="top-inner">
+<img alt="Logo Empreinte de Bois" class="logo" loading="lazy" src="assets/logo.png"/>
+<h1 class="site-title">Empreinte de Bois</h1>
+</div>
+</header>
+<main>
+<section class="section s-black angled-bottom">
+<div class="container narrow center">
+<p class="lede">Gravure &amp; fabrication — du sur‑mesure, un fond fixe, des blocs anguleux, et une galerie dynamique.</p>
+</div>
+</section>
+<section class="section s-transparent angled-both">
+<div class="container">
+<h2 class="section-title">Nos réalisations</h2>
+<div class="slider-wrapper">
+<button aria-label="Précédent" class="slider-nav prev">‹</button>
+<div class="slider-inner">
+<div class="slider-container" id="slider"></div>
+</div>
+<button aria-label="Suivant" class="slider-nav next">›</button>
+</div>
+</div>
+</section>
+<section class="section s-white angled-top">
+<div class="container">
+<h2 class="section-title">Supports disponibles</h2>
+<div class="accordion-list" id="accordion"></div>
+</div>
+</section>
+<section class="section s-black angled-both">
+<div class="container">
+<h2 class="section-title">Matrice — en construction</h2>
+<p class="muted">La matrice détaillée arrive bientôt. En attendant, vous pouvez accéder au prototype.</p>
+<p><a class="btn" href="matrice/matrice.html">Ouvrir la matrice</a></p>
+</div>
+</section>
+<section class="section s-transparent angled-top">
+<div class="container narrow">
+<h2 class="section-title">Préférences de traitement</h2>
+<div class="form-card">
+<label class="label" for="traitement">Type de fichier</label>
+<input id="traitement" max="2" min="0" step="1" type="range" value="0"/>
+<div class="range-labels">
+<span>Photo</span><span>Illustration</span><span>DXF</span>
+</div>
+<div class="spacer"></div>
+<label class="label" for="texture">Texture</label>
+<input id="texture" max="2" min="0" step="1" type="range" value="0"/>
+<div class="texture-labels">
+<span>Aplat</span><span>Dégradé</span><span>Pointillé</span>
+</div>
+<div class="texture-samples">
+<span class="sample aplat" title="Aplat"></span>
+<span class="sample degrade" title="Dégradé"></span>
+<span class="sample pointille" title="Pointillé"></span>
+</div>
+</div>
+</div>
+</section>
+<section class="section s-white angled-bottom">
+<div class="container narrow">
+<h2 class="section-title">Demande de gravure</h2>
+<form id="contact-form">
+<div class="grid-2">
+<div class="field">
+<label for="email">Votre e‑mail</label>
+<input id="email" placeholder="vous@exemple.com" required="" type="email"/>
+</div>
+<div class="field">
+<label for="subject">Objet</label>
+<input id="subject" placeholder="Objet de la demande" type="text"/>
+</div>
+</div>
+<div class="grid-2">
+<div class="field">
+<label for="quantite">Quantité</label>
+<input id="quantite" min="1" type="number" value="1"/>
+</div>
+<div class="field">
+<label for="commentaire">Message (optionnel)</label>
+<input id="commentaire" placeholder="Quelques précisions…" type="text"/>
+</div>
+</div>
+<input id="selected-material" type="hidden" value=""/>
+<button class="btn primary" type="submit">Préparer l’e‑mail</button>
+<p class="contact-foot">contact : <a href="mailto:empreinte.de.bois@gmail.com">empreinte.de.bois@gmail.com</a></p>
+</form>
+</div>
+</section>
+</main>
+<script defer="True" src="script.js"></script>
 </body>
 </html>
