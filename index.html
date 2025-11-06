@@ -1,35 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Empreinte de Bois</title>
-  <link rel="preload" href="assets/hero-bg.png" as="image"/>
-  <link rel="stylesheet" href="styles.css"/>
+  <link rel="preload" href="assets/hero-bg.png" as="image" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="background" aria-hidden="true"></div>
-
-  <a class="ribbon-matrice" href="matrice/index.html" title="Matrice">MATRICE</a>
-
-  <header class="top-bar">
+  <header class="top-bar" role="banner">
     <div class="top-inner">
-      <img class="logo" src="assets/logo.png" alt="Logo"/>
+      <img class="logo" src="assets/logo.png" alt="Logo Empreinte de Bois" />
       <h1 class="site-title">Empreinte de Bois</h1>
     </div>
   </header>
 
   <main>
-    <section id="intro" class="section s-transparent block-wrap" data-skin="">
-      <div class="block panel center">
-        <p class="lede">Des créations uniques gravées avec passion et précision. Faites‑nous part de vos envies et nous leur donnerons vie.</p>
+    <section class="section s-black angled-bottom">
+      <div class="container narrow center">
+        <p class="lede">Gravure & fabrication — du sur‑mesure, un fond fixe, des blocs anguleux, et une galerie dynamique.</p>
       </div>
     </section>
 
-    <section id="galerie" class="section s-transparent block-wrap" data-skin="">
-      <div class="block panel">
-        <h2 class="section-title title-skin">Nos réalisations</h2>
-        <div class="slider-frame">
+    <section class="section s-transparent angled-both">
+      <div class="container">
+        <h2 class="section-title">Nos réalisations</h2>
+        <div class="slider-wrapper">
           <button class="slider-nav prev" aria-label="Précédent">‹</button>
           <div class="slider-inner">
             <div class="slider-container" id="slider"></div>
@@ -39,36 +36,50 @@
       </div>
     </section>
 
-    <section id="supports" class="section s-transparent block-wrap" data-skin="">
-      <div class="block panel light">
-        <h2 class="section-title title-skin">Supports disponibles</h2>
+    <section class="section s-white angled-top">
+      <div class="container">
+        <h2 class="section-title">Supports disponibles</h2>
         <div class="accordion-list" id="accordion"></div>
       </div>
     </section>
 
-    <section id="preferences" class="section s-transparent block-wrap" data-skin="">
-      <div class="block panel light">
-        <h2 class="section-title title-skin">Préférences de traitement</h2>
+    <section class="section s-black angled-both">
+      <div class="container">
+        <h2 class="section-title">Matrice — en construction</h2>
+        <p class="muted">La matrice détaillée arrive bientôt. En attendant, vous pouvez accéder au prototype.</p>
+        <p><a class="btn" href="matrice/matrice.html">Ouvrir la matrice</a></p>
+      </div>
+    </section>
+
+    <section class="section s-transparent angled-top">
+      <div class="container narrow">
+        <h2 class="section-title">Préférences de traitement</h2>
         <div class="form-card">
           <label for="traitement" class="label">Type de fichier</label>
-          <input id="traitement" type="range" min="0" max="2" step="1" value="0"/>
-          <div class="range-labels"><span>Photo</span><span>Illustration</span><span>DXF</span></div>
+          <input id="traitement" type="range" min="0" max="2" step="1" value="0" />
+          <div class="range-labels">
+            <span>Photo</span><span>Illustration</span><span>DXF</span>
+          </div>
+
           <div class="spacer"></div>
+
           <label for="texture" class="label">Texture</label>
-          <input id="texture" type="range" min="0" max="2" step="1" value="0"/>
-          <div class="texture-labels"><span>Aplat</span><span>Dégradé</span><span>Pointillé</span></div>
+          <input id="texture" type="range" min="0" max="2" step="1" value="0" />
+          <div class="texture-labels">
+            <span>Aplat</span><span>Dégradé</span><span>Pointillé</span>
+          </div>
           <div class="texture-samples">
-            <span class="sample aplat"></span>
-            <span class="sample degrade"></span>
-            <span class="sample pointille"></span>
+            <span class="sample aplat" title="Aplat"></span>
+            <span class="sample degrade" title="Dégradé"></span>
+            <span class="sample pointille" title="Pointillé"></span>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="contact" class="section s-transparent block-wrap" data-skin="">
-      <div class="block panel light">
-        <h2 class="section-title title-skin">Demande de gravure</h2>
+    <section class="section s-white angled-bottom">
+      <div class="container narrow">
+        <h2 class="section-title">Demande de gravure</h2>
         <form id="contact-form">
           <div class="grid-2">
             <div class="field">
@@ -80,6 +91,7 @@
               <input id="subject" type="text" placeholder="Objet de la demande" />
             </div>
           </div>
+
           <div class="grid-2">
             <div class="field">
               <label for="quantite">Quantité</label>
@@ -90,7 +102,9 @@
               <input id="commentaire" type="text" placeholder="Quelques précisions…" />
             </div>
           </div>
-          <input type="hidden" id="selected-material" value=""/>
+
+          <input type="hidden" id="selected-material" value="" />
+
           <button type="submit" class="btn primary">Préparer l’e‑mail</button>
           <p class="contact-foot">contact : <a href="mailto:empreinte.de.bois@gmail.com">empreinte.de.bois@gmail.com</a></p>
         </form>
