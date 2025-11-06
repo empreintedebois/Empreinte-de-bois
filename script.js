@@ -196,10 +196,58 @@ function bindForm(){
 }
 
 
-// Add: subtle shadow on scroll for fixed header
-document.addEventListener('scroll', () => {
-  const h = document.querySelector('.top-bar, header');
-  if(!h) return;
-  const sc = window.scrollY || document.documentElement.scrollTop;
-  h.style.boxShadow = sc > 10 ? '0 10px 24px rgba(0,0,0,.35)' : 'none';
-});
+// === OPT Additions: lazy slider & header shadow ===
+(function(){
+  // header shadow on scroll
+  document.addEventListener('scroll', () => {
+    const h = document.querySelector('.top-bar');
+    if(!h) return;
+    const sc = window.scrollY || document.documentElement.scrollTop;
+    h.style.boxShadow = sc > 10 ? '0 10px 24px rgba(0,0,0,.35)' : 'none';
+  });
+
+  // observe elements with data-lazy-bg to set background-image only when visible
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const el = e.target;
+        const url = el.getAttribute('data-lazy-bg');
+        if(url){ el.style.backgroundImage = 'url("'+url+'")'; el.removeAttribute('data-lazy-bg'); }
+        io.unobserve(el);
+      }
+    });
+  }, {rootMargin:'200px'}) : null;
+
+  function lazySetBg(el, url){
+    if(io){
+      el.setAttribute('data-lazy-bg', url);
+      io.observe(el);
+    }else{
+      el.style.backgroundImage = 'url("'+url+'")';
+    }
+  }
+
+  // Hook into existing slider builder if present
+  const origBuildSlider = window.buildSlider;
+  window.buildSlider = async function(){
+    const res = await (origBuildSlider ? origBuildSlider() : Promise.resolve());
+    const slides = document.querySelectorAll('.slide');
+    slides.forEach(sl => {
+      const bg = sl.getAttribute('data-bg');
+      if(bg){ lazySetBg(sl, bg); sl.removeAttribute('data-bg'); }
+    });
+    return res;
+  };
+
+  // When creating <img> dynamically, set lazy hints
+  const origCreateElement = document.createElement;
+  document.createElement = function(tag){
+    const el = origCreateElement.call(document, tag);
+    if(tag.toLowerCase() === 'img'){
+      el.loading = 'lazy';
+      el.decoding = 'async';
+      el.fetchPriority = 'low';
+    }
+    return el;
+  };
+})();
