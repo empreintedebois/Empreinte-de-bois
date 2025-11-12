@@ -1,88 +1,16 @@
-<!DOCTYPE html>
-
-<html lang="fr">
-<head><link as="style" href="matrice.css" rel="preload"/>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>En construction - Estimer votre devis</title>
-<link href="matrice.css" rel="stylesheet"/>
-<script defer="True" src="config.js"></script>
+<!doctype html>
+<html lang="fr"><head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Matrice</title>
+<style>
+html,body{margin:0;height:100%;font-family:system-ui, sans-serif}
+main{padding:1rem}
+</style>
 </head>
 <body>
-<header class="wrap">
-<div class="header card">
-<h1 id="title">Matrice</h1>
-</div>
-</header>
-<main class="wrap grid">
-<section class="card form">
-<h2>Paramètres</h2>
-<div class="fieldset">
-<h3>1) Matière</h3>
-<div class="row"><label for="materiau_type">Type</label><select id="materiau_type"></select></div>
-<div class="row"><label for="materiau_texture">Texture</label><select id="materiau_texture"></select></div>
-<div class="row"><label for="materiau_traitement">Traitement</label><select id="materiau_traitement"></select></div>
-<div class="row row-inline">
-<label for="epaisseur_mm">Épaisseur (mm)</label>
-<input id="epaisseur_mm" min="0" step="0.1" type="number" value="3"/>
-<label class="chk"><input id="masquage" type="checkbox"/> Masquage de protection</label>
-</div>
-</div>
-<div class="fieldset">
-<h3>2) Format</h3>
-<div class="row row-inline">
-<label for="largeur_mm">Largeur (mm)</label>
-<input id="largeur_mm" min="1" step="1" type="number" value="200"/>
-<label for="hauteur_mm">Hauteur (mm)</label>
-<input id="hauteur_mm" min="1" step="1" type="number" value="100"/>
-</div>
-<div class="row">
-<label class="chk"><input id="fixations" type="checkbox"/> Fixations / gabarit requis</label>
-<label class="inline" for="tolerance">Tolérance</label>
-<select id="tolerance"></select>
-</div>
-</div>
-<div class="fieldset">
-<h3>3) Quantité</h3>
-<div class="row"><label for="quantite">Nombre d’unités</label><input id="quantite" min="1" step="1" type="number" value="5"/></div>
-</div>
-<div class="fieldset">
-<h3>4) Opération</h3>
-<div class="row"><label for="operation_type">Type d’opération</label><select id="operation_type"></select></div>
-<div class="row"><label for="complexite_type">Complexité graphique</label><select id="complexite_type"></select></div>
-</div>
-<div class="fieldset">
-<h3>5) Implication opérateur</h3>
-<div class="row row-wrap">
-<label class="chk"><input id="prototype" type="checkbox"/> Prototype / itérations</label>
-<label class="chk"><input id="fichier_non_optimal" type="checkbox"/> Fichier non optimisé</label>
-</div>
-</div>
-<div class="actions">
-<button class="x-btn x-btn-brown" id="resetBtn" type="button">Réinitialiser</button>
-<div class="stack" id="presetBtns"></div>
-</div>
-</section>
-<aside class="card quote">
-<h2>Devis estimé</h2>
-<div class="summary-grid">
-<div>Prix unitaire</div><div id="prix_unitaire">—</div>
-<div>Prix total</div><div id="prix_total">—</div>
-<div>Temps unitaire (h)</div><div id="t_unitaire">—</div>
-<div>Temps total (h)</div><div id="t_total">—</div>
-</div>
-<div class="alerts" id="alerts"></div>
-<h3>Contact</h3>
-<form class="contact" id="contactForm">
-<div class="row"><label for="name">Nom</label><input id="name" placeholder="Votre nom" type="text"/></div>
-<div class="row"><label for="email">Email</label><input id="email" placeholder="votre@email.fr" type="email"/></div>
-<div class="row"><label for="message">Message</label><textarea id="message" placeholder="Précisez votre besoin…" rows="4"></textarea></div>
-<button class="x-btn x-btn-brown" type="submit">Envoyer par email</button>
-</form>
-<p class="copy" id="copyNotice"></p>
-</aside>
+<main>
+  <h1>Matrice (démo)</h1>
+  <p>Remplace ce fichier par ta matrice réelle. Cette page est chargée dans la modale du site.</p>
 </main>
-<footer class="wrap footer"><small id="footerNotice">Estimation indicative — modèle interne.</small></footer>
-<script defer="True" src="matrice.js"></script>
-</body>
-</html>
+</body></html>
