@@ -4,36 +4,31 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Empreinte de Bois</title>
-  <meta name="description" content="Atelier de gravure et fabrication. Galerie, matériaux, matrice et contact." />
+  <meta name="description" content="Atelier de gravure et fabrication : galerie, matériaux, matrice, contact." />
   <link rel="stylesheet" href="styles.css" />
+  <script src="config/site-config.js"></script>
 </head>
 <body>
-  <!-- Calque fond bleu fixe -->
-  <div class="site-bg" aria-hidden="true"></div>
-
-  <!-- Header -->
-  <header id="site-header" class="header header--sticky" role="banner">
+  <header id="site-header" class="header" role="banner">
     <div class="hdr-inner">
       <a class="brand" href="#" aria-label="Retour à l'accueil">
-        <!-- Logo en texte pour éviter images -->
-        <span class="brand__logo" aria-hidden="true">EB</span>
+        <img id="brand-logo" class="brand__logo" alt="Empreinte de Bois - logo" />
       </a>
-      <h1 class="title" id="site-title">Empreinte de Bois</h1>
-      <button id="btn-matrice" class="btn-matrice" aria-haspopup="dialog" aria-controls="modal-root">
-        Matrice
-      </button>
+      <h1 id="site-title" class="title"></h1>
+      <button id="btn-matrice" class="btn-matrice" aria-haspopup="dialog" aria-controls="modal-root">Matrice</button>
     </div>
   </header>
 
-  <!-- Sous-titre avec ornement -->
-  <section class="subtitle-wrap" aria-labelledby="subtitle">
-    <div class="subtitle-ornament ornament-left" aria-hidden="true"></div>
-    <h2 id="subtitle" class="subtitle">Gravure & créations — galerie</h2>
-    <div class="subtitle-ornament ornament-right" aria-hidden="true"></div>
+  <section id="hero" class="hero" aria-label="Hero principal">
+    <div class="hero__overlay"></div>
+    <div class="hero__inner">
+      <h2 id="subtitle" class="subtitle"></h2>
+      <div class="subtitle-ornament ornament-left" aria-hidden="true"></div>
+      <div class="subtitle-ornament ornament-right" aria-hidden="true"></div>
+    </div>
   </section>
 
-  <!-- Bande oblique avec bannière blanche et galerie -->
-  <section class="band band--gallery band--clip" aria-label="Galerie">
+  <section id="galerie" class="band band--gallery" aria-label="Galerie d'images">
     <div class="gallery-banner" aria-hidden="true"></div>
     <div class="gallery-wrap">
       <button class="gal-nav gal-prev" aria-label="Image précédente" data-dir="-1"></button>
@@ -42,43 +37,24 @@
     </div>
   </section>
 
-  <!-- Matériaux + Contact (alignement bas-à-bas) -->
-  <section class="band band--content grid-btm-align" aria-label="Infos">
-    <div id="materiaux">
+  <section class="band band--content grid-btm-align" aria-label="Informations">
+    <div id="materiaux" class="panel">
       <h3>Matériaux</h3>
-      <details class="acc" open>
-        <summary>M01 — Bois</summary>
-        <div class="acc-panel">
-          <p>Essences variées, finitions personnalisées.</p>
-        </div>
-      </details>
-      <details class="acc">
-        <summary>M02 — Acrylique</summary>
-        <div class="acc-panel">
-          <p>Découpe nette, multiples coloris.</p>
-        </div>
-      </details>
-      <!-- Ajoute tes autres Mxx ici -->
+      <details class="acc" open><summary>M01 — Bois</summary><div class="acc-panel"><p>Essences variées, finitions personnalisées.</p></div></details>
+      <details class="acc"><summary>M02 — Acrylique</summary><div class="acc-panel"><p>Découpe nette, multiples coloris.</p></div></details>
     </div>
 
-    <div id="contact">
+    <div id="contact" class="panel">
       <h3>Contact</h3>
       <form id="contact-form" action="mailto:empreinte.de.bois@example.com" method="post">
-        <label>Nom
-          <input name="name" required autocomplete="name" />
-        </label>
-        <label>Email
-          <input type="email" name="email" required autocomplete="email" />
-        </label>
-        <label>Message
-          <textarea name="message" rows="5" required></textarea>
-        </label>
+        <label>Nom<input name="name" required autocomplete="name" /></label>
+        <label>Email<input type="email" name="email" required autocomplete="email" /></label>
+        <label>Message<textarea name="message" rows="5" required></textarea></label>
         <button type="submit">Envoyer</button>
       </form>
     </div>
   </section>
 
-  <!-- Modale -->
   <div id="modal-root" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal__overlay" data-close="1"></div>
     <div class="modal__content" role="document" aria-labelledby="modal-title">
@@ -90,6 +66,6 @@
     </div>
   </div>
 
-  <script src="js/main.js" type="module"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
