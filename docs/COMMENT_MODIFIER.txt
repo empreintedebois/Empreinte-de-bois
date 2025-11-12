@@ -1,0 +1,32 @@
+[COMMENT_MODIFIER]
+
+1) CONFIG GLOBALE — `config/site-config.json`
+- `header.heightMobile` / `header.heightDesktop` (px)
+- `header.opacity` (0 → 1)
+- `header.shadow` (CSS box-shadow)
+- `title.sizeMobile` / `title.sizeDesktop`
+- `subtitle.ornament` ("antique" | "moderne" | "none")
+- `gallery.maxWidthVW` (pour 2/3 mets 66)
+- `gallery.cardShadow`
+- `gallery.navDiameterVW` (diamètre des flèches en vw; 12.5 = 1/8)
+- `gallery.whiteBannerHeight` (px)
+
+2) GALERIE — `config/galerie-config.json`
+- Ajoute des chemins relatifs vers tes images. Exemple:
+  ["assets/gallery/photo1.webp","assets/gallery/photo2.webp"]
+- Les vignettes sont **carrées** automatiquement; `object-fit: cover`.
+
+3) MATRICE (MODALE)
+- Le bouton ouvre `matrice/matrice.html` dans une iframe.
+- Remplace le contenu de `matrice/matrice.html` par ta vraie matrice ou référence un fichier existant.
+
+4) MATÉRIAUX
+- Chaque groupe Mxx est un `<details>` sous `#materiaux`. Un seul ouvert à la fois.
+
+5) ALIGNEMENT MATÉRIAUX / CONTACT
+- Les deux colonnes sont dans `.grid-btm-align`. Le bloc Contact est calé sur le bas via CSS.
+
+6) ACCESSIBILITÉ
+- Navigation clavier: TAB/SHIFT+TAB, flèches gauche/droite dans la galerie, ESC ferme la modale.
+- `aria-label`, `role`, et `aria-controls` appliqués.
+
