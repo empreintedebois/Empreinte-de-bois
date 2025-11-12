@@ -1,17 +1,13 @@
 export function applyHeader(cfg){
   const header = document.getElementById('site-header');
+  const body = document.body;
   if(!header) return;
-
-  // Heights from config
-  const isDesktop = () => window.matchMedia('(min-width:768px)').matches;
+  const isDesktop = () => matchMedia('(min-width:768px)').matches;
   const setHeight = () => {
-    const h = isDesktop() ? cfg.header.heightDesktop : cfg.header.heightMobile;
+    const h = isDesktop() ? (cfg.header?.heightDesktop ?? 72) : (cfg.header?.heightMobile ?? 56);
     header.style.minHeight = h + 'px';
-    document.body.style.setProperty('--hdrh', h + 'px');
-    document.body.setAttribute('data-hdrh','1');
-    document.documentElement.style.setProperty('--hdr-opacity', cfg.header.opacity);
-    document.documentElement.style.setProperty('--hdr-shadow', cfg.header.shadow);
+    body.style.setProperty('--hdrh', h + 'px');
+    body.setAttribute('data-hdrh','1');
   };
-  setHeight();
-  window.addEventListener('resize', setHeight);
+  setHeight(); addEventListener('resize', setHeight);
 }
