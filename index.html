@@ -1,105 +1,95 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="fr">
-<head><link as="style" href="styles.css" rel="preload"/>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Empreinte de Bois</title>
-<link href="styles.css" rel="stylesheet"/>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Empreinte de Bois</title>
+  <meta name="description" content="Atelier de gravure et fabrication. Galerie, matériaux, matrice et contact." />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div aria-hidden="true" class="background" data-bg="assets/hero-bg_w1024.webp"></div>
-<header class="top-bar" role="banner">
-<div class="top-inner">
-<picture><source sizes="(min-width: 720px) 33vw, 95vw" srcset="assets/logo_w640.webp 640w, assets/logo_w1024.webp 1024w, assets/logo_w1024.webp 1024w" type="image/webp"/><img alt="Logo Empreinte de Bois" class="logo" decoding="async" fetchpriority="low" height="1024" loading="lazy" src="assets/logo.png" width="1024"/></picture>
-<h1 class="site-title">Empreinte de Bois</h1>
-</div>
-</header>
-<main>
-<section class="section s-black angled-bottom">
-<div class="container narrow center">
-<p class="lede">Gravure &amp; fabrication — du sur‑mesure, un fond fixe, des blocs anguleux, et une galerie dynamique.</p>
-</div>
-</section>
-<section class="section s-transparent angled-both">
-<div class="container">
-<h2 class="section-title">Nos réalisations</h2>
-<div class="slider-wrapper">
-<button aria-label="Précédent" class="slider-nav prev">‹</button>
-<div class="slider-inner">
-<div class="slider-container" id="slider"></div>
-</div>
-<button aria-label="Suivant" class="slider-nav next">›</button>
-</div>
-</div>
-</section>
-<section class="section s-white angled-top">
-<div class="container">
-<h2 class="section-title">Supports disponibles</h2>
-<div class="accordion-list" id="accordion"></div>
-</div>
-</section>
-<section class="section s-black angled-both">
-<div class="container">
-<h2 class="section-title">Matrice — en construction</h2>
-<p class="muted">La matrice détaillée arrive bientôt. En attendant, vous pouvez accéder au prototype.</p>
-<p><a class="btn" href="matrice/matrice.html">Ouvrir la matrice</a></p>
-</div>
-</section>
-<section class="section s-transparent angled-top">
-<div class="container narrow">
-<h2 class="section-title">Préférences de traitement</h2>
-<div class="form-card">
-<label class="label" for="traitement">Type de fichier</label>
-<input id="traitement" max="2" min="0" step="1" type="range" value="0"/>
-<div class="range-labels">
-<span>Photo</span><span>Illustration</span><span>DXF</span>
-</div>
-<div class="spacer"></div>
-<label class="label" for="texture">Texture</label>
-<input id="texture" max="2" min="0" step="1" type="range" value="0"/>
-<div class="texture-labels">
-<span>Aplat</span><span>Dégradé</span><span>Pointillé</span>
-</div>
-<div class="texture-samples">
-<span class="sample aplat" title="Aplat"></span>
-<span class="sample degrade" title="Dégradé"></span>
-<span class="sample pointille" title="Pointillé"></span>
-</div>
-</div>
-</div>
-</section>
-<section class="section s-white angled-bottom">
-<div class="container narrow">
-<h2 class="section-title">Demande de gravure</h2>
-<form id="contact-form">
-<div class="grid-2">
-<div class="field">
-<label for="email">Votre e‑mail</label>
-<input id="email" placeholder="vous@exemple.com" required="" type="email"/>
-</div>
-<div class="field">
-<label for="subject">Objet</label>
-<input id="subject" placeholder="Objet de la demande" type="text"/>
-</div>
-</div>
-<div class="grid-2">
-<div class="field">
-<label for="quantite">Quantité</label>
-<input id="quantite" min="1" type="number" value="1"/>
-</div>
-<div class="field">
-<label for="commentaire">Message (optionnel)</label>
-<input id="commentaire" placeholder="Quelques précisions…" type="text"/>
-</div>
-</div>
-<input id="selected-material" type="hidden" value=""/>
-<button class="btn primary" type="submit">Préparer l’e‑mail</button>
-<p class="contact-foot">contact : <a href="mailto:empreinte.de.bois@gmail.com">empreinte.de.bois@gmail.com</a></p>
-</form>
-</div>
-</section>
-</main>
-<script defer="True" src="script.js"></script>
+  <!-- Calque fond bleu fixe -->
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header id="site-header" class="header header--sticky" role="banner">
+    <div class="hdr-inner">
+      <a class="brand" href="#" aria-label="Retour à l'accueil">
+        <!-- Logo en texte pour éviter images -->
+        <span class="brand__logo" aria-hidden="true">EB</span>
+      </a>
+      <h1 class="title" id="site-title">Empreinte de Bois</h1>
+      <button id="btn-matrice" class="btn-matrice" aria-haspopup="dialog" aria-controls="modal-root">
+        Matrice
+      </button>
+    </div>
+  </header>
+
+  <!-- Sous-titre avec ornement -->
+  <section class="subtitle-wrap" aria-labelledby="subtitle">
+    <div class="subtitle-ornament ornament-left" aria-hidden="true"></div>
+    <h2 id="subtitle" class="subtitle">Gravure & créations — galerie</h2>
+    <div class="subtitle-ornament ornament-right" aria-hidden="true"></div>
+  </section>
+
+  <!-- Bande oblique avec bannière blanche et galerie -->
+  <section class="band band--gallery band--clip" aria-label="Galerie">
+    <div class="gallery-banner" aria-hidden="true"></div>
+    <div class="gallery-wrap">
+      <button class="gal-nav gal-prev" aria-label="Image précédente" data-dir="-1"></button>
+      <div class="gallery-grid" role="list" aria-live="polite" aria-busy="false"></div>
+      <button class="gal-nav gal-next" aria-label="Image suivante" data-dir="1"></button>
+    </div>
+  </section>
+
+  <!-- Matériaux + Contact (alignement bas-à-bas) -->
+  <section class="band band--content grid-btm-align" aria-label="Infos">
+    <div id="materiaux">
+      <h3>Matériaux</h3>
+      <details class="acc" open>
+        <summary>M01 — Bois</summary>
+        <div class="acc-panel">
+          <p>Essences variées, finitions personnalisées.</p>
+        </div>
+      </details>
+      <details class="acc">
+        <summary>M02 — Acrylique</summary>
+        <div class="acc-panel">
+          <p>Découpe nette, multiples coloris.</p>
+        </div>
+      </details>
+      <!-- Ajoute tes autres Mxx ici -->
+    </div>
+
+    <div id="contact">
+      <h3>Contact</h3>
+      <form id="contact-form" action="mailto:empreinte.de.bois@example.com" method="post">
+        <label>Nom
+          <input name="name" required autocomplete="name" />
+        </label>
+        <label>Email
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>Message
+          <textarea name="message" rows="5" required></textarea>
+        </label>
+        <button type="submit">Envoyer</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Modale -->
+  <div id="modal-root" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal__overlay" data-close="1"></div>
+    <div class="modal__content" role="document" aria-labelledby="modal-title">
+      <div class="modal__hdr">
+        <h4 id="modal-title">Matrice</h4>
+        <button class="modal__close" aria-label="Fermer la matrice" data-close="1">×</button>
+      </div>
+      <iframe class="modal__iframe" title="Matrice" src="matrice/matrice.html" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <script src="js/main.js" type="module"></script>
 </body>
 </html>
