@@ -45,3 +45,49 @@ body[data-hdrh]{padding-top:calc(var(--hdrh, 64px))}
 label{display:block;margin:.5rem 0}
 input,textarea{width:100%;padding:.5rem;border:1px solid #bbb;border-radius:8px}
 button[type=submit]{margin-top:.75rem;padding:.6rem 1rem;border-radius:10px;border:1px solid #222;background:#111;color:#fff;cursor:pointer}
+
+
+
+/* Empreinte fixes: responsive gallery, two-column bottom-align, and focus styles */
+.grid-btm-align {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+/* focus style for Matrice button (accessible focus visible) */
+.btn-matrice:focus,
+button.btn-matrice:focus,
+a.btn-matrice:focus {
+  outline: 3px solid #c9a86d; /* doré clair */
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(201,168,109,0.15);
+}
+
+/* Larger screens: two columns and 4-col gallery */
+@media (min-width: 768px) {
+  .grid-btm-align {
+    grid-template-columns: 1fr 1fr;
+    align-items: end; /* align bas des colonnes */
+    gap: 2rem;
+  }
+  .gallery-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Modal overlay fix: ensure modal sits above and body scroll locked when open */
+.matrice-modal[aria-hidden="false"] {
+  display: block !important;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: auto;
+}
