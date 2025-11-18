@@ -1,54 +1,56 @@
-:root{
-  --hdr-opacity: .85;
-  --hdr-shadow: 0 10px 28px rgba(0,0,0,.35);
-  --title-size-m: 1.1rem;
-  --title-size-d: 1.35rem;
+:root {
+  --hdr-shadow: 0 10px 28px rgba(0,0,0,.55);
+  --title-size-m: 1.15rem;
+  --title-size-d: 1.4rem;
   --gallery-maxvw: 66vw;
   --gallery-card-shadow: 0 10px 24px rgba(0,0,0,.25);
   --gallery-banner-h: 64px;
   --gallery-nav-d: 12.5vw;
-  --gold:#d4af37;
-  --gold-border:#c49b2e;
-  --black:#000;
-  --white:#fff;
+  --gold: #d4af37;
+  --gold-border: #c49b2e;
+  --black: #000;
+  --white: #fff;
 
-  /* Parallaxe header */
-  --header-parallax-factor: 0.5;  /* 2x moins vite que la page */
-  --header-parallax-offset: 0px;  /* mis à jour par le script */
+  --header-parallax-factor: 0.5;
+  --header-parallax-offset: 0px;
 }
 
-* {
-  box-sizing:border-box;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 html,
 body {
-  height:100%;
-  margin:0;
-  padding:0;
-  background:#000; /* évite la ligne blanche au-dessus du header */
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,sans-serif;
-  color:#111;
-  line-height:1.4;
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,sans-serif;
+  color: #111;
+  line-height: 1.4;
+  background: #000;
 }
 
 /* ===========================
-   HEADER IMAGE + PARALLAX + DÉGRADÉ
+   HEADER IMAGE + PARALLAX
    =========================== */
 
 .header {
-  position: relative;        /* plus de sticky, le header scrolle normalement */
+  position: relative;
   width: 100%;
-  height: 100vh;             /* occupe toute la hauteur de la fenêtre */
-  overflow: visible;         /* permet au dégradé de dépasser un peu en bas */
+  height: 16.6667vh; /* environ 1/6 de la fenêtre */
+  min-height: 120px;
+  max-height: 260px;
+  overflow: visible;
   background: transparent;
   box-shadow: var(--hdr-shadow);
 }
 
-/* Image de fond du header */
+/* Image de fond */
 .header::before {
   content: "";
   position: absolute;
@@ -57,33 +59,31 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
-  /* Parallaxe via variable CSS */
   transform: translateY(var(--header-parallax-offset));
   will-change: transform;
 }
 
-/* Dégradé noir -> transparent qui déborde légèrement sous le header */
+/* Dégradé noir -> transparent sous le header */
 .header::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -40px;               /* descend un peu sous le header */
-  height: 80px;                /* hauteur du dégradé */
+  bottom: -40px;
+  height: 80px;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 1),
-    rgba(0, 0, 0, 0)
+    rgba(0,0,0,1),
+    rgba(0,0,0,0)
   );
   pointer-events: none;
 }
 
-/* On masque le contenu d'origine (logo, titre, bouton) */
+/* Contenu interne du header : conservé pour accessibilité, masqué visuellement */
 .hdr-inner {
-  display: none;
   position: relative;
   z-index: 1;
+  display: none;
 }
 
 .brand__logo {
@@ -100,24 +100,10 @@ body {
   font-size:var(--title-size-m);
 }
 
-.btn-matrice {
-  height:40px;
-  padding:0 12px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.5);
-  background:rgba(255,255,255,.12);
-  color:#fff;
-  cursor:pointer;
-}
-
-@media (min-width:768px) {
+@media (min-width: 768px) {
   .title {
-    font-size:var(--title-size-d);
+    font-size: var(--title-size-d);
   }
-}
-
-body[data-hdrh] {
-  padding-top:calc(var(--hdrh, 64px));
 }
 
 /* ===========================
@@ -125,43 +111,48 @@ body[data-hdrh] {
    =========================== */
 
 .hero {
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#000;
-  color:#fff;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    #000
+    url("assets/hero-bgw640.webp") center / cover fixed no-repeat;
+  color: #fff;
+  min-height: 60vh;
 }
 
 .hero__overlay {
   position:absolute;
   inset:0;
+  background: rgba(0,0,0,0.35);
 }
 
 .hero__inner {
   position:relative;
   text-align:center;
-  padding:2rem 1rem;
+  padding:2rem 1rem 3rem;
   max-width:1100px;
   margin:0 auto;
 }
 
 .subtitle {
-  margin:.5rem 0 0;
+  margin:0;
+  font-size: 1.4rem;
 }
 
 .subtitle-ornament {
-  display:none;
+  display: none;
 }
 
 /* ===========================
-   BANDES & GALERIE
+   BANDES + GALERIE
    =========================== */
 
 .band {
-  position:relative;
-  padding:2rem 1rem;
-  background:#fff; /* fond par défaut des sections en dessous */
+  position: relative;
+  padding: 2rem 1rem;
+  background: #fff;
 }
 
 .band--gallery {
@@ -175,10 +166,10 @@ body[data-hdrh] {
 }
 
 .gallery-banner {
-  height:var(--gallery-banner-h);
+  height: var(--gallery-banner-h);
   background:#fff;
   margin:0 auto;
-  max-width:var(--gallery-maxvw);
+  max-width: var(--gallery-maxvw);
   border-radius:10px;
 }
 
@@ -187,7 +178,7 @@ body[data-hdrh] {
   grid-template-columns:var(--gallery-nav-d) 1fr var(--gallery-nav-d);
   align-items:center;
   gap:1rem;
-  max-width:calc(var(--gallery-maxvw) + 2*var(--gallery-nav-d));
+  max-width:calc(var(--gallery-maxvw) + 2 * var(--gallery-nav-d));
   margin:0 auto;
   padding:1rem 0;
 }
@@ -209,15 +200,15 @@ body[data-hdrh] {
   background:#fff;
 }
 
-@media (min-width:768px) {
+@media (min-width: 768px) {
   .gallery-grid {
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (min-width:1100px) {
+@media (min-width: 1100px) {
   .gallery-grid {
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -247,7 +238,7 @@ body[data-hdrh] {
   content:'>';
 }
 
-.gal-nav:focus {
+.gal-nav:focus-visible {
   outline:3px solid #000;
   outline-offset:3px;
 }
@@ -272,7 +263,7 @@ body[data-hdrh] {
   box-shadow:0 4px 14px rgba(0,0,0,.12);
 }
 
-@media (min-width:900px) {
+@media (min-width: 900px) {
   .grid-btm-align {
     grid-template-columns:1fr 1fr;
     align-items:end;
@@ -302,8 +293,14 @@ body[data-hdrh] {
   border-top:1px solid #eee;
 }
 
+.acc-subtext {
+  margin-top: .35rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
 /* ===========================
-   MODAL
+   MODAL MATRICE
    =========================== */
 
 .modal {
@@ -363,6 +360,7 @@ textarea {
   padding:.5rem;
   border:1px solid #bbb;
   border-radius:8px;
+  font: inherit;
 }
 
 button[type=submit] {
@@ -376,50 +374,44 @@ button[type=submit] {
 }
 
 /* ===========================
-   FIXES / ACCESSIBILITÉ
+   BOUTON MATRICE BAS DE PAGE
    =========================== */
 
-/* Empreinte fixes: responsive gallery, two-column bottom-align, and focus styles */
-.grid-btm-align {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  align-items: start;
+.band--matrice {
+  background: #111;
+  color: #fff;
+  text-align: center;
 }
 
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  align-items: start;
+.matrice-cta {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-/* focus style for Matrice button (accessible focus visible) */
-.btn-matrice:focus,
-button.btn-matrice:focus,
-a.btn-matrice:focus {
-  outline: 3px solid #c9a86d; /* doré clair */
+.matrice-cta p {
+  margin: 0 0 0.75rem;
+}
+
+.btn-matrice {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.5);
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-matrice:focus-visible {
+  outline: 3px solid #c9a86d;
   outline-offset: 3px;
   box-shadow: 0 0 0 4px rgba(201,168,109,0.15);
 }
 
-/* Larger screens: two columns and 4-col gallery */
-@media (min-width: 768px) {
-  .grid-btm-align {
-    grid-template-columns: 1fr 1fr;
-    align-items: end; /* align bas des colonnes */
-    gap: 2rem;
-  }
-  .gallery-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
+/* ===========================
+   UTILITAIRES
+   =========================== */
 
-/* Modal overlay fix: ensure modal sits above and body scroll locked when open */
-.matrice-modal[aria-hidden="false"] {
-  display: block !important;
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  overflow: auto;
+main {
+  background: #fff;
 }

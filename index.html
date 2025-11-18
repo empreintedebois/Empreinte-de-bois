@@ -15,61 +15,139 @@
         <img id="brand-logo" class="brand__logo" alt="Empreinte de Bois - logo" />
       </a>
       <h1 id="site-title" class="title"></h1>
-      <button id="btn-matrice" class="btn-matrice" aria-haspopup="dialog" aria-controls="modal-root">Matrice</button>
     </div>
   </header>
 
-  <section id="hero" class="hero" aria-label="Hero principal">
-    <div class="hero__overlay"></div>
-    <div class="hero__inner">
-      <h2 id="subtitle" class="subtitle"></h2>
-      <div class="subtitle-ornament ornament-left" aria-hidden="true"></div>
-      <div class="subtitle-ornament ornament-right" aria-hidden="true"></div>
-    </div>
-  </section>
+  <main>
+    <section id="hero" class="hero" aria-label="Présentation">
+      <div class="hero__overlay"></div>
+      <div class="hero__inner">
+        <h2 id="subtitle" class="subtitle"></h2>
+        <div class="subtitle-ornament ornament-left" aria-hidden="true"></div>
+        <div class="subtitle-ornament ornament-right" aria-hidden="true"></div>
+      </div>
+    </section>
 
-  <section id="galerie" class="band band--gallery" aria-label="Galerie d'images">
-    <div class="gallery-banner" aria-hidden="true"></div>
-    <div class="gallery-wrap">
-      <button class="gal-nav gal-prev" aria-label="Image précédente" data-dir="-1"></button>
-      <div class="gallery-grid" role="list" aria-live="polite" aria-busy="false"></div>
-      <button class="gal-nav gal-next" aria-label="Image suivante" data-dir="1"></button>
-    </div>
-  </section>
+    <section id="galerie" class="band band--gallery" aria-label="Galerie d'images">
+      <div class="gallery-banner" aria-hidden="true"></div>
+      <div class="gallery-wrap">
+        <button class="gal-nav gal-prev" aria-label="Images précédentes" data-dir="-1"></button>
+        <div class="gallery-grid" role="list" aria-live="polite" aria-busy="false"></div>
+        <button class="gal-nav gal-next" aria-label="Images suivantes" data-dir="1"></button>
+      </div>
+    </section>
 
-  <section class="band band--content grid-btm-align" aria-label="Informations">
-    <div id="materiaux" class="panel">
-      <h3>Matériaux</h3>
-      <details class="acc" open>
-        <summary>M01 — Bois</summary>
-        <div class="acc-panel">
-          <p>Essences variées, finitions personnalisées.</p>
-        </div>
-      </details>
-      <details class="acc">
-        <summary>M02 — Acrylique</summary>
-        <div class="acc-panel">
-          <p>Découpe nette, multiples coloris.</p>
-        </div>
-      </details>
-    </div>
+    <section class="band band--content grid-btm-align" aria-label="Informations">
+      <div id="materiaux" class="panel panel--materiaux">
+        <h3>Matériaux</h3>
 
-    <div id="contact" class="panel">
-      <h3>Contact</h3>
-      <form id="contact-form" action="mailto:empreinte.de.bois@example.com" method="post">
-        <label>Nom
-          <input name="name" required autocomplete="name" />
-        </label>
-        <label>Email
-          <input type="email" name="email" required autocomplete="email" />
-        </label>
-        <label>Message
-          <textarea name="message" rows="5" required></textarea>
-        </label>
-        <button type="submit">Envoyer</button>
-      </form>
-    </div>
-  </section>
+        <details class="acc" data-material="M01" open>
+          <summary>M01 — Bois</summary>
+          <div class="acc-panel">
+            <p>Essences variées, finitions personnalisées.</p>
+            <p class="acc-subtext">Idéal pour signalétique, objets décoratifs, petites séries.</p>
+          </div>
+        </details>
+
+        <details class="acc" data-material="M02">
+          <summary>M02 — Acrylique</summary>
+          <div class="acc-panel">
+            <p>Découpe nette, multiples coloris.</p>
+            <p class="acc-subtext">Convient aux enseignes lumineuses, tokens, pièces techniques fines.</p>
+          </div>
+        </details>
+
+        <details class="acc" data-material="M03">
+          <summary>M03 — Carton / Papier épais</summary>
+          <div class="acc-panel">
+            <p>Supports économiques pour maquettes et prototypes.</p>
+            <p class="acc-subtext">Découpe rapide, idéal pour tests de volumes ou gabarits.</p>
+          </div>
+        </details>
+
+        <details class="acc" data-material="M04">
+          <summary>M04 — Cuir / Simili</summary>
+          <div class="acc-panel">
+            <p>Gravure de motifs, logos, marquages personnalisés.</p>
+            <p class="acc-subtext">Perfect pour petites séries d'accessoires et cadeaux.</p>
+          </div>
+        </details>
+
+        <details class="acc" data-material="M05">
+          <summary>M05 — Métal traité (marquage)</summary>
+          <div class="acc-panel">
+            <p>Marquage sur métaux préparés ou plaques spécifiques.</p>
+            <p class="acc-subtext">Numéros de série, étiquettes techniques, plaques signalétiques.</p>
+          </div>
+        </details>
+
+        <details class="acc" data-material="M06">
+          <summary>M06 — Verre / Céramique</summary>
+          <div class="acc-panel">
+            <p>Gravure de surface pour pièces uniques ou petites séries.</p>
+            <p class="acc-subtext">Verres, bouteilles, carafes, carreaux décoratifs.</p>
+          </div>
+        </details>
+
+        <details class="acc" data-material="M07">
+          <summary>M07 — Textile technique</summary>
+          <div class="acc-panel">
+            <p>Découpe ou marquage sur tissus adaptés au laser.</p>
+            <p class="acc-subtext">Écussons, patchs, prototypes de formes.</p>
+          </div>
+        </details>
+
+        <details class="acc" data-material="M08">
+          <summary>M08 — Composites légers</summary>
+          <div class="acc-panel">
+            <p>Panneaux type sandwich léger ou matériaux hybrides.</p>
+            <p class="acc-subtext">Supports rigides pour signalétique ou structures.</p>
+          </div>
+        </details>
+
+        <details class="acc" data-material="M09">
+          <summary>M09 — Expérimental</summary>
+          <div class="acc-panel">
+            <p>Essais sur matériaux hors liste, selon faisabilité.</p>
+            <p class="acc-subtext">Test sur échantillons fournis, devis au cas par cas.</p>
+          </div>
+        </details>
+
+        <details class="acc" data-material="M10">
+          <summary>M10 — Autres demandes</summary>
+          <div class="acc-panel">
+            <p>Vous avez une idée précise ou un support particulier ?</p>
+            <p class="acc-subtext">Décrivez votre projet par mail, on étudie ensemble la faisabilité.</p>
+          </div>
+        </details>
+      </div>
+
+      <div id="contact" class="panel panel--contact">
+        <h3>Contact</h3>
+        <form id="contact-form" action="mailto:empreinte.de.bois@example.com" method="post">
+          <label>Nom
+            <input name="name" required autocomplete="name" />
+          </label>
+          <label>Email
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label>Message
+            <textarea name="message" rows="5" required></textarea>
+          </label>
+          <button type="submit">Envoyer</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="band band--matrice">
+      <div class="matrice-cta">
+        <p>Besoin d'une estimation plus précise ?</p>
+        <button id="btn-matrice" class="btn-matrice" type="button" aria-haspopup="dialog" aria-controls="modal-root">
+          Ouvrir la matrice
+        </button>
+      </div>
+    </section>
+  </main>
 
   <div id="modal-root" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal__overlay" data-close="1"></div>
@@ -84,35 +162,5 @@
 
   <script type="module" src="js/main.js"></script>
   <script defer src="js/modules/ui-modal.js"></script>
-
-  <!-- Script parallaxe header : le fond se déplace 2x moins vite que le scroll -->
-  <script type="module" src="js/main.js"></script>
-  <script defer src="js/modules/ui-modal.js"></script>
-
-  <!-- Parallaxe du header : l'image scrolle 2x moins vite que la page -->
-  <script>
-    (function () {
-      const root = document.documentElement;
-      const factor = 0.5; // 2x moins vite
-      let ticking = false;
-
-      function updateParallax() {
-        const scrollY = window.scrollY || window.pageYOffset || 0;
-        const offset = -scrollY * factor;
-        root.style.setProperty('--header-parallax-offset', offset + 'px');
-        ticking = false;
-      }
-
-      window.addEventListener('scroll', function () {
-        if (!ticking) {
-          window.requestAnimationFrame(updateParallax);
-          ticking = true;
-        }
-      });
-
-      // Position initiale
-      updateParallax();
-    })();
-  </script>
 </body>
 </html>
