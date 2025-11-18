@@ -12,18 +12,9 @@
   --black:#000;
   --white:#fff;
 
-  /* Nouveau : header image + parallaxe */
-  --header-height: 260px;           /* hauteur visible du header */
-  --header-parallax-factor: 0.5;    /* 0.5 => 2x moins vite que le scroll */
-  --header-gradient-height: 40px;   /* hauteur du dégradé sous le header */
-  --header-parallax-offset: 0px;    /* mis à jour par le script */
-}
-
-/* Option : header un peu plus grand sur desktop */
-@media (min-width: 768px) {
-  :root {
-    --header-height: 300px;
-  }
+  /* Parallaxe header */
+  --header-parallax-factor: 0.5;  /* 2x moins vite que la page */
+  --header-parallax-offset: 0px;  /* mis à jour par le script */
 }
 
 * {
@@ -33,70 +24,62 @@
 html,
 body {
   height:100%;
+  margin:0;
+  padding:0;
+  background:#000; /* évite la ligne blanche au-dessus du header */
 }
 
 body {
-  margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,sans-serif;
   color:#111;
   line-height:1.4;
 }
 
 /* ===========================
-   HEADER
+   HEADER IMAGE + PARALLAX + DÉGRADÉ
    =========================== */
 
 .header {
-  position:sticky;
-  top:0;
-  z-index:1000;
-  height: var(--header-height);
+  position: relative;        /* plus de sticky, le header scrolle normalement */
   width: 100%;
-  overflow: hidden;
-
-  /* On laisse l'image de fond gérer le visuel */
+  height: 100vh;             /* occupe toute la hauteur de la fenêtre */
+  overflow: visible;         /* permet au dégradé de dépasser un peu en bas */
   background: transparent;
-
-  box-shadow:var(--hdr-shadow);
-  backdrop-filter:saturate(1.1) blur(2px);
+  box-shadow: var(--hdr-shadow);
 }
 
-/* Image de fond du header (header01.png en pleine largeur) */
+/* Image de fond du header */
 .header::before {
   content: "";
   position: absolute;
   inset: 0;
-
-  /* ⚠️ fichier dans /assets */
   background-image: url("assets/header01.png");
   background-size: cover;
-  background-position: center top;
+  background-position: center;
   background-repeat: no-repeat;
 
-  /* parallaxe contrôlée via la variable CSS mise à jour en JS */
+  /* Parallaxe via variable CSS */
   transform: translateY(var(--header-parallax-offset));
   will-change: transform;
 }
 
-/* Dégradé noir -> transparent quelques pixels sous le header */
+/* Dégradé noir -> transparent qui déborde légèrement sous le header */
 .header::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(-1 * var(--header-gradient-height));
-  height: calc(var(--header-gradient-height) * 2);
-
+  bottom: -40px;               /* descend un peu sous le header */
+  height: 80px;                /* hauteur du dégradé */
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.9),
+    rgba(0, 0, 0, 1),
     rgba(0, 0, 0, 0)
   );
   pointer-events: none;
 }
 
-/* Contenu interne du header : on le cache complètement
-   → il reste dans le DOM mais visuellement tu n'as QUE l'image */
+/* On masque le contenu d'origine (logo, titre, bouton) */
 .hdr-inner {
   display: none;
   position: relative;
@@ -178,6 +161,7 @@ body[data-hdrh] {
 .band {
   position:relative;
   padding:2rem 1rem;
+  background:#fff; /* fond par défaut des sections en dessous */
 }
 
 .band--gallery {
