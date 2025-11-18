@@ -40,16 +40,32 @@
   <section class="band band--content grid-btm-align" aria-label="Informations">
     <div id="materiaux" class="panel">
       <h3>Matériaux</h3>
-      <details class="acc" open><summary>M01 — Bois</summary><div class="acc-panel"><p>Essences variées, finitions personnalisées.</p></div></details>
-      <details class="acc"><summary>M02 — Acrylique</summary><div class="acc-panel"><p>Découpe nette, multiples coloris.</p></div></details>
+      <details class="acc" open>
+        <summary>M01 — Bois</summary>
+        <div class="acc-panel">
+          <p>Essences variées, finitions personnalisées.</p>
+        </div>
+      </details>
+      <details class="acc">
+        <summary>M02 — Acrylique</summary>
+        <div class="acc-panel">
+          <p>Découpe nette, multiples coloris.</p>
+        </div>
+      </details>
     </div>
 
     <div id="contact" class="panel">
       <h3>Contact</h3>
       <form id="contact-form" action="mailto:empreinte.de.bois@example.com" method="post">
-        <label>Nom<input name="name" required autocomplete="name" /></label>
-        <label>Email<input type="email" name="email" required autocomplete="email" /></label>
-        <label>Message<textarea name="message" rows="5" required></textarea></label>
+        <label>Nom
+          <input name="name" required autocomplete="name" />
+        </label>
+        <label>Email
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>Message
+          <textarea name="message" rows="5" required></textarea>
+        </label>
         <button type="submit">Envoyer</button>
       </form>
     </div>
@@ -67,7 +83,39 @@
   </div>
 
   <script type="module" src="js/main.js"></script>
+  <script defer src="js/modules/ui-modal.js"></script>
 
-    <script defer src="js/modules/ui-modal.js"></script>
+  <!-- Script parallaxe header : le fond se déplace 2x moins vite que le scroll -->
+  <script>
+    (function () {
+      const root = document.documentElement;
+
+      function getParallaxFactor() {
+        const val = getComputedStyle(root).getPropertyValue('--header-parallax-factor');
+        const num = parseFloat(val);
+        return Number.isNaN(num) ? 0.5 : num;
+      }
+
+      const factor = getParallaxFactor();
+      let ticking = false;
+
+      function updateParallax() {
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        const offset = -scrollY * factor; // 2x moins vite si factor = 0.5
+        root.style.setProperty('--header-parallax-offset', offset + 'px');
+        ticking = false;
+      }
+
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          window.requestAnimationFrame(updateParallax);
+          ticking = true;
+        }
+      });
+
+      // Position initiale au chargement
+      updateParallax();
+    })();
+  </script>
 </body>
 </html>
