@@ -1,53 +1,51 @@
-import { applyHeader } from './modules/ui-header.js';
-import { setupModal } from './modules/ui-modal.js';
-import { setupAccordion } from './modules/ui-accordion.js';
-import { setupGalleryFallback } from './modules/ui-gallery-fallback.js';
+import { initGallery } from "./modules/ui-gallery.js";
+import { initAccordion } from "./modules/ui-accordion.js";
 
-(function init(){
-  const cfg = window.SITE_CONFIG || {};
-  document.documentElement.style.setProperty('--hdr-opacity', cfg.header?.opacity ?? .85);
-  document.documentElement.style.setProperty('--hdr-shadow', cfg.header?.shadow ?? '0 10px 28px rgba(0,0,0,.35)');
-  document.documentElement.style.setProperty('--gallery-maxvw', (cfg.gallery?.maxWidthVW ?? 66) + 'vw');
-  document.documentElement.style.setProperty('--gallery-card-shadow', cfg.gallery?.cardShadow ?? '0 10px 24px rgba(0,0,0,.25)');
-  document.documentElement.style.setProperty('--gallery-banner-h', (cfg.gallery?.whiteBannerHeight ?? 64) + 'px');
-  document.documentElement.style.setProperty('--gallery-nav-d', (cfg.gallery?.navDiameterVW ?? 12.5) + 'vw');
+function applySiteConfig() {
+  const cfg = window.EDB_CONFIG || {};
+  const titleEl = document.getElementById("site-title");
+  const subtitleEl = document.getElementById("subtitle");
+  const logoEl = document.getElementById("brand-logo");
 
-  applyHeader(cfg);
-
-  const hero = document.getElementById('hero');
-  const overlay = hero?.querySelector('.hero__overlay');
-  const subtitle = document.getElementById('subtitle');
-  const titleEl = document.getElementById('site-title');
-  const logoEl = document.getElementById('brand-logo');
-
-  if (hero){
-    const isDesktop = () => matchMedia('(min-width:768px)').matches;
-    const applyHero = () => {
-      hero.style.minHeight = (isDesktop() ? (cfg.hero?.minHeightDesktop ?? 420) : (cfg.hero?.minHeightMobile ?? 300)) + 'px';
-    };
-    hero.style.backgroundImage = cfg.hero?.backgroundImage ? `url('${cfg.hero.backgroundImage}')` : 'none';
-    hero.style.backgroundSize = 'cover'; hero.style.backgroundPosition = 'center';
-    if (overlay && cfg.hero?.overlay) overlay.style.background = cfg.hero.overlay;
-    applyHero(); addEventListener('resize', applyHero);
+  if (cfg.siteTitle && titleEl) {
+    titleEl.textContent = cfg.siteTitle;
+    document.title = cfg.siteTitle;
   }
 
-  if (titleEl) titleEl.textContent = cfg.brand?.title ?? 'Empreinte de Bois';
-  if (logoEl && cfg.brand?.logoSrc) { logoEl.src = cfg.brand.logoSrc; }
+  if (cfg.subtitle && subtitleEl) {
+    subtitleEl.textContent = cfg.subtitle;
+  }
 
-  if (subtitle){
-    subtitle.textContent = cfg.subtitle?.text ?? '';
-    const ornStyle = cfg.subtitle?.ornament ?? 'none';
-    if (ornStyle !== 'none'){
-      document.querySelectorAll('.subtitle-ornament').forEach(el => el.style.display = 'block');
+  if (cfg.brandLogoSrc && logoEl) {
+    logoEl.src = cfg.brandLogoSrc;
+  }
+}
+
+function initHeaderParallax() {
+  const root = document.documentElement;
+  const factor = Number.parseFloat(getComputedStyle(root).getPropertyValue("--header-parallax-factor")) || 0.5;
+  let ticking = false;
+
+  function updateParallax() {
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    const offset = -scrollY * factor;
+    root.style.setProperty("--header-parallax-offset", offset + "px");
+    ticking = false;
+  }
+
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateParallax);
+      ticking = true;
     }
-  }
+  });
 
-  setupModal();
-  setupAccordion();
+  updateParallax();
+}
 
-  if (typeof window.setupGallery === 'function'){
-    window.setupGallery(cfg);
-  } else {
-    setupGalleryFallback(cfg);
-  }
-})();
+document.addEventListener("DOMContentLoaded", () => {
+  applySiteConfig();
+  initHeaderParallax();
+  initGallery(window.EDB_CONFIG);
+  initAccordion(window.EDB_CONFIG);
+});
