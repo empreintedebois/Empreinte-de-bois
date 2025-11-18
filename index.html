@@ -86,22 +86,19 @@
   <script defer src="js/modules/ui-modal.js"></script>
 
   <!-- Script parallaxe header : le fond se déplace 2x moins vite que le scroll -->
+  <script type="module" src="js/main.js"></script>
+  <script defer src="js/modules/ui-modal.js"></script>
+
+  <!-- Parallaxe du header : l'image scrolle 2x moins vite que la page -->
   <script>
     (function () {
       const root = document.documentElement;
-
-      function getParallaxFactor() {
-        const val = getComputedStyle(root).getPropertyValue('--header-parallax-factor');
-        const num = parseFloat(val);
-        return Number.isNaN(num) ? 0.5 : num;
-      }
-
-      const factor = getParallaxFactor();
+      const factor = 0.5; // 2x moins vite
       let ticking = false;
 
       function updateParallax() {
         const scrollY = window.scrollY || window.pageYOffset || 0;
-        const offset = -scrollY * factor; // 2x moins vite si factor = 0.5
+        const offset = -scrollY * factor;
         root.style.setProperty('--header-parallax-offset', offset + 'px');
         ticking = false;
       }
@@ -113,7 +110,7 @@
         }
       });
 
-      // Position initiale au chargement
+      // Position initiale
       updateParallax();
     })();
   </script>
