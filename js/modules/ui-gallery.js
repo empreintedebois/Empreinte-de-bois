@@ -1,40 +1,54 @@
-export async function setupGallery(cfg){
-  const grid = document.querySelector('.gallery-grid');
-  if(!grid) return;
+export function initGallery(config) {
+  const grid = document.querySelector(".gallery-grid");
+  const prevBtn = document.querySelector(".gal-prev");
+  const nextBtn = document.querySelector(".gal-next");
 
-  const res = await fetch('config/galerie-config.json');
-  const items = await res.json(); // array of URLs
-  grid.setAttribute('aria-busy','true');
+  if (!grid) return;
 
-  const fragment = document.createDocumentFragment();
-  items.forEach((src, idx)=>{
-    const img = document.createElement('img');
-    img.src = src;
-    img.loading = 'lazy';
-    img.alt = 'Image ' + (idx+1);
-    img.setAttribute('role','listitem');
-    fragment.appendChild(img);
-  });
-  grid.appendChild(fragment);
-  grid.setAttribute('aria-busy','false');
+  const images = Array.isArray(config?.galleryImages) && config.galleryImages.length
+    ? config.galleryImages
+    : [];
 
-  // Navigation buttons (scroll snap style)
-  const prev = document.querySelector('.gal-prev');
-  const next = document.querySelector('.gal-next');
-  const scrollBy = ()=>{
-    grid.scrollBy({ left: grid.clientWidth * 0.9, behavior: 'smooth' });
+  // Nettoyage
+  grid.innerHTML = "";
+
+  if (!images.length) {
+    const msg = document.createElement("p");
+    msg.textContent = "Ajoutez vos images dans assets/galerie et mettez à jour config/site-config.js.";
+    msg.style.margin = "0";
+    grid.appendChild(msg);
+  } else {
+    for (const src of images) {
+      const img = new Image();
+      img.src = src;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.alt = "";
+      grid.appendChild(img);
+    }
+  }
+
+  const scrollByStep = () => {
+    const rect = grid.getBoundingClientRect();
+    return rect.width * 0.9;
   };
-  prev?.addEventListener('click', ()=>{
-    grid.scrollBy({ left: -grid.clientWidth * 0.9, behavior: 'smooth' });
-  });
-  next?.addEventListener('click', scrollBy);
 
-  // Keyboard left/right
-  grid.tabIndex = 0;
-  grid.addEventListener('keydown', (e)=>{
-    if(e.key === 'ArrowLeft') prev?.click();
-    if(e.key === 'ArrowRight') next?.click();
-  });
+  const onNavClick = (dir) => {
+    grid.scrollBy({
+      left: dir * scrollByStep(),
+      behavior: "smooth"
+    });
+  };
 
-  // Ensure grid doesn't exceed banner zone visually — accomplished via max width and band clip-path
+  prevBtn?.addEventListener("click", () => onNavClick(-1));
+  nextBtn?.addEventListener("click", () => onNavClick(1));
+
+  // Navigation clavier
+  document.addEventListener("keydown", (evt) => {
+    if (evt.key === "ArrowLeft") {
+      onNavClick(-1);
+    } else if (evt.key === "ArrowRight") {
+      onNavClick(1);
+    }
+  });
 }

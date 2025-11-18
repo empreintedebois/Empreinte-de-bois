@@ -1,24 +1,44 @@
-export function setupModal(){
-  const modal = document.getElementById('modal-root');
-  const openBtn = document.getElementById('btn-matrice');
-  if(!modal || !openBtn) return;
-  const content = modal.querySelector('.modal__content');
-  const overlay = modal.querySelector('.modal__overlay');
-  const closeBtn = modal.querySelector('.modal__close');
-  let prevFocus = null;
-  const onKey = (e)=>{
-    if(e.key === 'Escape') close();
-    if(e.key === 'Tab'){
-      const f = content.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-      if(!f.length) return;
-      const first = f[0], last = f[f.length-1];
-      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+(function () {
+  const root = document.getElementById("modal-root");
+  const openBtn = document.getElementById("btn-matrice");
+
+  if (!root || !openBtn) return;
+
+  const overlay = root.querySelector(".modal__overlay");
+  const closeBtns = root.querySelectorAll("[data-close]");
+
+  let lastActive = null;
+
+  function openModal() {
+    lastActive = document.activeElement;
+    root.setAttribute("aria-hidden", "false");
+    const closeBtn = root.querySelector(".modal__close");
+    closeBtn?.focus();
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    root.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    if (lastActive && typeof lastActive.focus === "function") {
+      lastActive.focus();
+    } else {
+      openBtn.focus();
     }
-  };
-  const open = () => { modal.setAttribute('aria-hidden','false'); prevFocus = document.activeElement; setTimeout(()=>closeBtn.focus(), 0); document.addEventListener('keydown', onKey); };
-  const close = () => { modal.setAttribute('aria-hidden','true'); document.removeEventListener('keydown', onKey); if (prevFocus) prevFocus.focus(); };
-  openBtn.addEventListener('click', open);
-  overlay.addEventListener('click', close);
-  modal.addEventListener('click', (e)=>{ if(e.target.dataset.close) close(); });
-}
+  }
+
+  openBtn.addEventListener("click", openModal);
+
+  overlay?.addEventListener("click", closeModal);
+  closeBtns.forEach((btn) => {
+    btn.addEventListener("click", closeModal);
+  });
+
+  document.addEventListener("keydown", (evt) => {
+    if (evt.key === "Escape") {
+      if (root.getAttribute("aria-hidden") === "false") {
+        closeModal();
+      }
+    }
+  });
+})();
