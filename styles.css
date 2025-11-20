@@ -145,8 +145,8 @@ body {
   width: clamp(52px, 9vw, 90px);
   height: clamp(52px, 9vw, 90px);
   border-radius: 50%;
-  background: var(--gold);
-  border: 3px solid var(--gold-border);
+  background: #fff;
+  border: 6px solid var(--gold-border);
   display: flex;
   align-items: center;
   justify-content: center;
