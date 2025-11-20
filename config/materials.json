@@ -1,0 +1,162 @@
+[
+  {
+    "id": "M01",
+    "title": "M01 — Matériau 1",
+    "summary": "M01",
+    "description": "Description courte du matériau M01.",
+    "subtext": "Texte complémentaire configurable.",
+    "imageBase": "assets/materiaux/M01_neutre.webp",
+    "options": [
+      {
+        "id": "neutre",
+        "label": "Neutre",
+        "image": "assets/materiaux/M01_neutre.webp",
+        "formTag": "M01:Neutre"
+      }
+    ]
+  },
+  {
+    "id": "M02",
+    "title": "M02 — Matériau 2",
+    "summary": "M02",
+    "description": "Description courte du matériau M02.",
+    "subtext": "Texte complémentaire configurable.",
+    "imageBase": "assets/materiaux/M02_neutre.webp",
+    "options": [
+      {
+        "id": "neutre",
+        "label": "Neutre",
+        "image": "assets/materiaux/M02_neutre.webp",
+        "formTag": "M02:Neutre"
+      }
+    ]
+  },
+  {
+    "id": "M03",
+    "title": "M03 — Matériau 3",
+    "summary": "M03",
+    "description": "Description courte du matériau M03.",
+    "subtext": "Texte complémentaire configurable.",
+    "imageBase": "assets/materiaux/M03_neutre.webp",
+    "options": [
+      {
+        "id": "neutre",
+        "label": "Neutre",
+        "image": "assets/materiaux/M03_neutre.webp",
+        "formTag": "M03:Neutre"
+      }
+    ]
+  },
+  {
+    "id": "M04",
+    "title": "M04 — Matériau 4",
+    "summary": "M04",
+    "description": "Description courte du matériau M04.",
+    "subtext": "Texte complémentaire configurable.",
+    "imageBase": "assets/materiaux/M04_neutre.webp",
+    "options": [
+      {
+        "id": "neutre",
+        "label": "Neutre",
+        "image": "assets/materiaux/M04_neutre.webp",
+        "formTag": "M04:Neutre"
+      }
+    ]
+  },
+  {
+    "id": "M05",
+    "title": "M05 — Matériau 5",
+    "summary": "M05",
+    "description": "Description courte du matériau M05.",
+    "subtext": "Texte complémentaire configurable.",
+    "imageBase": "assets/materiaux/M05_neutre.webp",
+    "options": [
+      {
+        "id": "neutre",
+        "label": "Neutre",
+        "image": "assets/materiaux/M05_neutre.webp",
+        "formTag": "M05:Neutre"
+      }
+    ]
+  },
+  {
+    "id": "M06",
+    "title": "M06 — Matériau 6",
+    "summary": "M06",
+    "description": "Description courte du matériau M06.",
+    "subtext": "Texte complémentaire configurable.",
+    "imageBase": "assets/materiaux/M06_neutre.webp",
+    "options": [
+      {
+        "id": "neutre",
+        "label": "Neutre",
+        "image": "assets/materiaux/M06_neutre.webp",
+        "formTag": "M06:Neutre"
+      }
+    ]
+  },
+  {
+    "id": "M07",
+    "title": "M07 — Matériau 7",
+    "summary": "M07",
+    "description": "Description courte du matériau M07.",
+    "subtext": "Texte complémentaire configurable.",
+    "imageBase": "assets/materiaux/M07_neutre.webp",
+    "options": [
+      {
+        "id": "neutre",
+        "label": "Neutre",
+        "image": "assets/materiaux/M07_neutre.webp",
+        "formTag": "M07:Neutre"
+      }
+    ]
+  },
+  {
+    "id": "M08",
+    "title": "M08 — Matériau 8",
+    "summary": "M08",
+    "description": "Description courte du matériau M08.",
+    "subtext": "Texte complémentaire configurable.",
+    "imageBase": "assets/materiaux/M08_neutre.webp",
+    "options": [
+      {
+        "id": "neutre",
+        "label": "Neutre",
+        "image": "assets/materiaux/M08_neutre.webp",
+        "formTag": "M08:Neutre"
+      }
+    ]
+  },
+  {
+    "id": "M09",
+    "title": "M09 — Matériau 9",
+    "summary": "M09",
+    "description": "Description courte du matériau M09.",
+    "subtext": "Texte complémentaire configurable.",
+    "imageBase": "assets/materiaux/M09_neutre.webp",
+    "options": [
+      {
+        "id": "neutre",
+        "label": "Neutre",
+        "image": "assets/materiaux/M09_neutre.webp",
+        "formTag": "M09:Neutre"
+      }
+    ]
+  },
+  {
+    "id": "M10",
+    "title": "M10 — Matériau 10",
+    "summary": "M10",
+    "description": "Description courte du matériau M10.",
+    "subtext": "Texte complémentaire configurable.",
+    "imageBase": "assets/materiaux/M10_neutre.webp",
+    "options": [
+      {
+        "id": "neutre",
+        "label": "Neutre",
+        "image": "assets/materiaux/M10_neutre.webp",
+        "formTag": "M10:Neutre"
+      }
+    ]
+  }
+]

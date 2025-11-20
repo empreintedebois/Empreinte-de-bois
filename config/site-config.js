@@ -1,23 +1,25 @@
-window.EDB_CONFIG = {
+window.SITE_CONFIG = {
   siteTitle: "Empreinte de Bois",
   subtitle: "Gravure & créations — galerie",
-  brandLogoSrc: "assets/logo.png",
+  headerImage: "assets/header01.webp",
+  heroBackground: "assets/hero-bg_w640.webp",
   galleryImages: [
-    "assets/galerie/image01.jpg",
-    "assets/galerie/image02.jpg",
-    "assets/galerie/image03.jpg",
-    "assets/galerie/image04.jpg"
+    "assets/galerie/galerie01.webp",
+    "assets/galerie/galerie02.webp",
+    "assets/galerie/galerie03.webp",
+    "assets/galerie/galerie04.webp",
+    "assets/galerie/galerie05.webp"
   ],
-  materialsVisibility: {
-    M01: true,
-    M02: true,
-    M03: true,
-    M04: true,
-    M05: true,
-    M06: true,
-    M07: false,
-    M08: false,
-    M09: false,
-    M10: false
-  }
+  ctaBand: {
+    title: "Gravure & créations sur mesure",
+    subtitle: "Bois, acrylique, métal, prototypes et petites séries."
+  },
+  infoBand: {
+    title: "Matériaux & Contact"
+  },
+  bottomButtons: [
+    { id: "btn-projects", label: "Voir la galerie complète" },
+    { id: "btn-custom", label: "Demande sur-mesure" },
+    { id: "btn-visit", label: "Suivre l'atelier" }
+  ]
 };

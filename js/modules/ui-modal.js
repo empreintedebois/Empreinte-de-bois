@@ -1,7 +1,6 @@
 (function () {
   const root = document.getElementById("modal-root");
   const openBtn = document.getElementById("btn-matrice");
-
   if (!root || !openBtn) return;
 
   const overlay = root.querySelector(".modal__overlay");
@@ -13,7 +12,7 @@
     lastActive = document.activeElement;
     root.setAttribute("aria-hidden", "false");
     const closeBtn = root.querySelector(".modal__close");
-    closeBtn?.focus();
+    if (closeBtn) closeBtn.focus();
     document.body.style.overflow = "hidden";
   }
 
@@ -28,17 +27,12 @@
   }
 
   openBtn.addEventListener("click", openModal);
-
   overlay?.addEventListener("click", closeModal);
-  closeBtns.forEach((btn) => {
-    btn.addEventListener("click", closeModal);
-  });
+  closeBtns.forEach((btn) => btn.addEventListener("click", closeModal));
 
   document.addEventListener("keydown", (evt) => {
-    if (evt.key === "Escape") {
-      if (root.getAttribute("aria-hidden") === "false") {
-        closeModal();
-      }
+    if (evt.key === "Escape" && root.getAttribute("aria-hidden") === "false") {
+      closeModal();
     }
   });
 })();
