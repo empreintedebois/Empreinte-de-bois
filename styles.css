@@ -32,41 +32,17 @@ body {
   font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,sans-serif;
   color: var(--text-color);
   line-height: 1.4;
-  background: #000;
-  position: relative;
+  /* 0. Fond du site : image fixe, sans dégradé ni flou */
+  background: #000 url("assets/hero-bg_w640.webp") center / cover fixed no-repeat;
   overflow-x: hidden;
 }
 
-/* 0. Fond immobile : image floue + dégradé latéral */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background:
-    url("assets/hero-bg_w640.webp") center / cover no-repeat fixed;
-  filter: blur(4px);
-  opacity: 0.7;
-  z-index: -2;
-}
-
-/* Plus l'écran est grand, plus on augmente le flou */
-@media (min-width: 768px) {
-  body::before {
-    filter: blur(6px);
-  }
-}
-@media (min-width: 1200px) {
-  body::before {
-    filter: blur(9px);
-  }
-}
-
-/* Coquille blanche posée sur le fond, avec dégradé noir sur les côtés */
+/* Coquille blanche posée sur le fond, SANS dégradé */
 .page-shell {
   max-width: var(--page-max-width);
   margin: 0 auto;
   min-height: 100vh;
-  background: linear-gradient(to right, rgba(0,0,0,0.7), #fff 15%, #fff 85%, rgba(0,0,0,0.7));
+  background: #fff;
   padding-bottom: 3rem;
 }
 
@@ -119,12 +95,13 @@ body::before {
 }
 
 /* ===========================
-   C. GALERIE OBLIQUE
+   C. GALERIE (PLUS D'OBLIQUE)
    =========================== */
 
 .band--gallery {
   padding-top: 0.5rem;
   padding-bottom: 2.5rem;
+  background: transparent;
 }
 
 .gallery-diagonal {
@@ -133,16 +110,18 @@ body::before {
   margin: 0 auto;
 }
 
+/* On enlève la rotation & l'ombre, tout devient droit et transparent */
 .gallery-diagonal__inner {
   position: relative;
-  overflow: hidden;
-  background: #fff;
-  transform: skewY(-8deg);
-  box-shadow: 0 0 30px rgba(0,0,0,0.35) inset;
+  overflow: visible;
+  background: transparent;
+  transform: none;
+  box-shadow: none;
 }
 
+/* Plus de skew, c'est une simple zone transparente centrée */
 .gallery-viewport {
-  transform: skewY(8deg);
+  transform: none;
   padding: 1.75rem 0;
   display: flex;
   justify-content: center;
@@ -223,6 +202,7 @@ body::before {
   padding: 0 var(--page-padding-x);
 }
 
+/* Panel générique (contact, matrice…) */
 .panel {
   background: rgba(255,255,255,0.96);
   border-radius: 14px;
@@ -241,18 +221,19 @@ body::before {
    E1. MATÉRIAUX
    =========================== */
 
+/* Bloc derrière les bandeaux : maintenant TRANSPARENT */
 .panel--materials {
-  background: rgba(255,255,255,0.9);
+  background: transparent;
+  box-shadow: none;
 }
 
-/* Bandeaux matériaux */
+/* Bandeaux matériaux : noirs, cadre doré */
 .material {
   border-radius: 10px;
   margin: 0.35rem 0;
-  border: 1px solid rgba(212,175,55,0.5);
-  background: rgba(255,255,255,0.15);
+  border: 1px solid var(--gold-border);
+  background: rgba(0,0,0,0.8);
   color: #fff;
-  background-clip: padding-box;
   overflow: hidden;
 }
 
@@ -275,7 +256,7 @@ body::before {
 
 /* Panneau déroulant */
 .material__panel {
-  background: rgba(0,0,0,0.75);
+  background: rgba(0,0,0,0.9);
   color: #f7f7f7;
   padding: 0.75rem 0.75rem 1rem;
 }
