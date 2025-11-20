@@ -42,7 +42,7 @@ body {
   max-width: var(--page-max-width);
   margin: 0 auto;
   min-height: 100vh;
-  background: #fff;
+  background: transparent;
   padding-bottom: 3rem;
 }
 
