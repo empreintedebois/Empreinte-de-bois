@@ -1,8 +1,0 @@
-[CHANGEMENTS]
-
-- Ajout d'une configuration centrale `config/site-config.json` pour piloter header, titres, galerie, modale.
-- Mise en place d'une modale accessible (overlay, ESC, focus trap) dans `js/modules/ui-modal.js`.
-- Galerie: vignettes carrées, limitation à 2/3 du viewport, clip dans bandes obliques, lazy-load, navigation clavier.
-- Flèches de navigation **géantes**: bouton circulaire doré, icône "<" noire, diamètre = 1/8 de la largeur de la page.
-- Accordéon Matériaux: un seul panneau ouvert.
-- Alignement bas-à-bas Matériaux/Contact par CSS Grid.
