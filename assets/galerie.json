@@ -1,0 +1,34 @@
+[
+  {
+    "src": "assets/galerie/galerie01.jpg",
+    "alt": "Exemple 1"
+  },
+  {
+    "src": "assets/galerie/galerie02.jpg",
+    "alt": "Exemple 2"
+  },
+  {
+    "src": "assets/galerie/galerie03.jpg",
+    "alt": "Exemple 3"
+  },
+  {
+    "src": "assets/galerie/galerie04.jpg",
+    "alt": "Exemple 4"
+  }
+  {
+    "src": "assets/galerie/galerie04.jpg",
+    "alt": "Exemple 5"
+  }
+  {
+    "src": "assets/galerie/galerie04.jpg",
+    "alt": "Exemple 6"
+  }
+  {
+    "src": "assets/galerie/galerie04.jpg",
+    "alt": "Exemple 7"
+  }
+  {
+    "src": "assets/galerie/galerie08.jpg",
+    "alt": "Exemple 8"
+  }
+]
