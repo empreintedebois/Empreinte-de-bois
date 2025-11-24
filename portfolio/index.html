@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Empreinte de Bois – Portfolio 3D</title>
+  <meta name="description" content="Portfolio 3D et gravure numérique : sélection de projets, démarche, matériaux et contact." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="site-header" id="site-header">
+    <div class="shell shell--row">
+      <a href="#top" class="site-logo">
+        <span class="site-logo__mark">EB</span>
+        <span class="site-logo__text">Empreinte de Bois</span>
+      </a>
+      <nav class="site-nav" aria-label="Navigation principale">
+        <a href="#portfolio">Galerie</a>
+        <a href="#process">Démarche</a>
+        <a href="#about">À propos</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO SECTION -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__bg"></div>
+      <div class="shell hero__content">
+        <div class="hero__text">
+          <p class="eyebrow">Conception 3D &amp; gravure</p>
+          <h1 id="hero-title">Donner du relief à la matière.</h1>
+          <p class="hero__subtitle">Images, volumes et textures au service de la fabrication. Un pont entre rendu numérique et pièce physique.</p>
+          <div class="hero__actions">
+            <a href="#portfolio" class="btn btn--primary">Voir la galerie</a>
+            <a href="#contact" class="btn btn--ghost">Discuter d’un projet</a>
+          </div>
+          <p class="hero__hint">Scroll pour explorer la galerie ↓</p>
+        </div>
+        <div class="hero__preview">
+          <div class="hero-card">
+            <img src="../assets/galerie/galerie01_w1280.webp" alt="Gravure bois avec lumière rasante" loading="lazy" />
+            <div class="hero-card__meta">
+              <p class="hero-card__tag">Série bois</p>
+              <p class="hero-card__title">Étude de lumière &amp; matière</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALERIE -->
+    <section class="section" id="portfolio" aria-labelledby="portfolio-title">
+      <div class="shell">
+        <div class="section__hdr">
+          <h2 id="portfolio-title">Galerie</h2>
+          <p>Une sélection de projets récents : matières, essais de lumière, compositions et maquettes préparatoires.</p>
+        </div>
+        <div class="gallery-filters" role="tablist" aria-label="Filtres galerie">
+          <button class="chip is-active" data-filter="all" role="tab" aria-selected="true">Tout</button>
+          <button class="chip" data-filter="gravure" role="tab">Gravure</button>
+          <button class="chip" data-filter="volume" role="tab">Volumes</button>
+          <button class="chip" data-filter="proto" role="tab">Maquettes / tests</button>
+        </div>
+        <div class="gallery-grid">
+          <!-- Carte 1 -->
+          <article class="gallery-item" data-cat="gravure">
+            <button class="gallery-item__btn" type="button" data-full="../assets/galerie/galerie01_w2000.webp">
+              <div class="gallery-item__media">
+                <img src="../assets/galerie/galerie01_w640.webp" alt="Détail de gravure sur bois – traits fins et forts contrastes" loading="lazy" decoding="async" />
+              </div>
+              <div class="gallery-item__meta">
+                <h3>Série “Empreintes”</h3>
+                <p>Gravure bois – jeu d’ombres et de micro-reliefs.</p>
+              </div>
+            </button>
+          </article>
+          <!-- Carte 2 -->
+          <article class="gallery-item" data-cat="gravure">
+            <button class="gallery-item__btn" type="button" data-full="../assets/galerie/galerie02_w2000.webp">
+              <div class="gallery-item__media">
+                <img src="../assets/galerie/galerie02_w640.webp" alt="Plaque gravée avec dégradés de profondeur" loading="lazy" decoding="async" />
+              </div>
+              <div class="gallery-item__meta">
+                <h3>Placage texturé</h3>
+                <p>Variation de profondeurs pour un rendu quasi topographique.</p>
+              </div>
+            </button>
+          </article>
+          <!-- Carte 3 -->
+          <article class="gallery-item" data-cat="volume">
+            <button class="gallery-item__btn" type="button" data-full="../assets/galerie/galerie03_w900.webp">
+              <div class="gallery-item__media">
+                <img src="../assets/galerie/galerie03_w640.webp" alt="Volume abstrait avec éclairage contrasté" loading="lazy" decoding="async" />
+              </div>
+              <div class="gallery-item__meta">
+                <h3>Volume abstrait</h3>
+                <p>Étude de forme et de lumière avant passage en atelier.</p>
+              </div>
+            </button>
+          </article>
+          <!-- Carte 4 -->
+          <article class="gallery-item" data-cat="proto">
+            <button class="gallery-item__btn" type="button" data-full="../assets/galerie/galerie04.webp">
+              <div class="gallery-item__media">
+                <img src="../assets/galerie/galerie04.webp" alt="Test matière et grain" loading="lazy" decoding="async" />
+              </div>
+              <div class="gallery-item__meta">
+                <h3>Test matière</h3>
+                <p>Expérimentations de grain et d’usure sur surface bois.</p>
+              </div>
+            </button>
+          </article>
+          <!-- Carte 5 -->
+          <article class="gallery-item" data-cat="volume proto">
+            <button class="gallery-item__btn" type="button" data-full="../assets/galerie/galerie05.webp">
+              <div class="gallery-item__media">
+                <img src="../assets/galerie/galerie05.webp" alt="Composition volumique en lumière froide" loading="lazy" decoding="async" />
+              </div>
+              <div class="gallery-item__meta">
+                <h3>Composition 3D</h3>
+                <p>Simulation de gravure et de lumière avant fabrication.</p>
+              </div>
+            </button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESS / DEMARCHE -->
+    <section class="section section--alt" id="process" aria-labelledby="process-title">
+      <div class="shell">
+      <div class="section__hdr">
+        <h2 id="process-title">Démarche</h2>
+        <p>Une boucle courte entre idée, simulation 3D et test matière.</p>
+      </div>
+      <div class="process-grid">
+        <article class="process-card">
+          <h3>1. Intention &amp; contraintes</h3>
+          <p>On clarifie le contexte : support, format, budget, contraintes d’atelier. L’idée, c’est d’avoir un cadre solide avant de pousser les images.</p>
+        </article>
+        <article class="process-card">
+          <h3>2. Études 3D &amp; lumière</h3>
+          <p>Travail en 3D sur volumes, textures, contrastes et lisibilité. Les rendus servent ensuite de base à la gravure ou à la fabrication.</p>
+        </article>
+        <article class="process-card">
+          <h3>3. Passage matière</h3>
+          <p>Tests sur bois ou autres matériaux, ajustement des profondeurs de gravure, des densités et des zones de réserve.</p>
+        </article>
+        <article class="process-card">
+          <h3>4. Finitions &amp; variations</h3>
+          <p>Déclinaisons de la même base : formats, intensité des contrastes, colorisation partielle ou séries limitées.</p>
+        </article>
+      </div>
+      </div>
+    </section>
+
+    <!-- A PROPOS -->
+    <section class="section" id="about" aria-labelledby="about-title">
+      <div class="shell about">
+        <div class="about__text">
+          <h2 id="about-title">À propos</h2>
+          <p>Je conçois des images et des volumes destinés à devenir des objets physiques : gravures, panneaux, pièces uniques ou petites séries.</p>
+          <p>Mon travail mélange outils 3D, sens de la matière et contraintes réelles d’atelier. L’objectif : garder un rendu fort, mais fabriquable.</p>
+        </div>
+        <ul class="about__tags" aria-label="Champs de travail">
+          <li>Conception 3D</li>
+          <li>Préparation gravure</li>
+          <li>Études lumière</li>
+          <li>Matériaux &amp; textures</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section section--alt" id="contact" aria-labelledby="contact-title">
+      <div class="shell contact">
+        <div class="contact__text">
+          <h2 id="contact-title">Contact</h2>
+          <p>Un projet, une idée ou juste une question sur la faisabilité d’une pièce ? Envoyez quelques lignes, éventuellement des visuels, et on voit ce qui est réaliste.</p>
+        </div>
+        <form class="contact__form" action="mailto:empreinte.de.bois@example.com" method="post">
+          <label>
+            Nom
+            <input type="text" name="name" autocomplete="name" required />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" autocomplete="email" required />
+          </label>
+          <label>
+            Message
+            <textarea name="message" rows="5" required></textarea>
+          </label>
+          <button type="submit" class="btn btn--primary">Envoyer</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <p>© Empreinte de Bois – Adam</p>
+      <div class="site-footer__links">
+        <a href="#top">Retour en haut</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lightbox__backdrop" data-close="1" aria-label="Fermer"></button>
+    <figure class="lightbox__body">
+      <img src="" alt="" id="lightbox-img" />
+      <figcaption id="lightbox-caption"></figcaption>
+      <button class="lightbox__close" data-close="1" aria-label="Fermer la vue détaillée">×</button>
+    </figure>
+  </div>
+
+  <script src="page.js" defer></script>
+</body>
+</html>
