@@ -1,0 +1,21 @@
+{
+  "header": {
+    "heightMobile": 56,
+    "heightDesktop": 72,
+    "opacity": 0.8,
+    "shadow": "0 8px 24px rgba(0,0,0,0.35)"
+  },
+  "title": {
+    "sizeMobile": "1.1rem",
+    "sizeDesktop": "1.35rem"
+  },
+  "subtitle": {
+    "ornament": "antique"
+  },
+  "gallery": {
+    "maxWidthVW": 66,
+    "cardShadow": "0 10px 24px rgba(0,0,0,0.25)",
+    "whiteBannerHeight": 64,
+    "navDiameterVW": 12.5
+  }
+}
