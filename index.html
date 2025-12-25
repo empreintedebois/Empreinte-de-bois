@@ -274,8 +274,12 @@ I8<!doctype html>
   // ===============================
   // PARAMÈTRES (à modifier)
   // ===============================
-  const IMG_GREY = "assets/fond/fond-gris.webp";
-  const IMG_GOLD = "assets/fond/fond-dore.webp";
+  // APRÈS (l.273–278)
+  const IMG_GREY_V = "assets/fond/fond-gris-v.webp";
+  const IMG_GOLD_V = "assets/fond/fond-dore-v.webp";
+
+  const IMG_GREY_H = "assets/fond/fond-gris-h.webp";
+  const IMG_GOLD_H = "assets/fond/fond-dore-h.webp";
 
   const MIN_DIAMETER = 120;
   const MAX_DIAMETER = 400;
@@ -329,7 +333,12 @@ I8<!doctype html>
       i.src = src;
     });
   }
-
+ function pickBackgroundByOrientation() {
+  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+   return isPortrait
+    ? { grey: IMG_GREY_V, gold: IMG_GOLD_V }
+    : { grey: IMG_GREY_H, gold: IMG_GOLD_H };
+ }
   function drawCover(ctx2d, img) {
     const iw = img.width, ih = img.height;
     const scale = Math.max(w / iw, h / ih);
@@ -373,7 +382,8 @@ function spawn(now) {
   (async function () {
     let grey, gold;
     try {
-      [grey, gold] = await Promise.all([load(IMG_GREY), load(IMG_GOLD)]);
+       const picked = pickBackgroundByOrientation();
+       [grey, gold] = await Promise.all([load(picked.grey), load(picked.gold)]);
     } catch (e) {
       console.error("[Fond animé]", e);
       return;
@@ -381,7 +391,15 @@ function spawn(now) {
 
     resize();
     window.addEventListener("resize", resize, { passive: true });
-
+window.addEventListener("orientationchange", async () => {
+  try {
+    const picked = pickBackgroundByOrientation();
+    [grey, gold] = await Promise.all([load(picked.grey), load(picked.gold)]);
+  } catch (e) {
+    console.error("[Fond animé] reload orientation", e);
+  }
+}, { passive: true });
+    
     function frame(now) {
       if (now - lastSpawn > SPAWN_DELAY) {
         spawn(now);
