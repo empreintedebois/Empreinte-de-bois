@@ -1,4 +1,4 @@
-<!doctype html>
+I8<!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
@@ -277,15 +277,16 @@
   const IMG_GREY = "assets/fond/fond-gris.webp";
   const IMG_GOLD = "assets/fond/fond-dore.webp";
 
-  const MIN_DIAMETER = 50;
-  const MAX_DIAMETER = 200;
+  const MIN_DIAMETER = 120;
+  const MAX_DIAMETER = 400;
 
   const FADE_IN  = 2000;
   const FADE_OUT = 1000;
-  const SPAWN_DELAY = 2000;
+  const SPAWN_DELAY = 1200;
 
   const SOFT_EDGE = 0.55;
-  const MAX_PULSES = 10;
+  const GREY_BLUR = 1.2;
+  const MAX_PULSES = 18;
   const MAX_DPR = 1.5;
   // ===============================
 
@@ -338,18 +339,28 @@
     const dy = (h - dh) / 2;
     ctx2d.drawImage(img, dx, dy, dw, dh);
   }
+    
+  // APRÈS (l.342–354 environ, ça remplace tout le bloc)
+function spawn(now) {
+  if (pulses.length >= MAX_PULSES) return;
 
-  function spawn(now) {
-    if (pulses.length >= MAX_PULSES) return;
+  // 1 à 3 ronds d’un coup (aléatoire)
+  const count = 1 + Math.floor(Math.random() * 3);
+
+  for (let i = 0; i < count; i++) {
+    if (pulses.length >= MAX_PULSES) break;
+
     const d = MIN_DIAMETER + Math.random() * (MAX_DIAMETER - MIN_DIAMETER);
+
     pulses.push({
       x: Math.random() * w,
       y: Math.random() * h,
       r: d / 2,
-      born: now,
-      die: now + FADE_IN + FADE_OUT
+      born: now + Math.random() * 250,            // petit décalage
+      die: now + FADE_IN + FADE_OUT + 250
     });
   }
+}
 
   function opacity(p, now) {
     const t = now - p.born;
@@ -381,7 +392,10 @@
 
       // base gris
       ctx.clearRect(0,0,w,h);
+      ctx.save();
+      ctx.filter = `blur(${GREY_BLUR}px)`;
       drawCover(ctx, grey);
+      ctx.restore();
 
       // couche dorée
       goldCtx.clearRect(0,0,w,h);
