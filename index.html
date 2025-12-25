@@ -285,14 +285,14 @@ I8<!doctype html>
   const MIN_DIAMETER_RATIO = 0.06;
   const MAX_DIAMETER_RATIO = 0.18;
 
-  const FADE_IN  = 2000;
+  const FADE_IN  = 3000;
   const FADE_OUT = 1000;
-  const SPAWN_DELAY = 1200;
+  const SPAWN_DELAY = 800;
 
   const SOFT_EDGE = 0.55;
-  const MAX_PULSES = 18;
+  const MAX_PULSES = 20;
   const MAX_DPR = 1.5;
-  const MAX_PULSES = 18;
+  const MAX_PULSES_PER_SPAWN = 3;
   const VIEWPORT_HYSTERESIS_PX = 80;
   // ===============================
 
@@ -361,30 +361,31 @@ I8<!doctype html>
   }
     
   // APRÈS (l.342–354 environ, ça remplace tout le bloc)
+
 function spawn(now) {
   if (pulses.length >= MAX_PULSES) return;
 
-  // 1 à 3 ronds d’un coup (aléatoire)
-  const count = 1 + Math.floor(Math.random() * 3);
+  // Nombre de halos à créer cette fois (1 → MAX_PULSES_PER_SPAWN)
+  const count = 1 + Math.floor(Math.random() * MAX_PULSES_PER_SPAWN);
+
+  const base = Math.min(w, h);
+  const minD = base * MIN_DIAMETER_RATIO;
+  const maxD = base * MAX_DIAMETER_RATIO;
 
   for (let i = 0; i < count; i++) {
     if (pulses.length >= MAX_PULSES) break;
 
-    const base = Math.min(w, h);
-    const minD = base * MIN_DIAMETER_RATIO;
-    const maxD = base * MAX_DIAMETER_RATIO;
     const d = minD + Math.random() * (maxD - minD);
 
     pulses.push({
       x: Math.random() * w,
       y: Math.random() * h,
       r: d / 2,
-      born: now + Math.random() * 250,            // petit décalage
-      die: now + FADE_IN + FADE_OUT + 250
+      born: now + Math.random() * 250,
+      die: now + FADE_IN + FADE_OUT
     });
   }
 }
-
   function opacity(p, now) {
     const t = now - p.born;
     if (t < 0) return 0;
@@ -397,7 +398,30 @@ function spawn(now) {
     let grey, gold;
     try {
        const picked = pickBackgroundByOrientation();
-       [grey, gold] = await Promise.all([load(picked.grey), load(picked.gold)]);
+       [grey, gold] = await Promise.all([loadfunction spawn(now) {
+  if (pulses.length >= MAX_PULSES) return;
+
+  // Nombre de halos à créer cette fois (1 → MAX_PULSES_PER_SPAWN)
+  const count = 1 + Math.floor(Math.random() * MAX_PULSES_PER_SPAWN);
+
+  const base = Math.min(w, h);
+  const minD = base * MIN_DIAMETER_RATIO;
+  const maxD = base * MAX_DIAMETER_RATIO;
+
+  for (let i = 0; i < count; i++) {
+    if (pulses.length >= MAX_PULSES) break;
+
+    const d = minD + Math.random() * (maxD - minD);
+
+    pulses.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: d / 2,
+      born: now + Math.random() * 250,
+      die: now + FADE_IN + FADE_OUT + 250
+    });
+  }
+    }(picked.grey), load(picked.gold)]);
     } catch (e) {
       console.error("[Fond animé]", e);
       return;
