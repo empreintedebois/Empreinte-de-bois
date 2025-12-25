@@ -292,6 +292,8 @@ I8<!doctype html>
   const SOFT_EDGE = 0.55;
   const MAX_PULSES = 18;
   const MAX_DPR = 1.5;
+  const MAX_PULSES = 18;
+  const VIEWPORT_HYSTERESIS_PX = 80;
   // ===============================
 
   const canvas = document.getElementById("background-canvas");
@@ -308,9 +310,17 @@ I8<!doctype html>
   let lastSpawn = 0;
 
   function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-    w = window.innerWidth;
-    h = window.innerHeight;
+  dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+
+  const newW = window.innerWidth;
+  const newH = window.innerHeight;
+
+  // Android/Chrome : la barre d’adresse fait varier innerHeight au scroll
+  // -> on ignore si c’est un petit delta, pour éviter le “zoom”
+  if (w && newW === w && Math.abs(newH - h) < VIEWPORT_HYSTERESIS_PX) return;
+
+  w = newW;
+  h = newH;
 
     for (const c of [canvas, maskCanvas, goldCanvas]) {
       c.width = Math.floor(w * dpr);
