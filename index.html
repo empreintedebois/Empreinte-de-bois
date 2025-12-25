@@ -280,9 +280,10 @@ I8<!doctype html>
 
   const IMG_GREY_H = "assets/fond/fond-gris-h.webp";
   const IMG_GOLD_H = "assets/fond/fond-dore-h.webp";
-
-  const MIN_DIAMETER = 120;
-  const MAX_DIAMETER = 400;
+  const MAX_COVER_SCALE = 1.15;
+  
+  const MIN_DIAMETER_RATIO = 0.06;
+  const MAX_DIAMETER_RATIO = 0.18;
 
   const FADE_IN  = 2000;
   const FADE_OUT = 1000;
@@ -341,7 +342,8 @@ I8<!doctype html>
  }
   function drawCover(ctx2d, img) {
     const iw = img.width, ih = img.height;
-    const scale = Math.max(w / iw, h / ih);
+    const rawScale = Math.max(w / iw, h / ih);
+    const scale = Math.min(rawScale, MAX_COVER_SCALE);
     const dw = iw * scale;
     const dh = ih * scale;
     const dx = (w - dw) / 2;
@@ -359,7 +361,10 @@ function spawn(now) {
   for (let i = 0; i < count; i++) {
     if (pulses.length >= MAX_PULSES) break;
 
-    const d = MIN_DIAMETER + Math.random() * (MAX_DIAMETER - MIN_DIAMETER);
+    const base = Math.min(w, h);
+    const minD = base * MIN_DIAMETER_RATIO;
+    const maxD = base * MAX_DIAMETER_RATIO;
+    const d = minD + Math.random() * (maxD - minD);
 
     pulses.push({
       x: Math.random() * w,
