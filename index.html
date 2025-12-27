@@ -40,7 +40,6 @@
 <div class="hero__preview">
 <div class="hero-card">
 <img alt="Carré Bois Sapin — support en bois" loading="lazy" src="assets/logo_w640.webp"/>
-
 </div>
 </div>
 </div>
@@ -51,7 +50,7 @@
 <div class="section__hdr">
 <h2 id="portfolio-title">Galerie</h2>
 <p>Une sélection de projets récents : matières, essais de lumière, compositions et maquettes préparatoires.</p>
-</div>
+</div><div class="chips"><button class="chip is-active" data-filter="all" type="button">Tout</button><button class="chip" data-filter="gravure" type="button">Gravure</button><button class="chip" data-filter="accessoire" type="button">Accessoire</button><button class="chip" data-filter="maquette" type="button">Maquette</button></div>
 <div aria-label="Filtres galerie" class="gallery-filters" role="tablist">
 <button aria-selected="true" class="chip is-active" data-filter="all" role="tab">Tout</button>
 <button class="chip" data-filter="gravure" role="tab">Gravure</button>
@@ -59,63 +58,7 @@
 <button class="chip" data-filter="proto" role="tab">Maquettes</button>
 <button class="chip" data-filter="volume proto" role="tab">Volumes &amp; prototypes</button>
 </div>
-<div class="gallery-grid">
-<article class="gallery-item" data-cat="gravure">
-<button class="gallery-item__btn" data-full="assets/galerie/galerie01_w1280.webp" type="button">
-<div class="gallery-item__media">
-<img alt="Gravure ronde aux motifs floraux" decoding="async" loading="lazy" src="assets/galerie/galerie01_w640.webp"/>
-</div>
-<div class="gallery-item__meta">
-<h3>Motifs floraux</h3>
-<p>Gravure ronde finement ciselée sur bois.</p>
-</div>
-</button>
-</article>
-<article class="gallery-item" data-cat="volume">
-<button class="gallery-item__btn" data-full="assets/bandeaux/M05/image.png" type="button">
-<div class="gallery-item__media">
-<img alt="Carré Bois Sapin — support en bois" decoding="async" loading="lazy" src="assets/bandeaux/M05/image.png"/>
-</div>
-<div class="gallery-item__meta">
-<h3>Carré Bois Sapin</h3>
-<p>Support en bois massif au grain fin.</p>
-</div>
-</button>
-</article>
-<article class="gallery-item" data-cat="volume">
-<button class="gallery-item__btn" data-full="assets/bandeaux/M06/image.png" type="button">
-<div class="gallery-item__media">
-<img alt="Carré Bois Noyer — support en bois foncé" decoding="async" loading="lazy" src="assets/bandeaux/M06/image.png"/>
-</div>
-<div class="gallery-item__meta">
-<h3>Carré Bois Noyer</h3>
-<p>Support en noyer aux teintes chaudes.</p>
-</div>
-</button>
-</article>
-<article class="gallery-item" data-cat="proto">
-<button class="gallery-item__btn" data-full="assets/bandeaux/M01/image.png" type="button">
-<div class="gallery-item__media">
-<img alt="Rond Sapin — disque en bois" decoding="async" loading="lazy" src="assets/bandeaux/M01/image.png"/>
-</div>
-<div class="gallery-item__meta">
-<h3>Rond Sapin</h3>
-<p>Disque en sapin avec bord arrondi.</p>
-</div>
-</button>
-</article>
-<article class="gallery-item" data-cat="volume proto">
-<button class="gallery-item__btn" data-full="assets/bandeaux/M03/image.png" type="button">
-<div class="gallery-item__media">
-<img alt="Rond Similicuir blanc — disque en simili cuir" decoding="async" loading="lazy" src="assets/bandeaux/M03/image.png"/>
-</div>
-<div class="gallery-item__meta">
-<h3>Rond Similicuir blanc</h3>
-<p>Disque en similicuir doux et résistant.</p>
-</div>
-</button>
-</article>
-</div>
+<div class="gallery-grid"><!-- Rempli automatiquement par gallery.js via data/gallery.json --></div>
 </div>
 </section>
 <!-- PROCESS SECTION -->
@@ -438,5 +381,5 @@
     requestAnimationFrame(frame);
   })();
   </script>
-</body>
+<script defer="True" src="gallery.js"></script></body>
 </html>
