@@ -5,6 +5,12 @@
       "thumb": "assets/galerie/gravure/thumb/image1.webp",
       "full": "assets/galerie/gravure/full/image1.webp",
       "caption": "Légende à compléter"
+    },
+    {
+      "category": "accessoire",
+      "thumb": "assets/galerie/accessoire/thumb/image1.webp",
+      "full": "assets/galerie/accessoire/full/image1.webp",
+      "caption": "Légende à compléter"
     }
   ]
 }
