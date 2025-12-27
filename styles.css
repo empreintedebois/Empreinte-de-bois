@@ -26,10 +26,10 @@
 *::after {
   box-sizing: border-box;
 }
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
+  background: #05070a;
 }
 body {
   min-height: 100vh;
@@ -644,12 +644,14 @@ body {
    - fixe au scroll
    - NON répété (le JS fait un "cover")
 ================================ */
-html { background: #000; }
-html, body { background: transparent !important; }
+html { background: #05070a; }
+html, body { background: #05070a; }
 
 #background-canvas {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 0;          /* visible, derrière le contenu */
   pointer-events: none;
 }
