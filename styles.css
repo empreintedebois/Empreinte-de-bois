@@ -643,8 +643,19 @@ body {
     padding-block: 0.5rem;
   }
   .site-nav {
-    display: none;
-  }
+  display: flex;
+  flex-wrap: nowrap;          /* UNE SEULE LIGNE */
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  line-height: 1;
+  justify-content: flex-end;
+  align-items: center;
+  margin-left: auto;
+}
+
+.site-nav a {
+  white-space: nowrap;        /* interdit le retour à la ligne dans les liens */
+}
   .hero {
     padding-block: 3rem;
   }
