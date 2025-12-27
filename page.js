@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const __AUTO_GALLERY__ = document.querySelector('section#portfolio[data-gallery="auto"]');
+
+  // --- Galerie (legacy) : désactivée si la galerie auto est active ---
+  if (!__AUTO_GALLERY__) {
+
   // Gestion des filtres de la galerie
   const filterButtons = Array.from(document.querySelectorAll(".chip"));
   const galleryItems = Array.from(document.querySelectorAll(".gallery-item"));
@@ -60,8 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
       lbImg.src = "";
     }
   });
+  }
 
-  // Données pour les modèles M01 à M10
+// Données pour les modèles M01 à M10
   const designs = [
     {
       id: "M01",
