@@ -1,4 +1,5 @@
-name: Audit architecture des données (site mono-page)
+
+name: Audit architecture V2 (mono-page)
 
 on:
   workflow_dispatch:
@@ -6,11 +7,10 @@ on:
 jobs:
   audit:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Audit complet
+      - name: Audit complet V2
         run: |
           python - << 'PY'
           import re, json
@@ -19,75 +19,100 @@ jobs:
           ROOT = Path(".")
           INDEX = ROOT / "index.html"
 
-          print("\n=== AUDIT ARCHITECTURE SITE ===\n")
+          def norm(p): 
+            return p.split("?")[0].replace("\\","/")
 
-          # -----------------------------
-          # 1. Fichiers réellement référencés
-          # -----------------------------
+          def is_ignored(ref: str) -> bool:
+            ref = ref.strip()
+            return (
+              ref.startswith("#") or
+              ref.startswith("http://") or ref.startswith("https://") or
+              ref.startswith("mailto:") or ref.startswith("tel:") or
+              ref.startswith("data:") or
+              ref == ""
+            )
+
           referenced = set()
 
-          html = INDEX.read_text(encoding="utf-8")
+          # --- HTML refs (src/href/poster) ---
+          html = INDEX.read_text(encoding="utf-8", errors="ignore")
+          for attr in ["src", "href", "poster"]:
+            for m in re.findall(rf'{attr}="([^"]+)"', html):
+              if not is_ignored(m):
+                referenced.add(norm(m))
 
-          # HTML refs
-          for attr in ["src", "href"]:
-              for m in re.findall(rf'{attr}="([^"]+)"', html):
-                  if not m.startswith("http"):
-                      referenced.add(m.split("?")[0])
+          # --- CSS url(...) ---
+          for css in ROOT.rglob("*.css"):
+            txt = css.read_text(encoding="utf-8", errors="ignore")
+            for m in re.findall(r'url\(["\']?([^"\')]+)["\']?\)', txt):
+              if not is_ignored(m):
+                referenced.add(norm(m))
 
-          # JS fetch()
+          # --- JS: fetch() + strings assets/... + data/... ---
           for js in ROOT.rglob("*.js"):
-              txt = js.read_text(encoding="utf-8", errors="ignore")
-              for m in re.findall(r'fetch\(["\']([^"\']+)["\']', txt):
-                  referenced.add(m.split("?")[0])
+            txt = js.read_text(encoding="utf-8", errors="ignore")
 
-          # -----------------------------
-          # 2. Galerie (JSON)
-          # -----------------------------
-          gallery_json = ROOT / "data/gallery.json"
-          if gallery_json.exists():
-              data = json.loads(gallery_json.read_text(encoding="utf-8"))
+            for m in re.findall(r'fetch\(["\']([^"\']+)["\']', txt):
+              if not is_ignored(m):
+                referenced.add(norm(m))
+
+            for m in re.findall(r'(["\'])(assets/[^"\']+)\1', txt):
+              referenced.add(norm(m[1]))
+
+            for m in re.findall(r'(["\'])(data/[^"\']+)\1', txt):
+              referenced.add(norm(m[1]))
+
+            for m in re.findall(r'(["\'])(config/[^"\']+)\1', txt):
+              referenced.add(norm(m[1]))
+
+          # --- JSON configs: scan for string paths ---
+          for j in list(ROOT.rglob("*.json")):
+            try:
+              obj = json.loads(j.read_text(encoding="utf-8"))
+            except Exception:
+              continue
+            blob = json.dumps(obj, ensure_ascii=False)
+            for m in re.findall(r'(assets/[^"\\\s]+)', blob):
+              referenced.add(norm(m))
+            for m in re.findall(r'(data/[^"\\\s]+)', blob):
+              referenced.add(norm(m))
+            for m in re.findall(r'(config/[^"\\\s]+)', blob):
+              referenced.add(norm(m))
+
+          # Galerie JSON => ajoute thumb/full si présents
+          gj = ROOT / "data/gallery.json"
+          if gj.exists():
+            try:
+              data = json.loads(gj.read_text(encoding="utf-8"))
               for it in data.get("items", []):
-                  for k in ["thumb", "full"]:
-                      referenced.add(it[k])
-          else:
-              print("⚠️ data/gallery.json manquant")
+                for k in ("thumb","full","src"):
+                  if k in it and it[k]:
+                    referenced.add(norm(it[k]))
+            except Exception:
+              pass
 
-          # -----------------------------
-          # 3. Tous les fichiers du repo
-          # -----------------------------
+          # Tous les fichiers du repo (hors .git)
           all_files = set(
-              str(p).replace("\\","/")
-              for p in ROOT.rglob("*")
-              if p.is_file()
-              and not p.parts[0].startswith(".git")
+            str(p).replace("\\","/")
+            for p in ROOT.rglob("*")
+            if p.is_file() and ".git" not in p.parts
           )
 
-          # -----------------------------
-          # 4. Analyse
-          # -----------------------------
           unused = sorted(f for f in all_files if f not in referenced)
           missing = sorted(f for f in referenced if not Path(f).exists())
 
-          # -----------------------------
-          # 5. Rapport
-          # -----------------------------
-          print("\n--- FICHIERS UTILISÉS ---")
+          print("\n=== AUDIT V2 ===\n")
+          print("\n--- UTILISÉS (référencés) ---")
           for f in sorted(referenced):
-              print("✓", f)
+            print("✓", f)
 
-          print("\n--- FICHIERS ORPHELINS (présents mais non utilisés) ---")
-          if unused:
-              for f in unused:
-                  print("⚠️", f)
-          else:
-              print("OK aucun")
+          print("\n--- ORPHELINS (présents mais non référencés) ---")
+          for f in unused:
+            print("⚠️", f)
 
-          print("\n--- FICHIERS MANQUANTS (référencés mais absents) ---")
-          if missing:
-              for f in missing:
-                  print("❌", f)
-          else:
-              print("OK aucun")
+          print("\n--- MANQUANTS (référencés mais absents) ---")
+          for f in missing:
+            print("❌", f)
 
-          print("\n=== FIN AUDIT ===\n")
+          print("\n=== FIN AUDIT V2 ===\n")
           PY
