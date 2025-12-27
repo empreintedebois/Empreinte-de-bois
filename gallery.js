@@ -1,11 +1,13 @@
 /* ============================================================
-   gallery.js — Galerie auto (optimisée) + "Voir plus"
+   gallery.js — Galerie auto (optimisée) V3
    ------------------------------------------------------------
-   - Charge un seul fichier data/gallery.json
-   - Affiche Tout + filtres (gravure/accessoire/maquette)
-   - Grille = thumbnails, lightbox = full
-   - Limite l'affichage : A=2x3 (6), B/C=3x3 (9)
-   - Bouton "Voir plus" ouvre une modal avec toute la grille
+   - data/gallery.json (1 seul fetch)
+   - Filtres : all / gravure / accessoire / maquette
+   - Grille : A=2 colonnes, B/C=3 colonnes (CSS)
+   - Miniatures carrées + légende overlay
+   - Limite : A = 6 (2x3), B/C = 9 (3x3)
+   - "Voir plus" : ouvre une modal avec toute la grille filtrée
+   - Clic dans "Voir plus" -> ouvre la lightbox image normale
    ============================================================ */
 
 (async function () {
@@ -16,40 +18,37 @@
   const filterButtons = Array.from(portfolio.querySelectorAll("[data-filter]"));
   const moreBtn = document.getElementById("galleryMoreBtn");
 
-  // Main image lightbox (existant dans ton HTML)
+  // Lightbox principale (déjà dans index)
   const lightbox = document.getElementById("lightbox");
-  const lbImg = lightbox ? lightbox.querySelector("figure img") : null;
-  const lbCap = lightbox ? lightbox.querySelector("figure figcaption") : null;
+  const lbImg = document.getElementById("lightbox-img");
+  const lbCaption = document.getElementById("lightbox-caption");
 
-  // "Voir plus" modal
+  // Modal "Voir plus" (ajoutée dans index)
   const moreModal = document.getElementById("galleryMore");
   const moreGrid = moreModal ? moreModal.querySelector(".gallery-more-grid") : null;
 
-  let currentFilter = "all";
   let items = [];
+  let currentFilter = "all";
 
-  function isMobileA() {
-    return (window.matchMedia && window.matchMedia("(max-width: 640px)").matches);
-  }
+  const isMobileA = () => window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
+  const limitCount = () => (isMobileA() ? 6 : 9);
 
-  function limitCount() {
-    return isMobileA() ? 6 : 9;
-  }
-
-  function openMainLightbox(fullSrc, caption) {
-    if (!lightbox || !lbImg || !lbCap) return;
+  function openLightbox(fullSrc, caption) {
+    if (!lightbox || !lbImg || !lbCaption) return;
     lbImg.src = fullSrc;
     lbImg.alt = caption || "";
-    lbCap.textContent = caption || "";
+    lbCaption.textContent = caption || "";
     lightbox.classList.add("is-open");
     lightbox.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
   }
 
-  function closeModal(modal) {
-    if (!modal) return;
-    modal.classList.remove("is-open");
-    modal.setAttribute("aria-hidden", "true");
+  function closeLightbox() {
+    if (!lightbox || !lbImg || !lbCaption) return;
+    lightbox.classList.remove("is-open");
+    lightbox.setAttribute("aria-hidden", "true");
+    lbImg.removeAttribute("src");
+    lbCaption.textContent = "";
     document.body.style.overflow = "";
   }
 
@@ -58,6 +57,13 @@
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+  }
+
+  function closeModal(modal) {
+    if (!modal) return;
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
   }
 
   function buildCard(it) {
@@ -86,7 +92,6 @@
     img.alt = caption || "";
     media.appendChild(img);
 
-    // Légende overlay dans le media (pour garder l'image carrée)
     const cap = document.createElement("div");
     cap.className = "gallery-item__caption";
     cap.textContent = caption;
@@ -97,45 +102,38 @@
     return article;
   }
 
-  function setActiveFilter(filter) {
+  function applyFilter(filter) {
     currentFilter = filter;
     filterButtons.forEach((b) => b.classList.toggle("is-active", (b.dataset.filter || "") === filter));
 
     const allCards = Array.from(grid.querySelectorAll(".gallery-item"));
-    const visibleCards = [];
+    const visible = [];
 
-    allCards.forEach((card) => {
+    for (const card of allCards) {
       const cat = (card.dataset.cat || "").trim();
       const match = filter === "all" || cat === filter;
       card.style.display = match ? "" : "none";
-      if (match) visibleCards.push(card);
-    });
+      if (match) visible.push(card);
+    }
 
-    // Limit + Voir plus
+    // Limitation + Voir plus
     const lim = limitCount();
     let shown = 0;
-    visibleCards.forEach((card) => {
+    for (const card of visible) {
       shown += 1;
       card.style.display = (shown <= lim) ? "" : "none";
-    });
-
-    if (moreBtn) {
-      moreBtn.style.display = (visibleCards.length > lim) ? "block" : "none";
     }
+
+    if (moreBtn) moreBtn.style.display = (visible.length > lim) ? "block" : "none";
   }
 
-  function populateMoreModal() {
+  function populateMoreGrid() {
     if (!moreGrid) return;
     moreGrid.innerHTML = "";
 
     const filtered = items.filter(it => currentFilter === "all" || (it.category || "") === currentFilter);
-
     const frag = document.createDocumentFragment();
-    for (const it of filtered) {
-      // In modal, use thumbs too (fast), open main lightbox with full
-      const card = buildCard(it);
-      frag.appendChild(card);
-    }
+    for (const it of filtered) frag.appendChild(buildCard(it));
     moreGrid.appendChild(frag);
   }
 
@@ -155,70 +153,54 @@
   for (const it of items) frag.appendChild(buildCard(it));
   grid.appendChild(frag);
 
-  // Filter button events
-  filterButtons.forEach((b) => {
-    b.addEventListener("click", () => setActiveFilter(b.dataset.filter || "all"));
-  });
+  // Filter events
+  filterButtons.forEach((b) => b.addEventListener("click", () => applyFilter(b.dataset.filter || "all")));
 
-  // Grid click opens main lightbox
+  // Click on base grid -> open lightbox
   grid.addEventListener("click", (evt) => {
     const btn = evt.target.closest(".gallery-item__btn");
     if (!btn) return;
-    openMainLightbox(btn.dataset.full || "", btn.dataset.caption || "");
+    openLightbox(btn.dataset.full || "", btn.dataset.caption || "");
   });
 
-  // More button
+  // "Voir plus" button
   if (moreBtn && moreModal && moreGrid) {
     moreBtn.addEventListener("click", () => {
-      populateMoreModal();
+      populateMoreGrid();
       openModal(moreModal);
     });
 
+    // click on more grid -> close modal then open lightbox
     moreGrid.addEventListener("click", (evt) => {
       const btn = evt.target.closest(".gallery-item__btn");
       if (!btn) return;
-      // close more modal, then open main lightbox
       closeModal(moreModal);
-      openMainLightbox(btn.dataset.full || "", btn.dataset.caption || "");
+      openLightbox(btn.dataset.full || "", btn.dataset.caption || "");
     });
 
+    // close modal by backdrop / close
     moreModal.addEventListener("click", (evt) => {
-      if (evt.target.closest("[data-close]") || evt.target.classList.contains("lightbox__backdrop")) {
-        closeModal(moreModal);
-      }
+      if (evt.target.closest("[data-close]")) closeModal(moreModal);
     });
   }
 
-  // Close main lightbox
+  // close main lightbox
   if (lightbox) {
     lightbox.addEventListener("click", (evt) => {
-      if (evt.target.closest("[data-close]") || evt.target.classList.contains("lightbox__backdrop")) {
-        lightbox.classList.remove("is-open");
-        lightbox.setAttribute("aria-hidden", "true");
-        if (lbImg) lbImg.removeAttribute("src");
-        if (lbCap) lbCap.textContent = "";
-        document.body.style.overflow = "";
-      }
+      if (evt.target.closest("[data-close]")) closeLightbox();
     });
   }
 
+  // Escape closes modals
   document.addEventListener("keydown", (evt) => {
     if (evt.key !== "Escape") return;
     if (moreModal && moreModal.classList.contains("is-open")) closeModal(moreModal);
-    if (lightbox && lightbox.classList.contains("is-open")) {
-      lightbox.classList.remove("is-open");
-      lightbox.setAttribute("aria-hidden", "true");
-      if (lbImg) lbImg.removeAttribute("src");
-      if (lbCap) lbCap.textContent = "";
-      document.body.style.overflow = "";
-    }
+    if (lightbox && lightbox.classList.contains("is-open")) closeLightbox();
   });
 
-  // Re-apply limit on resize (A<->B/C)
-  window.addEventListener("resize", () => {
-    window.requestAnimationFrame(() => setActiveFilter(currentFilter));
-  }, { passive: true });
+  // Re-apply on resize (A<->B/C)
+  window.addEventListener("resize", () => window.requestAnimationFrame(() => applyFilter(currentFilter)), { passive: true });
 
   // Init
-  setActiveFilter("all");
+  applyFilter("all");
 })();

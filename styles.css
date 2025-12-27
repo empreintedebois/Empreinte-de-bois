@@ -638,55 +638,81 @@ body {
   }
 }
 
-/* ============================================================
-   TYPO pilotée par texte.js (variables CSS)
-   - Les valeurs sont appliquées via texte.js (VARS + MODES A/B/C)
-   ============================================================ */
-:root{
-  --t-body-size: 1.05rem;
-  --t-h1-size: 3.25rem;
-  --t-h1-lh: 1;
-  --t-eyebrow-size: 0.90rem;
-  --t-section-h2-size: 1.75rem;
-  --t-nav-size: 0.90rem;
-  --t-btn-size: 1.00rem;
 
-  --gold: #b88a3b;
-  --frame-border-w: clamp(1px, 0.18vw, 3px);
-  --frame-bg-solid: rgba(0,0,0,1);
-  --frame-bg-soft: rgba(0,0,0,0.9);
+/* ===============================
+   FOND ANIMÉ GLOBAL (CANVAS)
+   - fixe au scroll
+   - NON répété (le JS fait un "cover")
+================================ */
+html { background: #000; }
+html, body { background: transparent !important; }
 
-  --header-offset: 72px;
+#background-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;          /* visible, derrière le contenu */
+  pointer-events: none;
 }
-body{ font-size: var(--t-body-size); }
-.hero .eyebrow{ font-size: var(--t-eyebrow-size); }
-.hero h1{ font-size: var(--t-h1-size); line-height: var(--t-h1-lh); }
-.section__hdr h2{ font-size: var(--t-section-h2-size); }
-.site-nav{ font-size: var(--t-nav-size); }
-.btn{ font-size: var(--t-btn-size); }
+
+/* Contenu au-dessus */
+main, .site-footer { position: relative; z-index: 1; }
+.site-header { position: sticky; z-index: 40; }
+
+/* ===============================
+   PANNEAUX : 90% opacité + liseré doré
+================================ */
+:root{
+  --gold: #b88a3b;                     /* doré chaud (approx RAL 1037) */
+  --panel-bg: rgba(2, 6, 23, 0.90);    /* 90% opaque */
+  --panel-border: rgba(184, 138, 59, 0.40);
+  --panel-border-strong: rgba(184, 138, 59, 0.65);
+}
+
+/* Header liseré doré */
+.site-header{
+  border-bottom: 1px solid var(--panel-border);
+}
+
+/* Surfaces "panneau" */
+.hero-card,
+.process-card,
+.gallery-item__btn,
+.model-preview,
+.models-list,
+.contact__form,
+.lightbox__body{
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+}
+
+/* Chips */
+.chip{
+  border: 1px solid var(--panel-border);
+  background: rgba(2,6,23,0.75);
+}
+
+/* Hover doré */
+.hero-card:hover,
+.process-card:hover,
+.gallery-item__btn:hover,
+.chip:hover{
+  border-color: var(--panel-border-strong);
+  box-shadow: 0 0 0 1px rgba(184,138,59,0.18);
+}
+
+/* Sections alt : légèrement plus sombres, mais pas opaques */
+.section--alt{
+  background: rgba(2,6,23,0.20) !important;
+}
 
 /* ============================================================
-   OVERRIDES (anti-redondance)
-   Ces règles font autorité : elles utilisent les variables pilotées par texte.js
-   ============================================================ */
-.site-nav{ font-size: var(--t-nav-size) !important; }
-.hero .eyebrow{ font-size: var(--t-eyebrow-size) !important; }
-.hero h1{ font-size: var(--t-h1-size) !important; line-height: var(--t-h1-lh) !important; }
-.section__hdr h2{ font-size: var(--t-section-h2-size) !important; }
-body{ font-size: var(--t-body-size) !important; }
-.btn{ font-size: var(--t-btn-size) !important; }
-
-/* Header fixed offset piloté par --header-offset */
-main#top{ padding-top: var(--header-offset) !important; }
-
-/* ============================================================
-   Galerie — Correctifs (A/B/C) + "Voir plus"
+   Galerie — V3 (A/B/C) : carrés, légende overlay, limites + Voir plus
    ============================================================ */
 
-/* Espace entre catégories (chips) et miniatures */
+/* Un peu plus d'air entre chips et miniatures */
 #portfolio .chips{ margin-bottom: 1rem; }
 
-/* Grille galerie : A=2 colonnes, B/C=3 colonnes */
+/* Grille galerie : B/C = 3 colonnes, A (mobile) = 2 colonnes */
 #portfolio .gallery-grid{
   display: grid;
   gap: 0.9rem;
@@ -696,12 +722,13 @@ main#top{ padding-top: var(--header-offset) !important; }
   #portfolio .gallery-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* Miniatures carrées */
+/* Miniature carrée + crop propre */
 .gallery-item__media{
   position: relative;
   aspect-ratio: 1 / 1;
   overflow: hidden;
   background: #000;
+  border-radius: var(--radius-lg);
 }
 .gallery-item__media img{
   width: 100%;
@@ -710,7 +737,7 @@ main#top{ padding-top: var(--header-offset) !important; }
   display: block;
 }
 
-/* Légende en overlay en bas (semi-transparent) */
+/* Légende en overlay (bande basse transparente) */
 .gallery-item__caption{
   position: absolute;
   left: 0;
@@ -727,12 +754,12 @@ main#top{ padding-top: var(--header-offset) !important; }
   .gallery-item__caption{ font-size: 0.82rem; }
 }
 
-/* Le bouton-carte ne doit pas ajouter de hauteur (caption est dans le media) */
+/* On n'utilise plus le bloc meta sous la photo (on garde des carrés) */
 .gallery-item__meta{ display: none !important; }
 
-/* Bouton bandeau "Voir plus" (affiché uniquement si nécessaire via JS) */
+/* Bandeau "Voir plus" */
 .gallery-more-banner{
-  display: none; /* JS l'active si besoin */
+  display: none; /* activé par JS si besoin */
   width: 100%;
   margin-top: 0.9rem;
   padding: 0.9rem 1rem;
@@ -746,8 +773,8 @@ main#top{ padding-top: var(--header-offset) !important; }
 }
 .gallery-more-banner:hover{ filter: brightness(1.05); }
 
-/* Lightbox (B/C) : afficher l'image entièrement */
-#lightbox figure img{
+/* Lightbox : toujours voir l'image entière (B/C notamment) */
+#lightbox-img{
   max-width: 92vw;
   max-height: 82vh;
   width: auto;
@@ -755,7 +782,7 @@ main#top{ padding-top: var(--header-offset) !important; }
   object-fit: contain;
 }
 
-/* Modal "Voir plus" : grille interne (A=2 colonnes, B/C=3 colonnes) */
+/* Modal "Voir plus" : grille interne */
 #galleryMore .gallery-more-grid{
   display: grid;
   gap: 0.9rem;
@@ -766,6 +793,3 @@ main#top{ padding-top: var(--header-offset) !important; }
 @media (max-width: 640px){
   #galleryMore .gallery-more-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-
-/* Les miniatures dans la modal reprennent le même style */
-#galleryMore .gallery-item__media{ border-radius: var(--radius-lg); }
