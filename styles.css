@@ -830,3 +830,8 @@ main { padding-top: var(--header-offset); }
     max-width: 520px;
   }
 }
+
+
+/* === Galerie auto : légende sous photo === */
+.gallery-item__meta{padding:0.6rem 0.8rem;}
+.gallery-item__meta p{margin:0;font-size:0.9rem;opacity:0.9;}
