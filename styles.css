@@ -742,7 +742,8 @@ main { padding-top: var(--header-offset); }
 
 /* Sections alt : légèrement plus sombres, mais pas opaques */
 .section--alt{
-  background: rgba(2,6,23,0.20) !important;                                            }
+  background: transparent !important;
+}
 /* === Correctif mobile : forcer l’affichage de la nav sur UNE ligne === */
 @media (max-width: 640px) {
   header.site-header .site-nav {
@@ -759,7 +760,7 @@ main { padding-top: var(--header-offset); }
     white-space: nowrap;
   }
 }
-/* === Correctif 2A : arrondis cohérents sur tous les cadres === */
+/* === Correctif 3 : arrondis partout, MAIS overflow hidden seulement sur les cadres image === */
 .hero-card,
 .process-card,
 .gallery-item__btn,
@@ -768,9 +769,18 @@ main { padding-top: var(--header-offset); }
 .models-list,
 .contact__form,
 .lightbox__body,
-.chip {
+.chip,
+.gallery-item__media,
+.variant {
   border-radius: var(--radius-lg);
-  overflow: hidden; /* pour que images/fonds respectent l'arrondi */
+}
+
+/* overflow hidden UNIQUEMENT où il y a une image */
+.hero-card,
+.gallery-item__media,
+.variant,
+.lightbox__body {
+  overflow: hidden;
 }
 /* === Correctif 2B : éviter l'effet vitreux qui crée des démarcations === */
 .panel,
@@ -781,13 +791,32 @@ main { padding-top: var(--header-offset); }
 .contact__form {
   backdrop-filter: none !important;
 }
-/* === Correctif 2B : fond panneau uniforme (évite les bandes visibles) === */
+/* === Correctif 3 : fonds de cadres cohérents (supprime les délimitations) === */
+/* Cadres AVEC image : noir plein */
 .hero-card,
-.process-card,
-.gallery-item__btn,
-.model-item,
-.model-preview,
-.models-list,
-.contact__form {
-  background: rgba(0, 0, 0, 0.90) !important;
+.gallery-item__media,
+.model-main img,
+.lightbox__body {
+  background: var(--frame-bg-solid) !important;
 }
+
+/* Cadres SANS image : 90% opaque */
+.process-card,
+.models-list,
+.contact__form,
+.model-preview,
+.model-info,
+.gallery-item__meta {
+  background: var(--frame-bg-soft) !important;
+}
+
+/* === Correctif 3 : un peu plus d'air dans les cadres texte === */
+.process-card,
+.models-list,
+.contact__form,
+.model-info,
+.gallery-item__meta {
+  padding-top: calc(1.1rem + 2px) !important;
+  padding-bottom: calc(1.1rem + 2px) !important;
+}
+
