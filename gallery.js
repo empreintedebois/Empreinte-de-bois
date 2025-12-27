@@ -100,10 +100,12 @@
       lbImg.src = fullSrc;
       lbImg.alt = caption || "";
       lbCap.textContent = caption || "";
+      lightbox.classList.add("is-open");
       lightbox.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
     }
     function closeLB() {
+      lightbox.classList.remove("is-open");
       lightbox.setAttribute("aria-hidden", "true");
       lbImg.removeAttribute("src");
       lbCap.textContent = "";
