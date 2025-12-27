@@ -130,12 +130,11 @@ body {
 .hero__bg {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 0 0, rgba(248, 250, 252, 0.15), transparent 55%),
-    radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.14), transparent 55%);
-  opacity: 0.7;
+  background: none;
+  opacity: 0;
   pointer-events: none;
 }
+
 .hero__content {
   position: relative;
   display: grid;
@@ -621,12 +620,25 @@ body {
 }
 
 @media (max-width: 640px) {
+  /* Mobile nav */
+  .site-nav {
+    gap: 0.6rem;
+    font-size: 0.72rem;
+    line-height: 1;
+    justify-content: flex-end;
+  }
+
   .site-header .shell {
     padding-block: 0.5rem;
   }
   .site-nav {
-    display: none;
-  }
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
   .hero {
     padding-block: 3rem;
   }
@@ -644,10 +656,12 @@ body {
    - fixe au scroll
    - NON répété (le JS fait un "cover")
 ================================ */
-html { background: #000; }
-html, body { background: transparent !important; }
-
+html, body { background: #000; }
+body { overscroll-behavior-y: none; }
 #background-canvas {
+  width: 100vw;
+  height: 100vh;
+
   position: fixed;
   inset: 0;
   z-index: 0;          /* visible, derrière le contenu */
