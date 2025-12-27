@@ -1,0 +1,89 @@
+name: Build gallery manifest
+
+on:
+  push:
+    paths:
+      - "assets/galerie/**"
+      - ".github/workflows/gallery-build.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-gallery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Pillow
+        run: pip install pillow
+
+      - name: Build gallery
+        run: |
+          python - << 'PY'
+          import json, re
+          from pathlib import Path
+          from PIL import Image
+
+          ROOT = Path("assets/galerie")
+          OUT = Path("data")
+          OUT.mkdir(exist_ok=True)
+
+          cats = ["gravure", "accessoire", "maquette"]
+          items = []
+
+          def num(p):
+            m = re.search(r'image(\d+)\.webp$', p.name)
+            return int(m.group(1)) if m else 9999
+
+          for cat in cats:
+            d = ROOT / cat
+            if not d.exists(): continue
+
+            (d/"thumb").mkdir(exist_ok=True)
+            (d/"full").mkdir(exist_ok=True)
+
+            for img in sorted(d.glob("image*.webp"), key=num):
+              txt = img.with_suffix(".txt")
+              if not txt.exists():
+                txt.write_text("Légende à compléter", encoding="utf-8")
+
+              caption = txt.read_text(encoding="utf-8").strip()
+
+              def resize(dst, w, q):
+                im = Image.open(img)
+                if im.width > w:
+                  h = int(im.height * w / im.width)
+                  im = im.resize((w, h), Image.LANCZOS)
+                im.save(dst, "WEBP", quality=q, method=6)
+
+              thumb = d/"thumb"/img.name
+              full  = d/"full"/img.name
+
+              if not thumb.exists(): resize(thumb, 640, 80)
+              if not full.exists():  resize(full, 1600, 85)
+
+              items.append({
+                "category": cat,
+                "thumb": str(thumb).replace("\\","/"),
+                "full": str(full).replace("\\","/"),
+                "caption": caption
+              })
+
+          (OUT/"gallery.json").write_text(
+            json.dumps({"items": items}, ensure_ascii=False, indent=2),
+            encoding="utf-8"
+          )
+          PY
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add data/gallery.json assets/galerie/**/*
+          git diff --cached --quiet || git commit -m "Auto build gallery"
+          git push
