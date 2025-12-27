@@ -321,9 +321,9 @@ I8<!doctype html>
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
 
-    const newW = window.innerWidth;
-    const newH = window.innerHeight;
-
+    const vv = window.visualViewport;
+    const newW = Math.round(vv ? vv.width : window.innerWidth);
+    const newH = Math.round(vv ? vv.height : window.innerHeight);
     // Android/Chrome : la barre d’adresse fait varier innerHeight au scroll
     // -> on ignore si c’est un petit delta, pour éviter le “zoom”
     if (w && newW === w && Math.abs(newH - h) < VIEWPORT_HYSTERESIS_PX) return;
