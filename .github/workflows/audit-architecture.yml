@@ -1,0 +1,93 @@
+name: Audit architecture des données (site mono-page)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Audit complet
+        run: |
+          python - << 'PY'
+          import re, json
+          from pathlib import Path
+
+          ROOT = Path(".")
+          INDEX = ROOT / "index.html"
+
+          print("\n=== AUDIT ARCHITECTURE SITE ===\n")
+
+          # -----------------------------
+          # 1. Fichiers réellement référencés
+          # -----------------------------
+          referenced = set()
+
+          html = INDEX.read_text(encoding="utf-8")
+
+          # HTML refs
+          for attr in ["src", "href"]:
+              for m in re.findall(rf'{attr}="([^"]+)"', html):
+                  if not m.startswith("http"):
+                      referenced.add(m.split("?")[0])
+
+          # JS fetch()
+          for js in ROOT.rglob("*.js"):
+              txt = js.read_text(encoding="utf-8", errors="ignore")
+              for m in re.findall(r'fetch\(["\']([^"\']+)["\']', txt):
+                  referenced.add(m.split("?")[0])
+
+          # -----------------------------
+          # 2. Galerie (JSON)
+          # -----------------------------
+          gallery_json = ROOT / "data/gallery.json"
+          if gallery_json.exists():
+              data = json.loads(gallery_json.read_text(encoding="utf-8"))
+              for it in data.get("items", []):
+                  for k in ["thumb", "full"]:
+                      referenced.add(it[k])
+          else:
+              print("⚠️ data/gallery.json manquant")
+
+          # -----------------------------
+          # 3. Tous les fichiers du repo
+          # -----------------------------
+          all_files = set(
+              str(p).replace("\\","/")
+              for p in ROOT.rglob("*")
+              if p.is_file()
+              and not p.parts[0].startswith(".git")
+          )
+
+          # -----------------------------
+          # 4. Analyse
+          # -----------------------------
+          unused = sorted(f for f in all_files if f not in referenced)
+          missing = sorted(f for f in referenced if not Path(f).exists())
+
+          # -----------------------------
+          # 5. Rapport
+          # -----------------------------
+          print("\n--- FICHIERS UTILISÉS ---")
+          for f in sorted(referenced):
+              print("✓", f)
+
+          print("\n--- FICHIERS ORPHELINS (présents mais non utilisés) ---")
+          if unused:
+              for f in unused:
+                  print("⚠️", f)
+          else:
+              print("OK aucun")
+
+          print("\n--- FICHIERS MANQUANTS (référencés mais absents) ---")
+          if missing:
+              for f in missing:
+                  print("❌", f)
+          else:
+              print("OK aucun")
+
+          print("\n=== FIN AUDIT ===\n")
+          PY
