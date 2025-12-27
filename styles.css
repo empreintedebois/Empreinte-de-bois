@@ -102,8 +102,11 @@ body {
 
 .site-nav {
   display: flex;
-  gap: 1.25rem;
-  font-size: 0.9rem;
+  gap: 0.6rem;
+  font-size: 0.72rem;      /* “petit” sur mobile */
+  line-height: 1;
+  flex-wrap: wrap;         /* évite de casser le header */
+  justify-content: flex-end;
 }
 .site-nav a {
   color: var(--muted);
@@ -111,6 +114,12 @@ body {
   position: relative;
   padding-block: 0.2rem;
   transition: color var(--transition-fast);
+}
+.site-logo__text {
+  max-width: 46vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .site-nav a::after {
   content: "";
