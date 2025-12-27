@@ -148,10 +148,8 @@ body {
 .hero__bg {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 0 0, rgba(248, 250, 252, 0.15), transparent 55%),
-    radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.14), transparent 55%);
-  opacity: 0.7;
+  background:none;
+  opacity: 0;
   pointer-events: none;
 }
 .hero__content {
@@ -760,4 +758,17 @@ main { padding-top: var(--header-offset); }
   header.site-header .site-nav a {
     white-space: nowrap;
   }
+}
+/* === Correctif 2A : arrondis cohérents sur tous les cadres === */
+.hero-card,
+.process-card,
+.gallery-item__btn,
+.model-item,
+.model-preview,
+.models-list,
+.contact__form,
+.lightbox__body,
+.chip {
+  border-radius: var(--radius-lg);
+  overflow: hidden; /* pour que images/fonds respectent l'arrondi */
 }
