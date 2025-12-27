@@ -19,15 +19,6 @@
   --shell: min(1120px, 100% - 2rem);
   --transition-fast: 180ms ease-out;
   --transition-med: 260ms ease-out;
-  /* === Cadres / liseré doré (RAL 1037 approx) === */
-  --gold: #b88a3b;
-
-  /* Épaisseur du liseré : dépend du viewport (vw), bornée pour rester propre */
-  --frame-border-w: clamp(1px, 0.18vw, 3px);
-
-  /* Fonds des cadres */
-  --frame-bg-solid: rgba(0, 0, 0, 1);    /* cadres AVEC image */
-  --frame-bg-soft:  rgba(0, 0, 0, 0.9);  /* cadres SANS image (10% transparent) */
 }
 
 *,
@@ -35,10 +26,10 @@
 *::after {
   box-sizing: border-box;
 }
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
-  background: #05070a;
 }
 body {
   min-height: 100vh;
@@ -102,11 +93,8 @@ body {
 
 .site-nav {
   display: flex;
-  gap: 0.6rem;
-  font-size: 0.72rem;      /* “petit” sur mobile */
-  line-height: 1;
-  flex-wrap: wrap;         /* évite de casser le header */
-  justify-content: flex-end;
+  gap: 1.25rem;
+  font-size: 0.9rem;
 }
 .site-nav a {
   color: var(--muted);
@@ -114,12 +102,6 @@ body {
   position: relative;
   padding-block: 0.2rem;
   transition: color var(--transition-fast);
-}
-.site-logo__text {
-  max-width: 46vw;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .site-nav a::after {
   content: "";
@@ -148,8 +130,10 @@ body {
 .hero__bg {
   position: absolute;
   inset: 0;
-  background:none;
-  opacity: 0;
+  background:
+    radial-gradient(circle at 0 0, rgba(248, 250, 252, 0.15), transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.14), transparent 55%);
+  opacity: 0.7;
   pointer-events: none;
 }
 .hero__content {
@@ -243,7 +227,19 @@ body {
   object-fit: cover;
   max-height: 420px;
 }
-.hero-card__meta{display:none !important;}
+.hero-card__meta {
+  position: absolute;
+  inset-inline: 0.9rem;
+  bottom: 0.9rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.9rem;
+  backdrop-filter: blur(18px);
+  background: linear-gradient(
+    to right,
+    rgba(15, 23, 42, 0.9),
+    rgba(15, 23, 42, 0.4)
+  );
+}
 .hero-card__tag {
   font-size: 0.7rem;
   text-transform: uppercase;
@@ -629,19 +625,8 @@ body {
     padding-block: 0.5rem;
   }
   .site-nav {
-  display: flex;
-  flex-wrap: nowrap;          /* UNE SEULE LIGNE */
-  gap: 0.6rem;
-  font-size: 0.72rem;
-  line-height: 1;
-  justify-content: flex-end;
-  align-items: center;
-  margin-left: auto;
-}
-
-.site-nav a {
-  white-space: nowrap;        /* interdit le retour à la ligne dans les liens */
-}
+    display: none;
+  }
   .hero {
     padding-block: 3rem;
   }
@@ -651,187 +636,136 @@ body {
   .process-grid {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  /* HERO (A) : aperçu plus petit, sans dépasser le reste */
-  .hero__preview{
-    justify-content: flex-start;
-  }
-  .hero-card{
-    max-width: min(320px, 86vw);
-    margin-inline: 0;
-  }
-  .hero-card img{
-    max-height: 260px;
-  }
 }
 
-
-/* ===============================
-   FOND ANIMÉ GLOBAL (CANVAS)
-   - fixe au scroll
-   - NON répété (le JS fait un "cover")
-================================ */
-html { background: #05070a; }
-html, body { background: #05070a; }
-
-#background-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;          /* visible, derrière le contenu */
-  pointer-events: none;
-}
-
-/* Contenu au-dessus */
-main, .site-footer { position: relative; z-index: 1; }
-.site-header { position: sticky; z-index: 40; }
-
-/* ===============================
-   PANNEAUX : 90% opacité + liseré doré
-================================ */
+/* ============================================================
+   TYPO pilotée par texte.js (variables CSS)
+   - Les valeurs sont appliquées via texte.js (VARS + MODES A/B/C)
+   ============================================================ */
 :root{
-  --gold: #b88a3b;                     /* doré chaud (approx RAL 1037) */
-  --panel-bg: rgba(2, 6, 23, 0.90);    /* 90% opaque */
-  --panel-border: rgba(184, 138, 59, 0.40);
-  --panel-border-strong: rgba(184, 138, 59, 0.65);
+  --t-body-size: 1.05rem;
+  --t-h1-size: 3.25rem;
+  --t-h1-lh: 1;
+  --t-eyebrow-size: 0.90rem;
+  --t-section-h2-size: 1.75rem;
+  --t-nav-size: 0.90rem;
+  --t-btn-size: 1.00rem;
+
+  --gold: #b88a3b;
+  --frame-border-w: clamp(1px, 0.18vw, 3px);
+  --frame-bg-solid: rgba(0,0,0,1);
+  --frame-bg-soft: rgba(0,0,0,0.9);
+
+  --header-offset: 72px;
+}
+body{ font-size: var(--t-body-size); }
+.hero .eyebrow{ font-size: var(--t-eyebrow-size); }
+.hero h1{ font-size: var(--t-h1-size); line-height: var(--t-h1-lh); }
+.section__hdr h2{ font-size: var(--t-section-h2-size); }
+.site-nav{ font-size: var(--t-nav-size); }
+.btn{ font-size: var(--t-btn-size); }
+
+/* ============================================================
+   OVERRIDES (anti-redondance)
+   Ces règles font autorité : elles utilisent les variables pilotées par texte.js
+   ============================================================ */
+.site-nav{ font-size: var(--t-nav-size) !important; }
+.hero .eyebrow{ font-size: var(--t-eyebrow-size) !important; }
+.hero h1{ font-size: var(--t-h1-size) !important; line-height: var(--t-h1-lh) !important; }
+.section__hdr h2{ font-size: var(--t-section-h2-size) !important; }
+body{ font-size: var(--t-body-size) !important; }
+.btn{ font-size: var(--t-btn-size) !important; }
+
+/* Header fixed offset piloté par --header-offset */
+main#top{ padding-top: var(--header-offset) !important; }
+
+/* ============================================================
+   Galerie — Correctifs (A/B/C) + "Voir plus"
+   ============================================================ */
+
+/* Espace entre catégories (chips) et miniatures */
+#portfolio .chips{ margin-bottom: 1rem; }
+
+/* Grille galerie : A=2 colonnes, B/C=3 colonnes */
+#portfolio .gallery-grid{
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 640px){
+  #portfolio .gallery-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* Header liseré doré */
-.site-header {
-  position: fixed;   /* toujours en haut, même avant scroll */
-  top: 0;
+/* Miniatures carrées */
+.gallery-item__media{
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #000;
+}
+.gallery-item__media img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Légende en overlay en bas (semi-transparent) */
+.gallery-item__caption{
+  position: absolute;
   left: 0;
   right: 0;
-  z-index: 40;
-
-  background: #000;  /* noir profond sans transparence */
-  backdrop-filter: none;
-
-  border-bottom: var(--frame-border-w) solid var(--gold);
+  bottom: 0;
+  padding: 0.55rem 0.7rem;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(2px);
+  color: #fff;
+  font-size: 0.9rem;
+  line-height: 1.15;
 }
-:root { --header-offset: 72px; }
-
-main { padding-top: var(--header-offset); }
-
-@media (max-width: 640px) {
-  :root { --header-offset: 64px; }
+@media (max-width: 640px){
+  .gallery-item__caption{ font-size: 0.82rem; }
 }
-/* Cadres SANS image : 10% transparent */
-.process-card,
-.models-list,
-.contact__form {
+
+/* Le bouton-carte ne doit pas ajouter de hauteur (caption est dans le media) */
+.gallery-item__meta{ display: none !important; }
+
+/* Bouton bandeau "Voir plus" (affiché uniquement si nécessaire via JS) */
+.gallery-more-banner{
+  display: none; /* JS l'active si besoin */
+  width: 100%;
+  margin-top: 0.9rem;
+  padding: 0.9rem 1rem;
   border: var(--frame-border-w) solid var(--gold);
-  background: var(--frame-bg-soft);
-}
-
-/* Chips */
-.chip{
-  border: var(--frame-border-w) solid var(--gold);
-  background: var(--frame-bg-soft);
-}
-
-/* Hover doré */
-.hero-card:hover,
-.process-card:hover,
-.gallery-item__btn:hover,
-.chip:hover{
-  border-color: var(--panel-border-strong);
-  box-shadow: 0 0 0 1px rgba(184,138,59,0.18);
-}
-
-/* Sections alt : légèrement plus sombres, mais pas opaques */
-.section--alt{
-  background: transparent !important;
-}
-/* === Correctif mobile : forcer l’affichage de la nav sur UNE ligne === */
-@media (max-width: 640px) {
-  header.site-header .site-nav {
-    display: flex !important;
-    flex-wrap: nowrap;        /* UNE SEULE LIGNE */
-    gap: 0.6rem;
-    font-size: 0.72rem;
-    line-height: 1;
-    justify-content: flex-end;
-    align-items: center;
-  }
-
-  header.site-header .site-nav a {
-    white-space: nowrap;
-  }
-}
-/* === Correctif 3 : arrondis partout, MAIS overflow hidden seulement sur les cadres image === */
-.hero-card,
-.process-card,
-.gallery-item__btn,
-.model-item,
-.model-preview,
-.models-list,
-.contact__form,
-.lightbox__body,
-.chip,
-.gallery-item__media,
-.variant {
   border-radius: var(--radius-lg);
+  background: rgba(0,0,0,0.90);
+  color: inherit;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+.gallery-more-banner:hover{ filter: brightness(1.05); }
+
+/* Lightbox (B/C) : afficher l'image entièrement */
+#lightbox figure img{
+  max-width: 92vw;
+  max-height: 82vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
-/* overflow hidden UNIQUEMENT où il y a une image */
-.hero-card,
-.gallery-item__media,
-.variant,
-.lightbox__body {
-  overflow: hidden;
+/* Modal "Voir plus" : grille interne (A=2 colonnes, B/C=3 colonnes) */
+#galleryMore .gallery-more-grid{
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(980px, 92vw);
+  padding: 0.6rem 0.2rem 0.2rem;
 }
-/* === Correctif 2B : éviter l'effet vitreux qui crée des démarcations === */
-.panel,
-.hero-card,
-.process-card,
-.models-list,
-.model-preview,
-.contact__form {
-  backdrop-filter: none !important;
-}
-/* === Correctif 3 : fonds de cadres cohérents (supprime les délimitations) === */
-/* Cadres AVEC image : noir plein */
-.hero-card,
-.gallery-item__media,
-.model-main img,
-.lightbox__body {
-  background: var(--frame-bg-solid) !important;
+@media (max-width: 640px){
+  #galleryMore .gallery-more-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* Cadres SANS image : 90% opaque */
-.process-card,
-.models-list,
-.contact__form,
-.model-preview,
-.model-info,
-.gallery-item__meta {
-  background: var(--frame-bg-soft) !important;
-}
-
-/* === Correctif 3 : un peu plus d'air dans les cadres texte === */
-.process-card,
-.models-list,
-.contact__form,
-.model-info,
-.gallery-item__meta {
-  padding-top: calc(1.1rem + 2px) !important;
-  padding-bottom: calc(1.1rem + 2px) !important;
-}
-
-
-/* HERO (B/C) : texte + aperçu alignés, taille maîtrisée */
-@media (min-width: 961px){
-  .hero__content{
-    align-items: center;
-  }
-  .hero-card{
-    max-width: 520px;
-  }
-}
-
-
-/* === Galerie auto : légende sous photo === */
-.gallery-item__meta{padding:0.6rem 0.8rem;}
-.gallery-item__meta p{margin:0;font-size:0.9rem;opacity:0.9;}
+/* Les miniatures dans la modal reprennent le même style */
+#galleryMore .gallery-item__media{ border-radius: var(--radius-lg); }

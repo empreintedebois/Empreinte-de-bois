@@ -51,8 +51,7 @@
 <h2 id="portfolio-title">Galerie</h2>
 <p>Une sélection de projets récents : matières, essais de lumière, compositions et maquettes préparatoires.</p>
 </div><div class="chips"><button class="chip is-active" data-filter="all" type="button">Tout</button><button class="chip" data-filter="gravure" type="button">Gravure</button><button class="chip" data-filter="accessoire" type="button">Accessoire</button><button class="chip" data-filter="maquette" type="button">Maquette</button></div>
-
-<div class="gallery-grid"><!-- Rempli automatiquement par gallery.js via data/gallery.json --></div>
+<div class="gallery-grid"><!-- Rempli automatiquement par gallery.js via data/gallery.json --></div><button class="gallery-more-banner" id="galleryMoreBtn" type="button">Voir plus</button>
 </div>
 </section>
 <!-- PROCESS SECTION -->
@@ -375,5 +374,5 @@
     requestAnimationFrame(frame);
   })();
   </script>
-<script defer="True" src="gallery.js"></script></body>
+<script defer="True" src="gallery.js"></script><div aria-hidden="true" class="lightbox lightbox--more" id="galleryMore"><div class="lightbox__backdrop" data-close="1"></div><figure class="lightbox__body"><button aria-label="Fermer" class="lightbox__close" data-close="1" type="button">×</button><figcaption class="lightbox__caption">Galerie</figcaption><div class="gallery-more-grid"></div></figure></div></body>
 </html>
