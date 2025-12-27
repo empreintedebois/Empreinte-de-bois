@@ -19,6 +19,15 @@
   --shell: min(1120px, 100% - 2rem);
   --transition-fast: 180ms ease-out;
   --transition-med: 260ms ease-out;
+  /* === Cadres / liseré doré (RAL 1037 approx) === */
+  --gold: #b88a3b;
+
+  /* Épaisseur du liseré : dépend du viewport (vw), bornée pour rester propre */
+  --frame-border-w: clamp(1px, 0.18vw, 3px);
+
+  /* Fonds des cadres */
+  --frame-bg-solid: rgba(0, 0, 0, 1);    /* cadres AVEC image */
+  --frame-bg-soft:  rgba(0, 0, 0, 0.9);  /* cadres SANS image (10% transparent) */
 }
 
 *,
@@ -671,26 +680,37 @@ main, .site-footer { position: relative; z-index: 1; }
 }
 
 /* Header liseré doré */
-.site-header{
-  border-bottom: 1px solid var(--panel-border);
-}
+.site-header {
+  position: fixed;   /* toujours en haut, même avant scroll */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
 
-/* Surfaces "panneau" */
-.hero-card,
+  background: #000;  /* noir profond sans transparence */
+  backdrop-filter: none;
+
+  border-bottom: var(--frame-border-w) solid var(--gold);
+}
+:root { --header-offset: 72px; }
+
+main { padding-top: var(--header-offset); }
+
+@media (max-width: 640px) {
+  :root { --header-offset: 64px; }
+}
+/* Cadres SANS image : 10% transparent */
 .process-card,
-.gallery-item__btn,
-.model-preview,
 .models-list,
-.contact__form,
-.lightbox__body{
-  border: 1px solid var(--panel-border);
-  background: var(--panel-bg);
+.contact__form {
+  border: var(--frame-border-w) solid var(--gold);
+  background: var(--frame-bg-soft);
 }
 
 /* Chips */
 .chip{
-  border: 1px solid var(--panel-border);
-  background: rgba(2,6,23,0.75);
+  border: var(--frame-border-w) solid var(--gold);
+  background: var(--frame-bg-soft);
 }
 
 /* Hover doré */
