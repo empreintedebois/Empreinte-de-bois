@@ -772,3 +772,22 @@ main { padding-top: var(--header-offset); }
   border-radius: var(--radius-lg);
   overflow: hidden; /* pour que images/fonds respectent l'arrondi */
 }
+/* === Correctif 2B : éviter l'effet vitreux qui crée des démarcations === */
+.panel,
+.hero-card,
+.process-card,
+.models-list,
+.model-preview,
+.contact__form {
+  backdrop-filter: none !important;
+}
+/* === Correctif 2B : fond panneau uniforme (évite les bandes visibles) === */
+.hero-card,
+.process-card,
+.gallery-item__btn,
+.model-item,
+.model-preview,
+.models-list,
+.contact__form {
+  background: rgba(0, 0, 0, 0.90) !important;
+}
