@@ -417,6 +417,7 @@ I8<!doctype html>
 
     resize();
     window.addEventListener("resize", resize, { passive: true });
+    window.visualViewport?.addEventListener("resize", resize, { passive: true });
 
     window.addEventListener("orientationchange", async () => {
       try {
