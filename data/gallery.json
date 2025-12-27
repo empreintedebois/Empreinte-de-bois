@@ -11,6 +11,12 @@
       "thumb": "assets/galerie/accessoire/thumb/image1.webp",
       "full": "assets/galerie/accessoire/full/image1.webp",
       "caption": "Légende à compléter"
+    },
+    {
+      "category": "maquette",
+      "thumb": "assets/galerie/maquette/thumb/image1.webp",
+      "full": "assets/galerie/maquette/full/image1.webp",
+      "caption": "Légende à compléter"
     }
   ]
 }
