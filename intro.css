@@ -1,25 +1,31 @@
 /* =========================
-   INTRO OVERLAY (transparent background)
+   INTRO OVERLAY (3s lock)
    ========================= */
 
-body.intro-lock {
-  overflow: hidden; /* bloque pendant 3s */
-}
+body.intro-lock { overflow: hidden; } /* bloque pendant 3s */
 
-/* Intro overlay: transparent, laisse voir le fond du site */
-.intro {
+.intro{
   position: fixed;
   inset: 0;
   z-index: 9999;
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: transparent; /* IMPORTANT: jamais noir */
-  pointer-events: none; /* seul le bouton flèche sera cliquable */
+  pointer-events: auto;
 }
 
-/* Centre logo */
-.intro-center {
+.intro-bg{ position:absolute; inset:0; }
+.intro-bg__gris, .intro-bg__dore{ display:none; }
+
+/* subtle vignette so the logo stays readable */
+.intro::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: radial-gradient(circle at 50% 45%, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.85) 70%, rgba(0,0,0,1) 100%);
+  pointer-events:none;
+}
+.intro-center{
   position: relative;
   z-index: 1;
   width: min(88vw, 720px);
@@ -29,26 +35,25 @@ body.intro-lock {
   pointer-events: none;
 }
 
-/* Logo "logique" 1200x1200 qu'on scale pour mobile */
-.logo-explode {
+.logo-explode{
   position: relative;
   width: 1200px;
   height: 1200px;
-  --logoScale: 0.55; /* fallback si JS ne calcule pas */
-  transform: scale(var(--logoScale));
+  transform: scale(var(--logoScale, 1));
   transform-origin: center;
 }
 
-/* Shards = petites images croppées, positionnées via style inline left/top/width/height */
-.logo-piece {
+.logo-piece{
   position: absolute;
-  transform: translate3d(0, 0, 0);
-  will-change: transform, opacity;
+  image-rendering: auto;
+  transform: translate3d(0,0,0);
+  will-change: transform, opacity, filter;
   opacity: 1;
+  filter: none;
 }
 
 /* Flèche */
-.scroll-arrow {
+.scroll-arrow{
   position: absolute;
   bottom: 26px;
   z-index: 2;
@@ -62,57 +67,92 @@ body.intro-lock {
   pointer-events: none;
 }
 
-.scroll-arrow.is-visible {
+.scroll-arrow.is-visible{
   opacity: 1;
   pointer-events: auto;
   animation: intro-bob 1.15s ease-in-out infinite;
 }
 
-@keyframes intro-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
+@keyframes intro-bob{
+  0%,100%{ transform: translateY(0); }
+  50%{ transform: translateY(8px); }
 }
 
-/* Le site est masqué le temps de l’intro */
-.site-hidden {
+/* Espace de scroll utilisé pour piloter l’intro */
+.intro-spacer{height:0;}
+
+/* Révélation du site */
+.site-hidden{
   opacity: 0;
-  transform: translateY(-12px);
+  transform: translateY(-18px);
 }
-
-.site-revealed {
+.site-revealed{
   opacity: 1;
   transform: translateY(0);
-  transition: opacity .7s ease, transform .7s ease;
+  transition: opacity .9s ease, transform .9s ease;
 }
 
-/* Reveal doux haut -> bas (bord non-franc), sans overlay blur */
-.reveal {
+/* Reveal haut -> bas */
+.reveal{
+  clip-path: inset(0 0 100% 0);
+}
+.reveal.reveal-on{
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.0s ease;
+}
+
+.logo-explode{
+  position: relative;
+  width: 1200px;
+  height: 1200px;
+  transform: scale(var(--logoScale, 1));
+  transform-origin: center;
+}
+.intro-center{
+  position: relative;
+  z-index: 1;
+  width: min(88vw, 720px);
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+/* Soft-edge reveal (no blur overlay) */
+.reveal{
   --revealY: 0%;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0) calc(var(--revealY) - 12%),
-    rgba(0,0,0,1) var(--revealY)
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0) calc(var(--revealY) - 12%),
-    rgba(0,0,0,1) var(--revealY)
-  );
+  -webkit-mask-image: linear-gradient(to bottom,
+    rgba(0,0,0,0) calc(var(--revealY) - 10%),
+    rgba(0,0,0,1) var(--revealY));
+  mask-image: linear-gradient(to bottom,
+    rgba(0,0,0,0) calc(var(--revealY) - 10%),
+    rgba(0,0,0,1) var(--revealY));
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 }
-
-.reveal.reveal-on {
-  --revealY: 125%;
+.reveal.reveal-on{
+  --revealY: 120%;
   transition: --revealY 1.25s ease;
 }
 
-/* Si ton navigateur ne supporte pas mask, fallback simple */
-@supports not (mask-image: linear-gradient(#000, #000)) {
-  .reveal { clip-path: inset(0 0 100% 0); }
-  .reveal.reveal-on { clip-path: inset(0 0 0 0); transition: clip-path 1.25s ease; }
+/* Override: intro background uses the page background */
+.intro-bg__gris, .intro-bg__dore{opacity:0 !important;}
+
+/* === OVERRIDES: fond intro identique au site (jamais noir) === */
+.intro{ background: transparent !important; }
+.intro-bg{ position:absolute !important; inset:0 !important; display:block !important; }
+.intro-bg__gris{
+  position:absolute !important; inset:0 !important; display:block !important;
+  background: url("assets/fond/fond-gris-h.webp") center/cover no-repeat !important;
+  opacity: 1 !important;
 }
-/* TEST: si ça fait revenir ton fond, on a la preuve que #site est masqué */
-#site.site-hidden { opacity: 1 !important; }
+.intro-bg__dore{
+  position:absolute !important; inset:0 !important; display:block !important;
+  background: url("assets/fond/fond-dore-h.webp") center/cover no-repeat !important;
+  opacity: .70 !important;
+  mix-blend-mode: screen !important;
+}
+
+.intro{ pointer-events: auto !important; }
