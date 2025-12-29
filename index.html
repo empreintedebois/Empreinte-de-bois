@@ -10,58 +10,8 @@
 <link href="intro.css" rel="stylesheet"/>
 </head>
 <body class="intro-lock">
-<!-- Intro overlay (bloque 3s, puis scroll-control) -->
-<div id="intro" class="intro" aria-hidden="false">
-  <div class="intro-bg">
-    <div class="intro-bg__gris"></div>
-    <div class="intro-bg__dore"></div>
-  </div>
-
-  <div class="intro-center">
-    <div id="logoExplode" class="logo-explode" aria-label="Empreinte de Bois">
-      
-            <img class="logo-piece" id="piece-p01" style="left:208px;top:156px;width:236px;height:278px" src="assets/intro/shards/p01.webp" alt="" />
-      <img class="logo-piece" id="piece-p02" style="left:182px;top:376px;width:133px;height:305px" src="assets/intro/shards/p02.webp" alt="" />
-      <img class="logo-piece" id="piece-p03" style="left:322px;top:562px;width:221px;height:161px" src="assets/intro/shards/p03.webp" alt="" />
-      <img class="logo-piece" id="piece-p04" style="left:596px;top:200px;width:180px;height:100px" src="assets/intro/shards/p04.webp" alt="" />
-      <img class="logo-piece" id="piece-p05" style="left:616px;top:586px;width:237px;height:106px" src="assets/intro/shards/p05.webp" alt="" />
-      <img class="logo-piece" id="piece-p06" style="left:773px;top:199px;width:184px;height:99px" src="assets/intro/shards/p06.webp" alt="" />
-      <img class="logo-piece" id="piece-p07" style="left:440px;top:620px;width:190px;height:101px" src="assets/intro/shards/p07.webp" alt="" />
-      <img class="logo-piece" id="piece-p08" style="left:185px;top:316px;width:214px;height:165px" src="assets/intro/shards/p08.webp" alt="" />
-      <img class="logo-piece" id="piece-p09" style="left:439px;top:519px;width:199px;height:82px" src="assets/intro/shards/p09.webp" alt="" />
-      <img class="logo-piece" id="piece-p10" style="left:572px;top:365px;width:114px;height:145px" src="assets/intro/shards/p10.webp" alt="" />
-      <img class="logo-piece" id="piece-p11" style="left:311px;top:456px;width:132px;height:215px" src="assets/intro/shards/p11.webp" alt="" />
-      <img class="logo-piece" id="piece-p12" style="left:508px;top:200px;width:88px;height:98px" src="assets/intro/shards/p12.webp" alt="" />
-      <img class="logo-piece" id="piece-p13" style="left:844px;top:362px;width:101px;height:112px" src="assets/intro/shards/p13.webp" alt="" />
-      <img class="logo-piece" id="piece-p14" style="left:306px;top:378px;width:130px;height:139px" src="assets/intro/shards/p14.webp" alt="" />
-      <img class="logo-piece" id="piece-p15" style="left:687px;top:376px;width:79px;height:134px" src="assets/intro/shards/p15.webp" alt="" />
-      <img class="logo-piece" id="piece-p16" style="left:444px;top:190px;width:66px;height:110px" src="assets/intro/shards/p16.webp" alt="" />
-      <img class="logo-piece" id="piece-p17" style="left:418px;top:431px;width:124px;height:112px" src="assets/intro/shards/p17.webp" alt="" />
-      <img class="logo-piece" id="piece-p18" style="left:717px;top:368px;width:78px;height:132px" src="assets/intro/shards/p18.webp" alt="" />
-      <img class="logo-piece" id="piece-p19" style="left:956px;top:200px;width:64px;height:98px" src="assets/intro/shards/p19.webp" alt="" />
-      <img class="logo-piece" id="piece-p20" style="left:565px;top:364px;width:61px;height:99px" src="assets/intro/shards/p20.webp" alt="" />
-      <img class="logo-piece" id="piece-p21" style="left:225px;top:115px;width:129px;height:83px" src="assets/intro/shards/p21.webp" alt="" />
-      <img class="logo-piece" id="piece-p22" style="left:791px;top:328px;width:227px;height:15px" src="assets/intro/shards/p22.webp" alt="" />
-      <img class="logo-piece" id="piece-p23" style="left:846px;top:451px;width:101px;height:60px" src="assets/intro/shards/p23.webp" alt="" />
-      <img class="logo-piece" id="piece-p24" style="left:166px;top:253px;width:74px;height:83px" src="assets/intro/shards/p24.webp" alt="" />
-      <img class="logo-piece" id="piece-p25" style="left:545px;top:599px;width:105px;height:56px" src="assets/intro/shards/p25.webp" alt="" />
-      <img class="logo-piece" id="piece-p26" style="left:633px;top:556px;width:109px;height:37px" src="assets/intro/shards/p26.webp" alt="" />
-      <img class="logo-piece" id="piece-p27" style="left:354px;top:525px;width:68px;height:42px" src="assets/intro/shards/p27.webp" alt="" />
-      <img class="logo-piece" id="piece-p28" style="left:713px;top:634px;width:80px;height:53px" src="assets/intro/shards/p28.webp" alt="" />
-      <img class="logo-piece" id="piece-p29" style="left:595px;top:258px;width:40px;height:38px" src="assets/intro/shards/p29.webp" alt="" />
-      <img class="logo-piece" id="piece-p30" style="left:234px;top:596px;width:36px;height:51px" src="assets/intro/shards/p30.webp" alt="" />
-    
-    </div>
-  </div>
-
-  <button id="scrollArrow" class="scroll-arrow" aria-label="Descendre">↓</button>
-</div>
-
-<!-- Espace de scroll pour piloter l’intro -->
-<div id="intro-spacer" class="intro-spacer" aria-hidden="true"></div>
 <!-- Fond animé global (fixe, derrière tout) -->
 <canvas aria-hidden="true" id="background-canvas"></canvas>
-<div id="site" class="site-hidden">
 <!-- HEADER STICKY -->
 <header class="site-header" id="site-header">
 <div class="shell shell--row">
@@ -206,7 +156,7 @@
 <figcaption id="lightbox-caption"></figcaption>
 <button aria-label="Fermer la vue détaillée" class="lightbox__close" data-close="1">×</button>
 </figure>
-</div><div aria-hidden="true" class="lightbox lightbox--more" id="galleryMore"><button aria-label="Fermer" class="lightbox__backdrop" data-close="1"></button><figure class="lightbox__body"><button aria-label="Fermer" class="lightbox__close" data-close="1">×</button><figcaption class="lightbox__caption">Galerie</figcaption><div class="gallery-more-grid"></div></figure>
+</div><div aria-hidden="true" class="lightbox lightbox--more" id="galleryMore"><button aria-label="Fermer" class="lightbox__backdrop" data-close="1"></button><figure class="lightbox__body"><button aria-label="Fermer" class="lightbox__close" data-close="1">×</button><figcaption class="lightbox__caption">Galerie</figcaption><div class="gallery-more-grid"></div></figure></div>
 <script defer src="gallery.js"></script>
 <script defer src="page.js"></script>
 <script defer src="intro.js"></script>
@@ -416,9 +366,5 @@
     requestAnimationFrame(frame);
   })();
   </script>
-
-</div>
-
-</div>
 </body>
 </html>

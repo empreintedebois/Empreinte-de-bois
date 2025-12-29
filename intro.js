@@ -11,6 +11,7 @@
   const failOpen = (why) => {
     try { console.warn("Intro fail-open:", why); } catch(e){}
     try { sessionStorage.setItem(KEY, "1"); } catch(e){}
+    try { body.classList.remove("intro-lock"); } catch(e){}
     try { intro?.remove(); } catch(e){}
     try { document.getElementById("reveal-curtain")?.remove(); } catch(e){}
     try { site?.classList.remove("site-hidden"); } catch(e){}
@@ -45,6 +46,8 @@
     window.addEventListener("touchmove", prevent, { passive:false });
   }
   function unlockScroll(){
+    try { body.classList.remove("intro-lock"); } catch(e){}
+
     window.removeEventListener("wheel", prevent);
     window.removeEventListener("touchmove", prevent);
     window.removeEventListener("touchstart", onTouchStart);
@@ -128,6 +131,8 @@
   }
 
   function finish(){
+    try { body.classList.remove("intro-lock"); } catch(e){}
+
     sessionStorage.setItem(KEY, "1");
 
     // L'intro disparaît (fond canvas reste en place => pas de saut)
@@ -139,7 +144,7 @@
     if (curtain) {
       // démarre légèrement après la fin de fade (tu peux ajuster si besoin)
       requestAnimationFrame(() => curtain.classList.add("reveal-on"));
-      setTimeout(() => curtain.remove(), 1400);
+      setTimeout(() => curtain.remove(), 1900);
     }
 
     unlockScroll();
@@ -210,6 +215,9 @@
       if (!pieces.length) throw new Error("no pieces in DOM");
 
       pieces.forEach((el, idx) => {
+        // Priorité de décodage/chargement (mobile)
+        try { el.loading = 'eager'; el.decoding = 'async'; if (idx < 6) el.fetchPriority = 'high'; } catch(e){}
+
         const m = /piece-(p\\d+)/.exec(el.id);
         el.dataset.pid = m ? m[1] : "";
         el.__seed = idx + 1;
