@@ -5,160 +5,209 @@
   const spacer = document.getElementById("intro-spacer");
   const site = document.getElementById("site");
   const arrow = document.getElementById("scrollArrow");
+  const logo = document.getElementById("logoExplode");
 
-  // Skip intro if already passed in this session
+  // already done this session
   if (sessionStorage.getItem("introDone") === "1") {
     if (intro) intro.remove();
     if (spacer) spacer.remove();
     site.classList.remove("site-hidden");
-    site.classList.add("site-revealed", "reveal", "reveal-on");
-    body.classList.remove("intro-lock");
+    site.classList.add("site-revealed");
+    site.classList.add("reveal");
+    requestAnimationFrame(() => site.classList.add("reveal-on"));
     return;
   }
 
   let pieces = [];
   let meta = null;
-  let canScroll = false;
-  let done = false;
 
-  // lock scroll for 3 seconds (not waiting full page load)
-  const lockStart = () => {
-    body.classList.add("intro-lock");
-    // hard block wheel/touch during lock
-    const block = (e) => { if (!canScroll) e.preventDefault(); };
-    window.__introBlockWheel = block;
-    window.addEventListener("wheel", block, { passive: false });
-    window.addEventListener("touchmove", block, { passive: false });
-  };
+  // ---- 3s lock (not tied to full page load) ----
+  let locked = true;
+  body.classList.add("intro-lock");
 
-  const unlock = () => {
-    canScroll = true;
+  // We use virtual scroll during intro to avoid browser UI/address bar collapsing.
+  let v = 0;                 // virtual progress 0..1
+  let isAuto = false;
+  let autoStart = 0;
+  let autoV0 = 0;
+
+  // timings (seconds)
+  const T_EXPLODE = 1.5;     // explode to full
+  const T_FADE = 1.0;        // fade to transparent (NOT to black)
+  const T_PAUSE = 0.5;       // pause after fade
+  const T_REVEAL = 1.25;     // reveal site (soft edge)
+  const AUTO_TRIGGER = 0.30; // start auto after 30% progress
+
+  // progress phases on v: [0..0.70] explode, [0.70..0.90] fade, [0.90..1] hold->finish
+  const P_EXP_END = 0.70;
+  const P_FADE_END = 0.90;
+
+  // prevent default scrolling during intro (even after unlock)
+  function prevent(e){ e.preventDefault(); }
+
+  window.addEventListener("wheel", prevent, { passive:false });
+  window.addEventListener("touchmove", prevent, { passive:false });
+
+  setTimeout(() => {
+    locked = false;
     body.classList.remove("intro-lock");
     if (arrow) arrow.classList.add("is-visible");
-    // remove blockers
-    if (window.__introBlockWheel) {
-      window.removeEventListener("wheel", window.__introBlockWheel);
-      window.removeEventListener("touchmove", window.__introBlockWheel);
-      window.__introBlockWheel = null;
-    }
-  };
+  }, 3000);
 
-  lockStart();
-  setTimeout(unlock, 3000);
-
-  // Progress mapping:
-  // p in [0..1] over INTRO_SCROLL_PX
-  const getIntroScrollPx = () => Math.max(1, Math.round(window.innerHeight * 1.05));
-
-  function getP() {
-    const px = getIntroScrollPx();
-    return Math.min(1, Math.max(0, window.scrollY / px));
+  // compute scale for 1200px logical logo inside responsive container
+  function updateScale(){
+    const box = logo?.parentElement?.getBoundingClientRect();
+    if (!box || !logo) return;
+    const scale = Math.min(box.width / 1200, box.height / 1200);
+    logo.style.setProperty("--logoScale", String(scale));
   }
+  window.addEventListener("resize", updateScale);
 
-  // explode 0..0.55 ; fade-to-black 0.55..1
-  function applyTransforms(p) {
-    const explode = Math.min(1, p / 0.55);
-    const fadeT = p < 0.55 ? 0 : Math.min(1, (p - 0.55) / 0.45);
+  function clamp01(x){ return Math.min(1, Math.max(0, x)); }
+
+  function apply(v){
+    // explode from 0..P_EXP_END
+    const explode = clamp01(v / P_EXP_END);
+
+    // fade to transparent from P_EXP_END-0.05..P_FADE_END (starts 0.2s before end in time; approx here)
+    const fade = v <= P_EXP_END ? 0 : clamp01((v - P_EXP_END) / (P_FADE_END - P_EXP_END));
+
+    // jitter fades out as explode progresses
+    const j = (1 - explode);
+
+    const now = performance.now() / 1000;
 
     pieces.forEach((el) => {
       const id = el.dataset.pid;
-      const info = meta.pieces.find(x => x.id === id);
+      const info = meta.piecesById[id];
       if (!info) return;
 
-      const mag = info.mag; // px at full explode
-      const tx = info.dir.x * mag * explode;
-      const ty = info.dir.y * mag * explode;
+      const tx = info.dir.x * info.mag * explode;
+      const ty = info.dir.y * info.mag * explode;
 
-      // jitter decreases as it explodes
-      const j = (1 - explode);
-      const jx = (Math.sin((performance.now()/1000) * 2.2 + el.__seed) * 1.2) * j;
-      const jy = (Math.cos((performance.now()/1000) * 2.0 + el.__seed*0.7) * 1.2) * j;
+      const jx = Math.sin(now * 2.2 + el.__seed) * 1.1 * j;
+      const jy = Math.cos(now * 2.0 + el.__seed*0.7) * 1.1 * j;
 
       el.style.transform = `translate3d(${tx + jx}px, ${ty + jy}px, 0)`;
 
-      // Fade to black: brightness(0) turns white to black. Then fade out slightly.
-      el.style.filter = `brightness(${1 - fadeT})`;
-      el.style.opacity = String(1 - fadeT * 0.95);
+      // fade to transparent (no black)
+      el.style.opacity = String(1 - fade);
     });
   }
 
-  function finishIntro() {
-    if (done) return;
-    done = true;
-    sessionStorage.setItem("introDone", "1");
+  function startAuto(){
+    if (isAuto) return;
+    isAuto = true;
+    autoStart = performance.now();
+    autoV0 = v;
+    if (arrow) arrow.classList.remove("is-visible");
+  }
 
-    // Remove intro visuals
+  function finish(){
+    sessionStorage.setItem("introDone", "1");
+    // remove intro
     if (intro) intro.remove();
     if (spacer) spacer.remove();
 
-    // Reset scroll to top of real site (no way back)
-    window.scrollTo({ top: 0, behavior: "auto" });
-
-    // Reveal site from top to bottom
+    // reveal site softly
     site.classList.remove("site-hidden");
     site.classList.add("site-revealed", "reveal");
     requestAnimationFrame(() => site.classList.add("reveal-on"));
 
-    // Hard guard: if user tries to scroll negative, there's nothing above anyway.
+    // allow normal scroll again
+    window.removeEventListener("wheel", prevent);
+    window.removeEventListener("touchmove", prevent);
   }
 
-  function onScroll() {
-    if (!canScroll || done) return;
-    const p = getP();
-    applyTransforms(p);
+  function tick(){
+    if (!meta) { requestAnimationFrame(tick); return; }
 
-    if (p >= 1) {
-      finishIntro();
+    // If user has manually progressed past trigger, start auto sequence
+    if (!locked && !isAuto && v >= AUTO_TRIGGER) startAuto();
+
+    if (isAuto){
+      const t = (performance.now() - autoStart) / 1000; // seconds
+      // Map time to v progression: explode to 1 over 1.5s, fade over 1s, pause 0.5s, reveal 1.25s then finish.
+      // We'll drive v until 1 to keep apply() coherent.
+      const total = T_EXPLODE + T_FADE + T_PAUSE;
+      const u = clamp01(t / total);
+      v = autoV0 + (1 - autoV0) * u;
+      v = clamp01(v);
+
+      apply(v);
+
+      // after total time, finish + reveal (reveal is CSS transition)
+      if (t >= total){
+        finish();
+        return;
+      }
+    } else {
+      apply(v);
     }
+
+    requestAnimationFrame(tick);
   }
 
-  // Arrow scrolls to end of intro
-  if (arrow) {
+  function onWheel(e){
+    if (locked || isAuto) return;
+    // clamp delta to slow it down
+    const delta = Math.max(-60, Math.min(60, e.deltaY));
+    v = clamp01(v + delta / 2600); // slower progression
+  }
+
+  let touchY = null;
+  function onTouchStart(e){
+    if (locked || isAuto) return;
+    touchY = e.touches?.[0]?.clientY ?? null;
+  }
+  function onTouchMove(e){
+    if (locked || isAuto || touchY === null) return;
+    const y = e.touches?.[0]?.clientY ?? touchY;
+    const dy = touchY - y;
+    touchY = y;
+    const delta = Math.max(-40, Math.min(40, dy));
+    v = clamp01(v + delta / 1800);
+  }
+
+  if (arrow){
     arrow.addEventListener("click", () => {
-      const px = getIntroScrollPx();
-      window.scrollTo({ top: px + 2, behavior: "smooth" });
+      if (locked) return;
+      // jump to trigger, then auto
+      v = Math.max(v, AUTO_TRIGGER);
+      startAuto();
     });
   }
 
-  // Load pieces meta, then init
-  async function init() {
-    try {
-      const res = await fetch("assets/intro/shards_meta.json", { cache: "no-store" });
+  async function init(){
+    try{
+      const res = await fetch("assets/intro/shards_meta.json", { cache:"no-store" });
       meta = await res.json();
+      meta.piecesById = {};
+      meta.pieces.forEach(p => meta.piecesById[p.id] = p);
 
       pieces = Array.from(document.querySelectorAll(".logo-piece"));
       pieces.forEach((el, idx) => {
-        // pid is like p01
         const m = /piece-(p\d+)/.exec(el.id);
         el.dataset.pid = m ? m[1] : "";
         el.__seed = idx + 1;
       });
 
-      // init state
-      applyTransforms(0);
+      updateScale();
+      apply(0);
 
-      // animate loop for jitter (so it updates even without scroll)
-      const loop = () => {
-        if (done) return;
-        if (canScroll) applyTransforms(getP());
-        else applyTransforms(0);
-        requestAnimationFrame(loop);
-      };
-      requestAnimationFrame(loop);
+      window.addEventListener("wheel", onWheel, { passive:false });
+      window.addEventListener("touchstart", onTouchStart, { passive:false });
+      window.addEventListener("touchmove", onTouchMove, { passive:false });
 
-      window.addEventListener("scroll", onScroll, { passive: true });
-      window.addEventListener("resize", () => { if (canScroll && !done) applyTransforms(getP()); });
-
-    } catch (e) {
-      console.error("Intro init failed", e);
+      requestAnimationFrame(tick);
+    } catch(err){
+      console.error(err);
       // fail open
-      unlock();
-      finishIntro();
+      finish();
     }
   }
 
-  // Ensure site stays hidden until intro ends
+  // keep site hidden until finish
   site.classList.add("site-hidden");
-
   init();
 })();
