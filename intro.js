@@ -7,6 +7,23 @@
   const arrow = document.getElementById("scrollArrow");
   const logo = document.getElementById("logoExplode");
 
+
+  // Fail-open: if anything goes wrong, never keep a black screen
+  const failOpen = (why) => {
+    try { console.warn("Intro fail-open:", why); } catch(e){}
+    try { sessionStorage.setItem("introDone", "1"); } catch(e){}
+    try { if (intro) intro.remove(); } catch(e){}
+    try { if (spacer) spacer.remove(); } catch(e){}
+    try {
+      site.classList.remove("site-hidden");
+      site.classList.add("site-revealed","reveal");
+      requestAnimationFrame(() => site.classList.add("reveal-on"));
+    } catch(e){}
+    try { window.removeEventListener("wheel", prevent); window.removeEventListener("touchmove", prevent); } catch(e){}
+  };
+
+  window.addEventListener("error", (e) => failOpen(e?.message || "error"));
+  window.addEventListener("unhandledrejection", (e) => failOpen(e?.reason || "promise"));
   // already done this session
   if (sessionStorage.getItem("introDone") === "1") {
     if (intro) intro.remove();
