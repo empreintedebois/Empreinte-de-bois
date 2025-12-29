@@ -1,0 +1,108 @@
+/* =========================
+   INTRO OVERLAY (3s lock)
+   ========================= */
+
+body.intro-lock { overflow: hidden; } /* bloque pendant 3s */
+
+.intro{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.intro-bg{ position:absolute; inset:0; }
+.intro-bg__gris{
+  position:absolute; inset:0;
+  background: url("assets/fond/fond-gris-h.webp") center/cover no-repeat;
+  filter: saturate(0.9) contrast(1.05);
+}
+.intro-bg__dore{
+  position:absolute; inset:0;
+  background: url("assets/fond/fond-dore-h.webp") center/cover no-repeat;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  filter: contrast(1.1) saturate(1.15);
+}
+
+.intro-center{
+  position: relative;
+  z-index: 1;
+  width: min(80vw, 980px);
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.logo-explode{
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.logo-piece{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: translate3d(0,0,0);
+  will-change: transform, opacity, filter;
+  opacity: 1;
+  filter: none;
+}
+
+/* Flèche */
+.scroll-arrow{
+  position: absolute;
+  bottom: 26px;
+  z-index: 2;
+  border: 0;
+  background: transparent;
+  font-size: 38px;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(0);
+  transition: opacity .35s ease;
+  pointer-events: none;
+}
+
+.scroll-arrow.is-visible{
+  opacity: 1;
+  pointer-events: auto;
+  animation: intro-bob 1.15s ease-in-out infinite;
+}
+
+@keyframes intro-bob{
+  0%,100%{ transform: translateY(0); }
+  50%{ transform: translateY(8px); }
+}
+
+/* Espace de scroll utilisé pour piloter l’intro */
+.intro-spacer{
+  height: 220vh; /* > 1 écran pour piloter explode + fade */
+}
+
+/* Révélation du site */
+.site-hidden{
+  opacity: 0;
+  transform: translateY(-18px);
+}
+.site-revealed{
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity .9s ease, transform .9s ease;
+}
+
+/* Reveal haut -> bas */
+.reveal{
+  clip-path: inset(0 0 100% 0);
+}
+.reveal.reveal-on{
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.0s ease;
+}

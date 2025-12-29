@@ -7,8 +7,41 @@
 <title>Empreinte de Bois – Portfolio</title>
 <meta content="Portfolio 3D et gravure numérique : sélection de projets, démarche, matériaux et contact." name="description"/>
 <link href="styles.css" rel="stylesheet"/>
+<link href="intro.css" rel="stylesheet"/>
 </head>
-<body>
+<body class="intro-lock">
+<!-- Intro overlay (bloque 3s, puis scroll-control) -->
+<div id="intro" class="intro" aria-hidden="false">
+  <div class="intro-bg">
+    <div class="intro-bg__gris"></div>
+    <div class="intro-bg__dore"></div>
+  </div>
+
+  <div class="intro-center">
+    <div id="logoExplode" class="logo-explode" aria-label="Empreinte de Bois">
+      <img class="logo-piece" id="piece-p01" src="assets/intro/shards/p01.webp" alt="" />
+      <img class="logo-piece" id="piece-p02" src="assets/intro/shards/p02.webp" alt="" />
+      <img class="logo-piece" id="piece-p03" src="assets/intro/shards/p03.webp" alt="" />
+      <img class="logo-piece" id="piece-p04" src="assets/intro/shards/p04.webp" alt="" />
+      <img class="logo-piece" id="piece-p05" src="assets/intro/shards/p05.webp" alt="" />
+      <img class="logo-piece" id="piece-p06" src="assets/intro/shards/p06.webp" alt="" />
+      <img class="logo-piece" id="piece-p07" src="assets/intro/shards/p07.webp" alt="" />
+      <img class="logo-piece" id="piece-p08" src="assets/intro/shards/p08.webp" alt="" />
+      <img class="logo-piece" id="piece-p09" src="assets/intro/shards/p09.webp" alt="" />
+      <img class="logo-piece" id="piece-p10" src="assets/intro/shards/p10.webp" alt="" />
+      <img class="logo-piece" id="piece-p11" src="assets/intro/shards/p11.webp" alt="" />
+      <img class="logo-piece" id="piece-p12" src="assets/intro/shards/p12.webp" alt="" />
+      <img class="logo-piece" id="piece-p13" src="assets/intro/shards/p13.webp" alt="" />
+    </div>
+  </div>
+
+  <button id="scrollArrow" class="scroll-arrow" aria-label="Descendre">↓</button>
+</div>
+
+<!-- Espace de scroll pour piloter l’intro -->
+<div id="intro-spacer" class="intro-spacer" aria-hidden="true"></div>
+
+<div id="site" class="site-hidden reveal">
 <!-- Fond animé global (fixe, derrière tout) -->
 <canvas aria-hidden="true" id="background-canvas"></canvas>
 <!-- HEADER STICKY -->
@@ -158,6 +191,7 @@
 </div><div aria-hidden="true" class="lightbox lightbox--more" id="galleryMore"><button aria-label="Fermer" class="lightbox__backdrop" data-close="1"></button><figure class="lightbox__body"><button aria-label="Fermer" class="lightbox__close" data-close="1">×</button><figcaption class="lightbox__caption">Galerie</figcaption><div class="gallery-more-grid"></div></figure></div>
 <script defer src="gallery.js"></script>
 <script defer src="page.js"></script>
+<script defer src="intro.js"></script>
 <!-- SCRIPT FOND ANIMÉ (cover, non répété, fixe) -->
 <script>
   // ===============================
@@ -364,5 +398,8 @@
     requestAnimationFrame(frame);
   })();
   </script>
+
+</div>
+
 </body>
 </html>
