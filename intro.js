@@ -1,6 +1,11 @@
 (() => {
-  const body = document.body;
-  const intro = document.getElementById("intro");
+  \1
+
+  // v7_UNLOCK_TIMER: always allow interaction after 3s (even if assets slow)
+  setTimeout(() => {
+    try { document.body.classList.remove('intro-lock'); } catch(e){}
+  }, 3000);
+const intro = document.getElementById("intro");
   const site = document.getElementById("site");
   const arrow = document.getElementById("scrollArrow");
   const logo = document.getElementById("logoExplode");
@@ -253,3 +258,26 @@
 
   init();
 })();
+// v/// v7: time-limited scroll lock (prevents accidental skip, but won't brick mobile)
+function lockScrollV7(ms=3000){
+  const prevent = (e)=>{ try{ e.preventDefault(); }catch(_){} };
+  try{ window.addEventListener('wheel', prevent, {passive:false}); }catch(e){}
+  try{ window.addEventListener('touchmove', prevent, {passive:false}); }catch(e){}
+  try{
+    setTimeout(()=>{
+      try{ window.removeEventListener('wheel', prevent); }catch(e){}
+      try{ window.removeEventListener('touchmove', prevent); }catch(e){}
+      try{ document.body.classList.remove('intro-lock'); }catch(e){}
+    }, ms);
+  }catch(e){}
+}
+try{ lockScrollV7(3000); }catch(e){}
+
+// v7_TAP_TO_SCROLL: if scrolling is awkward on mobile, tapping arrow/intro triggers the scripted sequence
+try{
+  const arrow = document.getElementById('scrollArrow');
+  const intro = document.getElementById('intro');
+  const go = () => { try{ arrow?.click(); }catch(e){} };
+  arrow?.addEventListener('touchstart', (e)=>{ e.preventDefault(); go(); }, {passive:false});
+  intro?.addEventListener('touchstart', ()=>{ /* allow user to start */ }, {passive:true});
+}catch(e){}

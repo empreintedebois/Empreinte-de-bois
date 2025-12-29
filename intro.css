@@ -143,3 +143,50 @@ body.intro-lock { overflow: hidden; }
 /* v6: intro always visible (no hidden state) */
 .intro{opacity:1 !important;}
 .site-hidden{opacity:0 !important; transform:none !important;}
+
+
+/* v7: robust mobile centering + consistent sizing */
+#intro{
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 9999;
+}
+
+.intro-inner{
+  width: min(92vw, 820px);
+  max-width: 92vw;
+  padding: clamp(10px, 2.5vw, 22px);
+}
+
+#logoExplode{
+  width: 100%;
+  height: auto;
+  max-height: 72svh; /* better than vh on mobile */
+  object-fit: contain;
+  display: block;
+}
+
+/* keep shards aligned to the same center as the logo */
+#shards{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shard{
+  opacity: 1 !important;
+  will-change: transform, opacity;
+}
+
+/* Ensure intro spacer exists to enable scroll driving (even when intro is fixed) */
+#intro-spacer{
+  height: 220vh !important;
+}
+
+/* During lock, only prevent overscroll bounce, do not kill all touch events */
+body.intro-lock{
+  overflow: hidden;
+  touch-action: none;
+}
