@@ -23,7 +23,7 @@ body.intro-lock { overflow: hidden; }
 /* centre */
 .intro-center{
   position: relative;
-  width: min(92vw, 760px);
+  width: min(88vw, 760px);
   aspect-ratio: 1/1;
   display: grid;
   place-items: center;
