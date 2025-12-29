@@ -12,68 +12,102 @@ permissions:
 jobs:
   apply:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      # ---------------------------------------------------
+      # Checkout du repo
+      # ---------------------------------------------------
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install unzip + rsync
+      # ---------------------------------------------------
+      # Dépendances
+      # ---------------------------------------------------
+      - name: Install unzip and rsync
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip rsync
 
-      - name: Extract updated zip
+      # ---------------------------------------------------
+      # Extraction du ZIP
+      # ---------------------------------------------------
+      - name: Extract Empreinte-de-bois-updated.zip
         run: |
           rm -rf .__zip_extract__
           mkdir -p .__zip_extract__
           unzip -o "Empreinte-de-bois-updated.zip" -d .__zip_extract__
 
-      - name: Use single top-level folder as source (case B)
+      # ---------------------------------------------------
+      # Cas B : un seul dossier racine dans le zip
+      # ---------------------------------------------------
+      - name: Detect single root folder (case B)
         id: detect
         shell: bash
         run: |
           set -euo pipefail
-          root=".__zip_extract__"
-          # On attend exactement 1 dossier racine dans le zip (cas B)
-          mapfile -t dirs < <(find "$root" -mindepth 1 -maxdepth 1 -type d -printf "%p\n")
-          if [ "${#dirs[@]}" -ne 1 ]; then
-            echo "ERROR: Expected exactly one top-level folder in the zip (case B). Found: ${#dirs[@]}"
-            ls -la "$root"
+          ROOT=".__zip_extract__"
+
+          mapfile -t DIRS < <(find "$ROOT" -mindepth 1 -maxdepth 1 -type d)
+
+          if [ "${#DIRS[@]}" -ne 1 ]; then
+            echo "ERROR: Expected exactly ONE top-level folder in the zip."
+            ls -la "$ROOT"
             exit 1
           fi
-          echo "src=${dirs[0]}" >> "$GITHUB_OUTPUT"
-          echo "Zip root detected: ${dirs[0]}"
 
-      - name: Safety checks (avoid bad zip)
-        shell: bash
-        run: |
-          set -euo pipefail
-          SRC="${{ steps.detect.outputs.src }}"
-          test -f "$SRC/index.html" || (echo "ERROR: index.html not found in zip root" && exit 1)
-          test -d "$SRC/assets" || (echo "ERROR: assets/ not found in zip root" && exit 1)
-          # Optionnel: empêcher qu'un zip vide/foireux écrase tout
-          echo "OK: minimal structure found (index.html + assets/)"
+          echo "src=${DIRS[0]}" >> "$GITHUB_OUTPUT"
+          echo "Detected zip root: ${DIRS[0]}"
 
-      - name: Apply files (overwrite/add only, no deletes)
+      # ---------------------------------------------------
+      # Sécurité minimale : éviter zip foireux
+      # ---------------------------------------------------
+      - name: Safety checks
         shell: bash
         run: |
           set -euo pipefail
           SRC="${{ steps.detect.outputs.src }}"
 
-          # Copie/écrase uniquement ce que contient le zip.
-          # Pas de --delete => rien n’est supprimé côté repo.
+          test -f "$SRC/index.html" || (echo "ERROR: index.html missing" && exit 1)
+          test -d "$SRC/assets"     || (echo "ERROR: assets/ missing" && exit 1)
+
+          echo "Safety checks OK"
+
+      # ---------------------------------------------------
+      # Application des fichiers (overwrite / add ONLY)
+      # ---------------------------------------------------
+      - name: Apply files from zip (safe mode)
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC="${{ steps.detect.outputs.src }}"
+
+          # IMPORTANT :
+          # - Pas de --delete  -> rien n'est supprimé
+          # - Exclusion .github -> pas de workflows touchés
+          # - Exclusion galerie auto -> pas d'écrasement
           rsync -a --checksum \
             --exclude ".git/" \
+            --exclude ".github/" \
+            --exclude "assets/galerie/" \
+            --exclude "data/gallery.json" \
             --exclude "__MACOSX/" \
             --exclude ".DS_Store" \
             "$SRC"/ ./
 
-      - name: Cleanup
+      # ---------------------------------------------------
+      # Nettoyage
+      # ---------------------------------------------------
+      - name: Cleanup temp files
         run: rm -rf .__zip_extract__
 
-      - name: Commit changes (if any)
+      # ---------------------------------------------------
+      # Commit automatique si changements
+      # ---------------------------------------------------
+      - name: Commit and push changes
         shell: bash
         run: |
           set -euo pipefail
+
           if git status --porcelain | grep -q .; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -81,5 +115,5 @@ jobs:
             git commit -m "Apply Empreinte-de-bois-updated.zip"
             git push
           else
-            echo "No changes to commit."
+            echo "No changes detected – nothing to commit."
           fi
