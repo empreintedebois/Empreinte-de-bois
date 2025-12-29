@@ -4,14 +4,10 @@
   const site = document.getElementById("site");
   const arrow = document.getElementById("scrollArrow");
   const logo = document.getElementById("logoExplode");
-
-  const KEY = "introDone_v4"; // nouvelle clé -> évite les états cassés
   const LOCK_MS = 3000;
 
   const failOpen = (why) => {
-    try { console.warn("Intro fail-open:", why); } catch(e){}
-    try { sessionStorage.setItem(KEY, "1"); } catch(e){}
-    try { body.classList.remove("intro-lock"); } catch(e){}
+    try { console.warn("Intro fail-open:", why); } catch(e){}    try { body.classList.remove("intro-lock"); } catch(e){}
     try { intro?.remove(); } catch(e){}
     try { document.getElementById("reveal-curtain")?.remove(); } catch(e){}
     try { site?.classList.remove("site-hidden"); } catch(e){}
@@ -22,13 +18,7 @@
   window.addEventListener("unhandledrejection", (e) => failOpen(e?.reason || "promise"));
 
   if (!intro || !site || !logo) { failOpen("missing nodes"); return; }
-
-  // Si déjà fait
-  if (sessionStorage.getItem(KEY) === "1") {
-    intro.remove();
-    site.classList.remove("site-hidden");
-    return;
-  }
+  // (intro always plays; no session gating)
 
   // --- bloque scroll 3s ---
   let locked = true;
@@ -131,11 +121,7 @@
   }
 
   function finish(){
-    try { body.classList.remove("intro-lock"); } catch(e){}
-
-    sessionStorage.setItem(KEY, "1");
-
-    // L'intro disparaît (fond canvas reste en place => pas de saut)
+    try { body.classList.remove("intro-lock"); } catch(e){}    // L'intro disparaît (fond canvas reste en place => pas de saut)
     intro.remove();
 
     // Reveal du site avec rideau doux
@@ -234,11 +220,7 @@
 
       // watchdog anti-écran figé
       setTimeout(() => {
-        if (sessionStorage.getItem(KEY) !== "1" && !locked && site.classList.contains("site-hidden")) {
-          // si après 8s le site est toujours caché, on fail-open
-          failOpen("watchdog stuck");
-        }
-      }, 8000);
+}, 8000);
 
       apply(0);
       requestAnimationFrame(tick);
