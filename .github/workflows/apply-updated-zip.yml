@@ -1,0 +1,85 @@
+name: Apply updated zip
+
+on:
+  push:
+    paths:
+      - "Empreinte-de-bois-updated.zip"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install unzip + rsync
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip rsync
+
+      - name: Extract updated zip
+        run: |
+          rm -rf .__zip_extract__
+          mkdir -p .__zip_extract__
+          unzip -o "Empreinte-de-bois-updated.zip" -d .__zip_extract__
+
+      - name: Use single top-level folder as source (case B)
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          root=".__zip_extract__"
+          # On attend exactement 1 dossier racine dans le zip (cas B)
+          mapfile -t dirs < <(find "$root" -mindepth 1 -maxdepth 1 -type d -printf "%p\n")
+          if [ "${#dirs[@]}" -ne 1 ]; then
+            echo "ERROR: Expected exactly one top-level folder in the zip (case B). Found: ${#dirs[@]}"
+            ls -la "$root"
+            exit 1
+          fi
+          echo "src=${dirs[0]}" >> "$GITHUB_OUTPUT"
+          echo "Zip root detected: ${dirs[0]}"
+
+      - name: Safety checks (avoid bad zip)
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC="${{ steps.detect.outputs.src }}"
+          test -f "$SRC/index.html" || (echo "ERROR: index.html not found in zip root" && exit 1)
+          test -d "$SRC/assets" || (echo "ERROR: assets/ not found in zip root" && exit 1)
+          # Optionnel: empêcher qu'un zip vide/foireux écrase tout
+          echo "OK: minimal structure found (index.html + assets/)"
+
+      - name: Apply files (overwrite/add only, no deletes)
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC="${{ steps.detect.outputs.src }}"
+
+          # Copie/écrase uniquement ce que contient le zip.
+          # Pas de --delete => rien n’est supprimé côté repo.
+          rsync -a --checksum \
+            --exclude ".git/" \
+            --exclude "__MACOSX/" \
+            --exclude ".DS_Store" \
+            "$SRC"/ ./
+
+      - name: Cleanup
+        run: rm -rf .__zip_extract__
+
+      - name: Commit changes (if any)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git status --porcelain | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "Apply Empreinte-de-bois-updated.zip"
+            git push
+          else
+            echo "No changes to commit."
+          fi
