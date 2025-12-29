@@ -156,3 +156,8 @@ body.intro-lock { overflow: hidden; } /* bloque pendant 3s */
 }
 
 .intro{ pointer-events: auto !important; }
+
+
+/* Hard-centering safeguard */
+.logo-explode{ left: 50%; top: 50%; transform: translate(-50%, -50%) scale(var(--logoScale)); position: absolute; }
+.intro-center{ position: relative; }

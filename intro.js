@@ -8,7 +8,7 @@
   const logo = document.getElementById("logoExplode");
 
   // already done this session
-  if (sessionStorage.getItem("introDone") === "1") {
+  if (sessionStorage.getItem("introDone_v3") === "1") {
     if (intro) intro.remove();
     if (spacer) spacer.remove();
     site.classList.remove("site-hidden");
@@ -63,6 +63,14 @@
   }
   window.addEventListener("resize", updateScale);
 
+  // Ensure scale is computed even on mobile before first paint
+  const scaleWarmupStart = performance.now();
+  const scaleWarmup = () => {
+    try { updateScale(); } catch(e){}
+    if (performance.now() - scaleWarmupStart < 1200) requestAnimationFrame(scaleWarmup);
+  };
+  requestAnimationFrame(scaleWarmup);
+
   function clamp01(x){ return Math.min(1, Math.max(0, x)); }
 
   function apply(v){
@@ -104,7 +112,7 @@
   }
 
   function finish(){
-    sessionStorage.setItem("introDone", "1");
+    sessionStorage.setItem("introDone_v3", "1");
     // remove intro
     if (intro) intro.remove();
     if (spacer) spacer.remove();
