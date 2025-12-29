@@ -138,3 +138,8 @@ body.intro-lock { overflow: hidden; }
   transform: translateY(120%);
   transition: transform 1.6s ease, opacity .2s ease;
 }
+
+
+/* v6: intro always visible (no hidden state) */
+.intro{opacity:1 !important;}
+.site-hidden{opacity:0 !important; transform:none !important;}

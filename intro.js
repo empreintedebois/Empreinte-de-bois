@@ -4,21 +4,37 @@
   const site = document.getElementById("site");
   const arrow = document.getElementById("scrollArrow");
   const logo = document.getElementById("logoExplode");
+
+  const KEY = "introDone_v4"; // nouvelle clé -> évite les états cassés
   const LOCK_MS = 3000;
 
   const failOpen = (why) => {
-    try { console.warn("Intro fail-open:", why); } catch(e){}    try { body.classList.remove("intro-lock"); } catch(e){}
-    try { intro?.remove(); } catch(e){}
-    try { document.getElementById("reveal-curtain")?.remove(); } catch(e){}
-    try { site?.classList.remove("site-hidden"); } catch(e){}
-    try { unlockScroll(); } catch(e){}
+    try { console.warn("Intro fail-open:", why); } catch(e){}
+    try { body.classList.remove("intro-lock"); } catch(e){}
+    try {
+      setTimeout(() => {
+        try { site?.classList.remove("site-hidden"); } catch(e){}
+        try { document.getElementById("reveal-curtain")?.remove(); } catch(e){}
+        try { unlockScroll?.(); } catch(e){}
+        try { intro?.remove(); } catch(e){}
+      }, 100);
+    } catch(e){}
   };
 
   window.addEventListener("error", (e) => failOpen(e?.message || "error"));
   window.addEventListener("unhandledrejection", (e) => failOpen(e?.reason || "promise"));
 
+  
+  // v6: force intro to run every time
+  try{ site.classList.add('site-hidden'); }catch(e){}
+  try{ body.classList.add('intro-lock'); }catch(e){}
   if (!intro || !site || !logo) { failOpen("missing nodes"); return; }
-  // (intro always plays; no session gating)
+
+  // Si déjà fait
+    intro.remove();
+    site.classList.remove("site-hidden");
+    return;
+  }
 
   // --- bloque scroll 3s ---
   let locked = true;
@@ -121,7 +137,10 @@
   }
 
   function finish(){
-    try { body.classList.remove("intro-lock"); } catch(e){}    // L'intro disparaît (fond canvas reste en place => pas de saut)
+    try { body.classList.remove("intro-lock"); } catch(e){}
+
+
+    // L'intro disparaît (fond canvas reste en place => pas de saut)
     intro.remove();
 
     // Reveal du site avec rideau doux
@@ -220,7 +239,10 @@
 
       // watchdog anti-écran figé
       setTimeout(() => {
-}, 8000);
+          // si après 8s le site est toujours caché, on fail-open
+          failOpen("watchdog stuck");
+        }
+      }, 8000);
 
       apply(0);
       requestAnimationFrame(tick);
