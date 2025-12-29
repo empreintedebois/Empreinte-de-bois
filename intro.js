@@ -10,6 +10,50 @@ const intro = document.getElementById("intro");
   const arrow = document.getElementById("scrollArrow");
   const logo = document.getElementById("logoExplode");
 
+  // v8: scale the 1200x1200 shards canvas to fit viewport (mobile-safe)
+  const DESIGN = 1200;
+  const applyLogoScale = () => {
+    try{
+      const vw = Math.max(320, window.innerWidth || 0);
+      // Use visualViewport when available (better on mobile URL bar)
+      const vh = Math.max(480, (window.visualViewport ? window.visualViewport.height : window.innerHeight) || 0);
+
+      // Keep some breathing room so corners never touch screen
+      const maxW = vw * 0.92;
+      const maxH = vh * 0.72;
+
+      const s = Math.max(0.18, Math.min(maxW / DESIGN, maxH / DESIGN));
+      logo.style.setProperty("--logo-scale", String(s));
+    }catch(e){}
+  };
+  applyLogoScale();
+  window.addEventListener("resize", applyLogoScale, {passive:true});
+  if (window.visualViewport){
+    window.visualViewport.addEventListener("resize", applyLogoScale, {passive:true});
+  }
+
+  // v8: lock scroll only 3s (to let the intro breathe) then unlock always
+  const unlockIntroLock = () => { try{ body.classList.remove("intro-lock"); }catch(e){} };
+  setTimeout(unlockIntroLock, 3000);
+
+  // v8: arrow click always works (even on mobile)
+  try{
+    arrow.addEventListener("click", (e)=>{
+      try{ e.preventDefault(); }catch(_){}
+      unlockIntroLock();
+      const spacer = document.getElementById("intro-spacer");
+      const target = spacer ? Math.round(spacer.offsetHeight * 0.55) : Math.round((window.innerHeight||800) * 0.55);
+      try{ window.scrollTo({top: target, behavior: "smooth"}); }catch(err){ window.scrollTo(0, target); }
+    }, {passive:false});
+
+    // Tap fallback
+    arrow.addEventListener("touchstart", (e)=>{
+      try{ e.preventDefault(); }catch(_){}
+      arrow.click();
+    }, {passive:false});
+  }catch(e){}
+
+
   const KEY = "introDone_v4"; // nouvelle clé -> évite les états cassés
   const LOCK_MS = 3000;
 
@@ -258,26 +302,4 @@ const intro = document.getElementById("intro");
 
   init();
 })();
-// v/// v7: time-limited scroll lock (prevents accidental skip, but won't brick mobile)
-function lockScrollV7(ms=3000){
-  const prevent = (e)=>{ try{ e.preventDefault(); }catch(_){} };
-  try{ window.addEventListener('wheel', prevent, {passive:false}); }catch(e){}
-  try{ window.addEventListener('touchmove', prevent, {passive:false}); }catch(e){}
-  try{
-    setTimeout(()=>{
-      try{ window.removeEventListener('wheel', prevent); }catch(e){}
-      try{ window.removeEventListener('touchmove', prevent); }catch(e){}
-      try{ document.body.classList.remove('intro-lock'); }catch(e){}
-    }, ms);
-  }catch(e){}
-}
-try{ lockScrollV7(3000); }catch(e){}
-
-// v7_TAP_TO_SCROLL: if scrolling is awkward on mobile, tapping arrow/intro triggers the scripted sequence
-try{
-  const arrow = document.getElementById('scrollArrow');
-  const intro = document.getElementById('intro');
-  const go = () => { try{ arrow?.click(); }catch(e){} };
-  arrow?.addEventListener('touchstart', (e)=>{ e.preventDefault(); go(); }, {passive:false});
-  intro?.addEventListener('touchstart', ()=>{ /* allow user to start */ }, {passive:true});
-}catch(e){}
+// v/

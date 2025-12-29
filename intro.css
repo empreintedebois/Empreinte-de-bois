@@ -190,3 +190,54 @@ body.intro-lock{
   overflow: hidden;
   touch-action: none;
 }
+
+
+/* =========================
+   v8 - Mobile/desktop parity
+   - scale logo canvas (1200x1200) to fit viewport
+   - keep it centered
+   - avoid clipping shards
+   ========================= */
+
+#intro{
+  overflow: visible !important; /* do NOT clip shards */
+}
+
+.intro-center{
+  width: 100vw !important;
+  height: 100svh !important;
+  display: grid !important;
+  place-items: center !important;
+  pointer-events: none;
+}
+
+#logoExplode{
+  width: 1200px !important;
+  height: 1200px !important;
+  position: relative !important;
+  transform-origin: 50% 50% !important;
+  transform: scale(var(--logo-scale, 0.55)) translateZ(0) !important;
+}
+
+.logo-piece{
+  position: absolute;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translate3d(0,0,0);
+}
+
+/* Arrow must remain clickable even if intro-center blocks events */
+#scrollArrow{
+  pointer-events: auto !important;
+  z-index: 10001 !important;
+}
+
+/* Ensure spacer provides scroll range */
+#intro-spacer{ height: 240svh !important; }
+
+/* During intro lock: only block scroll for a moment */
+body.intro-lock{
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
