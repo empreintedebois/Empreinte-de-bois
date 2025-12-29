@@ -114,3 +114,5 @@ body.intro-lock {
   .reveal { clip-path: inset(0 0 100% 0); }
   .reveal.reveal-on { clip-path: inset(0 0 0 0); transition: clip-path 1.25s ease; }
 }
+/* TEST: si ça fait revenir ton fond, on a la preuve que #site est masqué */
+#site.site-hidden { opacity: 1 !important; }
