@@ -1,106 +1,122 @@
-
 (() => {
   const body = document.body;
   const intro = document.getElementById("intro");
-  const spacer = document.getElementById("intro-spacer");
   const site = document.getElementById("site");
   const arrow = document.getElementById("scrollArrow");
   const logo = document.getElementById("logoExplode");
 
-  // already done this session
-  if (sessionStorage.getItem("introDone_v3") === "1") {
-    if (intro) intro.remove();
-    if (spacer) spacer.remove();
+  const KEY = "introDone_v4"; // nouvelle clé -> évite les états cassés
+  const LOCK_MS = 3000;
+
+  const failOpen = (why) => {
+    try { console.warn("Intro fail-open:", why); } catch(e){}
+    try { sessionStorage.setItem(KEY, "1"); } catch(e){}
+    try { intro?.remove(); } catch(e){}
+    try { document.getElementById("reveal-curtain")?.remove(); } catch(e){}
+    try { site?.classList.remove("site-hidden"); } catch(e){}
+    try { unlockScroll(); } catch(e){}
+  };
+
+  window.addEventListener("error", (e) => failOpen(e?.message || "error"));
+  window.addEventListener("unhandledrejection", (e) => failOpen(e?.reason || "promise"));
+
+  if (!intro || !site || !logo) { failOpen("missing nodes"); return; }
+
+  // Si déjà fait
+  if (sessionStorage.getItem(KEY) === "1") {
+    intro.remove();
     site.classList.remove("site-hidden");
-    site.classList.add("site-revealed");
-    site.classList.add("reveal");
-    requestAnimationFrame(() => site.classList.add("reveal-on"));
     return;
   }
 
-  let pieces = [];
-  let meta = null;
-
-  // ---- 3s lock (not tied to full page load) ----
+  // --- bloque scroll 3s ---
   let locked = true;
   body.classList.add("intro-lock");
+  setTimeout(() => {
+    locked = false;
+    body.classList.remove("intro-lock");
+    arrow?.classList.add("is-visible");
+  }, LOCK_MS);
 
-  // We use virtual scroll during intro to avoid browser UI/address bar collapsing.
-  let v = 0;                 // virtual progress 0..1
+  // --- scroll virtuel (évite la barre d'adresse qui saute) ---
+  function prevent(e){ e.preventDefault(); }
+  function lockScroll(){
+    window.addEventListener("wheel", prevent, { passive:false });
+    window.addEventListener("touchmove", prevent, { passive:false });
+  }
+  function unlockScroll(){
+    window.removeEventListener("wheel", prevent);
+    window.removeEventListener("touchmove", prevent);
+    window.removeEventListener("touchstart", onTouchStart);
+    window.removeEventListener("touchmove", onTouchMove);
+    window.removeEventListener("wheel", onWheel);
+  }
+  lockScroll();
+
+  // --- scale sans flash: on calcule puis on affiche l'intro ---
+  function updateScale(){
+    try{
+      const box = logo.parentElement.getBoundingClientRect();
+      const scale = Math.min(box.width / 1200, box.height / 1200);
+      logo.style.setProperty("--logoScale", String(scale));
+    }catch(e){}
+  }
+  updateScale();
+  requestAnimationFrame(() => {
+    updateScale();
+    intro.classList.add("intro-ready");
+  });
+  // micro warmup (1s max)
+  let warmFrames = 0;
+  const warm = () => {
+    warmFrames++;
+    updateScale();
+    if (warmFrames < 30) requestAnimationFrame(warm);
+  };
+  requestAnimationFrame(warm);
+
+  // --- meta + pièces ---
+  let meta = null;
+  let pieces = [];
+
+  // progress virtuelle
+  let v = 0;            // 0..1
   let isAuto = false;
   let autoStart = 0;
   let autoV0 = 0;
 
-  // timings (seconds)
-  const T_EXPLODE = 1.5;     // explode to full
-  const T_FADE = 1.0;        // fade to transparent (NOT to black)
-  const T_PAUSE = 0.5;       // pause after fade
-  const T_REVEAL = 1.25;     // reveal site (soft edge)
-  const AUTO_TRIGGER = 0.30; // start auto after 30% progress
-
-  // progress phases on v: [0..0.70] explode, [0.70..0.90] fade, [0.90..1] hold->finish
+  // timings
+  const AUTO_TRIGGER = 0.30;
+  const T_EXPLODE = 1.5;
+  const T_FADE = 1.0;
+  const T_PAUSE = 0.5;
   const P_EXP_END = 0.70;
   const P_FADE_END = 0.90;
 
-  // prevent default scrolling during intro (even after unlock)
-  function prevent(e){ e.preventDefault(); }
+  const clamp01 = (x) => Math.min(1, Math.max(0, x));
 
-  window.addEventListener("wheel", prevent, { passive:false });
-  window.addEventListener("touchmove", prevent, { passive:false });
-
-  setTimeout(() => {
-    locked = false;
-    body.classList.remove("intro-lock");
-    if (arrow) arrow.classList.add("is-visible");
-  }, 3000);
-
-  // compute scale for 1200px logical logo inside responsive container
-  function updateScale(){
-    const box = logo?.parentElement?.getBoundingClientRect();
-    if (!box || !logo) return;
-    const scale = Math.min(box.width / 1200, box.height / 1200);
-    logo.style.setProperty("--logoScale", String(scale));
-  }
-  window.addEventListener("resize", updateScale);
-
-  // Ensure scale is computed even on mobile before first paint
-  const scaleWarmupStart = performance.now();
-  const scaleWarmup = () => {
-    try { updateScale(); } catch(e){}
-    if (performance.now() - scaleWarmupStart < 1200) requestAnimationFrame(scaleWarmup);
-  };
-  requestAnimationFrame(scaleWarmup);
-
-  function clamp01(x){ return Math.min(1, Math.max(0, x)); }
-
-  function apply(v){
-    // explode from 0..P_EXP_END
-    const explode = clamp01(v / P_EXP_END);
-
-    // fade to transparent from P_EXP_END-0.05..P_FADE_END (starts 0.2s before end in time; approx here)
-    const fade = v <= P_EXP_END ? 0 : clamp01((v - P_EXP_END) / (P_FADE_END - P_EXP_END));
-
-    // jitter fades out as explode progresses
-    const j = (1 - explode);
+  function apply(vv){
+    if (!meta) return;
+    const explode = clamp01(vv / P_EXP_END);
+    const fade = vv <= P_EXP_END ? 0 : clamp01((vv - P_EXP_END) / (P_FADE_END - P_EXP_END));
 
     const now = performance.now() / 1000;
+    const j = (1 - explode);
 
-    pieces.forEach((el) => {
+    for (const el of pieces){
       const id = el.dataset.pid;
       const info = meta.piecesById[id];
-      if (!info) return;
+      if (!info) continue;
 
       const tx = info.dir.x * info.mag * explode;
       const ty = info.dir.y * info.mag * explode;
 
       const jx = Math.sin(now * 2.2 + el.__seed) * 1.1 * j;
-      const jy = Math.cos(now * 2.0 + el.__seed*0.7) * 1.1 * j;
+      const jy = Math.cos(now * 2.0 + el.__seed * 0.7) * 1.1 * j;
 
       el.style.transform = `translate3d(${tx + jx}px, ${ty + jy}px, 0)`;
-
-      // fade to transparent (no black)
       el.style.opacity = String(1 - fade);
-    });
+    }
   }
 
   function startAuto(){
@@ -108,59 +124,35 @@
     isAuto = true;
     autoStart = performance.now();
     autoV0 = v;
-    if (arrow) arrow.classList.remove("is-visible");
+    arrow?.classList.remove("is-visible");
   }
 
   function finish(){
-    sessionStorage.setItem("introDone_v3", "1");
-    // remove intro
-    if (intro) intro.remove();
-    if (spacer) spacer.remove();
+    sessionStorage.setItem(KEY, "1");
 
-    // reveal site softly
+    // L'intro disparaît (fond canvas reste en place => pas de saut)
+    intro.remove();
+
+    // Reveal du site avec rideau doux
     site.classList.remove("site-hidden");
-    site.classList.add("site-revealed", "reveal");
-    requestAnimationFrame(() => site.classList.add("reveal-on"));
-
-    // allow normal scroll again
-    window.removeEventListener("wheel", prevent);
-    window.removeEventListener("touchmove", prevent);
-  }
-
-  function tick(){
-    if (!meta) { requestAnimationFrame(tick); return; }
-
-    // If user has manually progressed past trigger, start auto sequence
-    if (!locked && !isAuto && v >= AUTO_TRIGGER) startAuto();
-
-    if (isAuto){
-      const t = (performance.now() - autoStart) / 1000; // seconds
-      // Map time to v progression: explode to 1 over 1.5s, fade over 1s, pause 0.5s, reveal 1.25s then finish.
-      // We'll drive v until 1 to keep apply() coherent.
-      const total = T_EXPLODE + T_FADE + T_PAUSE;
-      const u = clamp01(t / total);
-      v = autoV0 + (1 - autoV0) * u;
-      v = clamp01(v);
-
-      apply(v);
-
-      // after total time, finish + reveal (reveal is CSS transition)
-      if (t >= total){
-        finish();
-        return;
-      }
-    } else {
-      apply(v);
+    const curtain = document.getElementById("reveal-curtain");
+    if (curtain) {
+      // démarre légèrement après la fin de fade (tu peux ajuster si besoin)
+      requestAnimationFrame(() => curtain.classList.add("reveal-on"));
+      setTimeout(() => curtain.remove(), 1400);
     }
 
-    requestAnimationFrame(tick);
+    unlockScroll();
+
+    // Empêche de remonter vers l'intro: on force un léger scroll et on nettoie
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" }));
   }
 
+  // input
   function onWheel(e){
     if (locked || isAuto) return;
-    // clamp delta to slow it down
     const delta = Math.max(-60, Math.min(60, e.deltaY));
-    v = clamp01(v + delta / 2600); // slower progression
+    v = clamp01(v + delta / 2600);
   }
 
   let touchY = null;
@@ -177,45 +169,75 @@
     v = clamp01(v + delta / 1800);
   }
 
-  if (arrow){
-    arrow.addEventListener("click", () => {
-      if (locked) return;
-      // jump to trigger, then auto
-      v = Math.max(v, AUTO_TRIGGER);
-      startAuto();
-    });
+  arrow?.addEventListener("click", () => {
+    if (locked) return;
+    v = Math.max(v, AUTO_TRIGGER);
+    startAuto();
+  });
+
+  function tick(){
+    try{
+      if (!meta){ requestAnimationFrame(tick); return; }
+
+      if (!locked && !isAuto && v >= AUTO_TRIGGER) startAuto();
+
+      if (isAuto){
+        const t = (performance.now() - autoStart) / 1000;
+        const total = T_EXPLODE + T_FADE + T_PAUSE;
+        const u = clamp01(t / total);
+        v = clamp01(autoV0 + (1 - autoV0) * u);
+        apply(v);
+        if (t >= total){ finish(); return; }
+      } else {
+        apply(v);
+      }
+
+      requestAnimationFrame(tick);
+    } catch(err){
+      failOpen(err);
+    }
   }
 
   async function init(){
     try{
-      const res = await fetch("assets/intro/shards_meta.json", { cache:"no-store" });
+      const res = await fetch(`assets/intro/shards_meta.json?v=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("meta fetch failed: " + res.status);
       meta = await res.json();
       meta.piecesById = {};
-      meta.pieces.forEach(p => meta.piecesById[p.id] = p);
+      for (const p of meta.pieces) meta.piecesById[p.id] = p;
 
       pieces = Array.from(document.querySelectorAll(".logo-piece"));
+      if (!pieces.length) throw new Error("no pieces in DOM");
+
       pieces.forEach((el, idx) => {
-        const m = /piece-(p\d+)/.exec(el.id);
+        const m = /piece-(p\\d+)/.exec(el.id);
         el.dataset.pid = m ? m[1] : "";
         el.__seed = idx + 1;
       });
 
-      updateScale();
-      apply(0);
+      // masque le site pendant intro
+      site.classList.add("site-hidden");
 
+      // écouteurs
       window.addEventListener("wheel", onWheel, { passive:false });
       window.addEventListener("touchstart", onTouchStart, { passive:false });
       window.addEventListener("touchmove", onTouchMove, { passive:false });
+      window.addEventListener("resize", updateScale);
 
+      // watchdog anti-écran figé
+      setTimeout(() => {
+        if (sessionStorage.getItem(KEY) !== "1" && !locked && site.classList.contains("site-hidden")) {
+          // si après 8s le site est toujours caché, on fail-open
+          failOpen("watchdog stuck");
+        }
+      }, 8000);
+
+      apply(0);
       requestAnimationFrame(tick);
     } catch(err){
-      console.error(err);
-      // fail open
-      finish();
+      failOpen(err);
     }
   }
 
-  // keep site hidden until finish
-  site.classList.add("site-hidden");
   init();
 })();

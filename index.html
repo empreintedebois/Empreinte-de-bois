@@ -10,10 +10,13 @@
 <link href="intro.css" rel="stylesheet"/>
 </head>
 <body class="intro-lock">
+<!-- Fond animé global (fixe, derrière tout) -->
+<canvas aria-hidden="true" id="background-canvas"></canvas>
 <!-- Intro overlay (bloque 3s, puis scroll-control) -->
 <div id="intro" class="intro" aria-hidden="false">
   <div class="intro-bg">
     <div class="intro-bg__gris"></div>
+<div id="reveal-curtain"></div>
     <div class="intro-bg__dore"></div>
   </div>
 
@@ -59,10 +62,7 @@
 
 <!-- Espace de scroll pour piloter l’intro -->
 <div id="intro-spacer" class="intro-spacer" aria-hidden="true"></div>
-
-<div id="site" class="site-hidden reveal">
-<!-- Fond animé global (fixe, derrière tout) -->
-<canvas aria-hidden="true" id="background-canvas"></canvas>
+<div id="site" class="site-hidden">
 <!-- HEADER STICKY -->
 <header class="site-header" id="site-header">
 <div class="shell shell--row">
@@ -79,15 +79,21 @@
 <div class="shell hero__content">
 <div class="hero__text">
 <p class="eyebrow">Conception, création &amp; gravure laser.</p>
-<h1 id="hero-title">Donnons du relief à vos idées.</h1>
-<p class="hero__subtitle">Bois, métal peint, acrylique : explorez les matières de base.</p>
+<h1 id="hero-title">Donnons du relief à vos idées. </h1>
+<p class="hero__subtitle">
+   Création artisanale sur demande. 
+          </p>
 <div class="hero__actions">
-<a class="btn btn--primary" href="#portfolio">Matières de base</a>
+<a class="btn btn--primary" href="#portfolio">Voir la galerie</a>
 <a class="btn btn--ghost" href="#contact">Discuter d’un projet</a>
 </div>
-<!-- Hint removed -->
+<p class="hero__hint">Scroll pour explorer la galerie ↓ </p>
 </div>
-<!-- hero preview removed -->
+<div class="hero__preview">
+<div class="hero-card">
+<img alt="Carré Bois Sapin — support en bois" loading="lazy" src="assets/logo.png"/>
+</div>
+</div>
 </div>
 </section>
 <!-- GALERIE SECTION -->
@@ -104,25 +110,25 @@
 <section aria-labelledby="process-title" class="section section--alt" id="process">
 <div class="shell">
 <div class="section__hdr">
-<h2 id="process-title">Comment je travaille</h2>
-<p>Un parcours clair, du besoin à la livraison.</p>
+<h2 id="process-title">Démarche et service</h2>
+<p>Gravure multi-support, découpe, carte de visite métal, reprise de logo ou dessin. </p>
 </div>
 <div class="process-grid">
 <article class="process-card">
-<h3>1. Échange &amp; compréhension du besoin</h3>
-<p>Premier contact pour cadrer l’idée et fournir un devis sous <strong>24 h à 48 h</strong>.</p>
+<h3>1. Intention &amp; contraintes</h3>
+<p>Chaques projets est unique : support, format, étude, quantité. L’idée, c’est d'explorer des nouveautés ou s'inspirer d'autres projets.</p>
 </article>
 <article class="process-card">
-<h3>2. Étude</h3>
-<p>Analyse et conception (2D/3D) pour valider la faisabilité et le rendu.</p>
+<h3>2. Études &amp; essais</h3>
+<p>Travail en 2D et 3D idées. Certains concepts ont déjà des bases solides, d'autres demandent d'être étudiés.</p>
 </article>
 <article class="process-card">
-<h3>3. Fabrication &amp; ajustements</h3>
-<p>Production du modèle sur la matière choisie, ajustements éventuels avant finalisation.</p>
+<h3>3. Passage matière</h3>
+<p>Tests sur bois ou autres matériaux, ajustement, délais.</p>
 </article>
 <article class="process-card">
-<h3>4. Livraison</h3>
-<p>Remise de la pièce terminée, ou reproduction en série selon vos besoins.</p>
+<h3>4. Finitions &amp; variations</h3>
+<p>Déclinaisons de bases communes: formats, couleurs, essences, traitements ou séries. </p>
 </article>
 </div>
 </div>
@@ -132,23 +138,24 @@
 <div class="shell">
 <div class="section__hdr">
 <h2 id="models-title">Modèles &amp; options</h2>
-<p>Choisissez un support puis une <strong>déclinaison de matière</strong>. Un seul matériau peut être sélectionné à la fois.</p>
+<p>Choisissez un support et explorez ses variantes de matière ou de couleurs. Les éléments choisis apparaissent dans le formulaire de contact. </p>
 </div>
-<div class="models-grid" id="modelsGrid" aria-label="Grille des modèles">
-  <!-- Rempli automatiquement par page.js via data/models.json -->
+<div class="models-wrapper">
+<aside aria-label="Liste des modèles" class="models-list"></aside>
+<div aria-live="polite" class="model-preview">
+<div class="model-main">
+<img alt="" src=""/>
+</div>
+<div class="model-info">
+<h3></h3>
+<p></p>
+</div>
+<div aria-label="Variantes" class="model-variants"></div>
+<button class="add-selection btn btn--primary" type="button">Ajouter à ma sélection</button>
+</div>
 </div>
 </div>
 </section>
-
-<!-- Lightbox dédiée aux modèles (matières / finitions / quantité) -->
-<div aria-hidden="true" class="lightbox lightbox--model" id="modelbox">
-  <button aria-label="Fermer" class="lightbox__backdrop" data-close="1"></button>
-  <figure class="lightbox__body">
-    <button aria-label="Fermer la vue détaillée" class="lightbox__close" data-close="1">×</button>
-    <img alt="" id="modelbox-img" src=""/>
-    <figcaption class="modelbox__content" id="modelbox-content"></figcaption>
-  </figure>
-</div>
 <!-- À PROPOS -->
 <section aria-labelledby="about-title" class="section" id="about">
 <div class="shell about">
@@ -166,9 +173,9 @@
 <div class="shell contact">
 <div class="contact__text">
 <h2 id="contact-title">Contact</h2>
-<p>Un projet, une idée ou juste une question sur la faisabilité d’une pièce ? Envoyez quelques lignes et on voit ce qui est réaliste. <strong>Merci de joindre vos fichiers directement par mail</strong> si nécessaire. Voici mon adresse : Empreinte.de.bois@gmail.com</p>
+<p>Un projet, une idée ou juste une question sur la faisabilité d’une pièce ? Envoyez quelques lignes, éventuellement des visuels, et on voit ce qui est réaliste. Voici mon adresse mail: Empreinte.de.bois@gmail.com</p>
 </div>
-<form action="mailto:Empreinte.de.bois@gmail.com" class="contact__form" method="post" enctype="text/plain">
+<form action="mailto:empreinte.de.bois@example.com" class="contact__form" method="post">
 <label>
             Nom
             <input autocomplete="name" name="name" required="" type="text"/>
@@ -208,8 +215,7 @@
 <button aria-label="Fermer la vue détaillée" class="lightbox__close" data-close="1">×</button>
 </figure>
 </div><div aria-hidden="true" class="lightbox lightbox--more" id="galleryMore"><button aria-label="Fermer" class="lightbox__backdrop" data-close="1"></button><figure class="lightbox__body"><button aria-label="Fermer" class="lightbox__close" data-close="1">×</button><figcaption class="lightbox__caption">Galerie</figcaption><div class="gallery-more-grid"></div></figure></div>
-<script defer src="gallery.js"></script>
-<script defer src="page.js"></script>
+<script defer="" src="page.js"></script>
 <script defer src="intro.js"></script>
 <!-- SCRIPT FOND ANIMÉ (cover, non répété, fixe) -->
 <script>
@@ -417,8 +423,5 @@
     requestAnimationFrame(frame);
   })();
   </script>
-
-</div>
-
-</body>
+<script defer="True" src="gallery.js"></script></body>
 </html>
