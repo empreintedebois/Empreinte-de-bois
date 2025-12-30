@@ -34,12 +34,16 @@
   let touchY = null;
 
   function lockScroll() {
+    document.documentElement.classList.add('intro-lock');
     body.classList.add('intro-lock');
+    document.documentElement.classList.add('reveal-lock');
     body.classList.add('reveal-lock');
     window.scrollTo(0, 0);
   }
   function unlockScroll() {
+    document.documentElement.classList.remove('intro-lock');
     body.classList.remove('intro-lock');
+    document.documentElement.classList.remove('reveal-lock');
     body.classList.remove('reveal-lock');
   }
 
@@ -217,11 +221,16 @@
   function endIntro() {
     // remove overlay and allow normal scroll
     intro.classList.add('is-hidden');
+    if (arrow) arrow.classList.add('is-hidden');
     revealMask.classList.remove('is-on');
     revealEdge.classList.remove('is-on');
     siteRoot.style.clipPath = '';
     siteRoot.style.willChange = '';
     unlockScroll();
+
+    // Remove overlay from DOM so it can never steal scroll/pointer events
+    setTimeout(() => { try { intro.remove(); } catch(e){} }, 50);
+
 
     // Clean listeners
     window.removeEventListener('wheel', onWheel);
@@ -253,12 +262,13 @@
 
       arrow.addEventListener('click', (e) => {
         e.preventDefault();
-        autoToEnd();
+        arrow.classList.add('is-hidden'); autoToEnd();
       });
 
     } catch (err) {
       // If SVG fails, just remove intro so site is usable.
       intro.classList.add('is-hidden');
+    if (arrow) arrow.classList.add('is-hidden');
       revealMask.classList.remove('is-on');
       revealEdge.classList.remove('is-on');
       siteRoot.style.clipPath = '';
@@ -270,6 +280,7 @@
   setTimeout(() => {
     if (!shards.length) {
       intro.classList.add('is-hidden');
+    if (arrow) arrow.classList.add('is-hidden');
       revealMask.classList.remove('is-on');
       revealEdge.classList.remove('is-on');
       siteRoot.style.clipPath = '';
