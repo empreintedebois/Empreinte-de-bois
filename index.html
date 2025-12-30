@@ -10,6 +10,28 @@
 <link href="intro.css" rel="stylesheet"/>
 </head>
 <body class="intro-lock">
+
+  <!-- INTRO -->
+  <div id="intro" aria-hidden="false">
+    <div id="introBg">
+      <!-- background is handled globally; this is just a hook layer -->
+      <div class="halo halo-a"></div>
+      <div class="halo halo-b"></div>
+      <div class="halo halo-c"></div>
+    </div>
+
+    <div id="introStage" role="img" aria-label="Empreinte de Bois">
+      <div id="introShards"></div>
+    </div>
+
+    <a id="introArrow" href="#site" aria-label="Défiler">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path d="M12 16.5l-7-7 1.4-1.4L12 13.7l5.6-5.6L19 9.5z" fill="currentColor"></path>
+      </svg>
+    </a>
+  </div>
+  <!-- END INTRO -->
+
 <!-- Intro overlay (bloque 3s, puis scroll-control) -->
 <div id="intro" class="intro" aria-hidden="false">
   <div class="intro-bg">
@@ -19,39 +41,97 @@
 
   <div class="intro-center">
     <div id="logoExplode" class="logo-explode" aria-label="Empreinte de Bois"><div id="logoInner" class="logo-inner">
-      
-            <img class="logo-piece" id="piece-p01" style="left:208px;top:156px;width:236px;height:278px" src="assets/intro/shards/p01.webp" alt="" />
-      <img class="logo-piece" id="piece-p02" style="left:182px;top:376px;width:133px;height:305px" src="assets/intro/shards/p02.webp" alt="" />
-      <img class="logo-piece" id="piece-p03" style="left:322px;top:562px;width:221px;height:161px" src="assets/intro/shards/p03.webp" alt="" />
-      <img class="logo-piece" id="piece-p04" style="left:596px;top:200px;width:180px;height:100px" src="assets/intro/shards/p04.webp" alt="" />
-      <img class="logo-piece" id="piece-p05" style="left:616px;top:586px;width:237px;height:106px" src="assets/intro/shards/p05.webp" alt="" />
-      <img class="logo-piece" id="piece-p06" style="left:773px;top:199px;width:184px;height:99px" src="assets/intro/shards/p06.webp" alt="" />
-      <img class="logo-piece" id="piece-p07" style="left:440px;top:620px;width:190px;height:101px" src="assets/intro/shards/p07.webp" alt="" />
-      <img class="logo-piece" id="piece-p08" style="left:185px;top:316px;width:214px;height:165px" src="assets/intro/shards/p08.webp" alt="" />
-      <img class="logo-piece" id="piece-p09" style="left:439px;top:519px;width:199px;height:82px" src="assets/intro/shards/p09.webp" alt="" />
-      <img class="logo-piece" id="piece-p10" style="left:572px;top:365px;width:114px;height:145px" src="assets/intro/shards/p10.webp" alt="" />
-      <img class="logo-piece" id="piece-p11" style="left:311px;top:456px;width:132px;height:215px" src="assets/intro/shards/p11.webp" alt="" />
-      <img class="logo-piece" id="piece-p12" style="left:508px;top:200px;width:88px;height:98px" src="assets/intro/shards/p12.webp" alt="" />
-      <img class="logo-piece" id="piece-p13" style="left:844px;top:362px;width:101px;height:112px" src="assets/intro/shards/p13.webp" alt="" />
-      <img class="logo-piece" id="piece-p14" style="left:306px;top:378px;width:130px;height:139px" src="assets/intro/shards/p14.webp" alt="" />
-      <img class="logo-piece" id="piece-p15" style="left:687px;top:376px;width:79px;height:134px" src="assets/intro/shards/p15.webp" alt="" />
-      <img class="logo-piece" id="piece-p16" style="left:444px;top:190px;width:66px;height:110px" src="assets/intro/shards/p16.webp" alt="" />
-      <img class="logo-piece" id="piece-p17" style="left:418px;top:431px;width:124px;height:112px" src="assets/intro/shards/p17.webp" alt="" />
-      <img class="logo-piece" id="piece-p18" style="left:717px;top:368px;width:78px;height:132px" src="assets/intro/shards/p18.webp" alt="" />
-      <img class="logo-piece" id="piece-p19" style="left:956px;top:200px;width:64px;height:98px" src="assets/intro/shards/p19.webp" alt="" />
-      <img class="logo-piece" id="piece-p20" style="left:565px;top:364px;width:61px;height:99px" src="assets/intro/shards/p20.webp" alt="" />
-      <img class="logo-piece" id="piece-p21" style="left:225px;top:115px;width:129px;height:83px" src="assets/intro/shards/p21.webp" alt="" />
-      <img class="logo-piece" id="piece-p22" style="left:791px;top:328px;width:227px;height:15px" src="assets/intro/shards/p22.webp" alt="" />
-      <img class="logo-piece" id="piece-p23" style="left:846px;top:451px;width:101px;height:60px" src="assets/intro/shards/p23.webp" alt="" />
-      <img class="logo-piece" id="piece-p24" style="left:166px;top:253px;width:74px;height:83px" src="assets/intro/shards/p24.webp" alt="" />
-      <img class="logo-piece" id="piece-p25" style="left:545px;top:599px;width:105px;height:56px" src="assets/intro/shards/p25.webp" alt="" />
-      <img class="logo-piece" id="piece-p26" style="left:633px;top:556px;width:109px;height:37px" src="assets/intro/shards/p26.webp" alt="" />
-      <img class="logo-piece" id="piece-p27" style="left:354px;top:525px;width:68px;height:42px" src="assets/intro/shards/p27.webp" alt="" />
-      <img class="logo-piece" id="piece-p28" style="left:713px;top:634px;width:80px;height:53px" src="assets/intro/shards/p28.webp" alt="" />
-      <img class="logo-piece" id="piece-p29" style="left:595px;top:258px;width:40px;height:38px" src="assets/intro/shards/p29.webp" alt="" />
-      <img class="logo-piece" id="piece-p30" style="left:234px;top:596px;width:36px;height:51px" src="assets/intro/shards/p30.webp" alt="" />
-    
-    </div></div>
+      <img class="logo-piece" id="piece-p01" src="assets/intro/pieces90/p01.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p02" src="assets/intro/pieces90/p02.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p03" src="assets/intro/pieces90/p03.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p04" src="assets/intro/pieces90/p04.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p05" src="assets/intro/pieces90/p05.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p06" src="assets/intro/pieces90/p06.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p07" src="assets/intro/pieces90/p07.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p08" src="assets/intro/pieces90/p08.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p09" src="assets/intro/pieces90/p09.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p10" src="assets/intro/pieces90/p10.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p11" src="assets/intro/pieces90/p11.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p12" src="assets/intro/pieces90/p12.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p13" src="assets/intro/pieces90/p13.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p14" src="assets/intro/pieces90/p14.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p15" src="assets/intro/pieces90/p15.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p16" src="assets/intro/pieces90/p16.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p17" src="assets/intro/pieces90/p17.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p18" src="assets/intro/pieces90/p18.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p19" src="assets/intro/pieces90/p19.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p20" src="assets/intro/pieces90/p20.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p21" src="assets/intro/pieces90/p21.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p22" src="assets/intro/pieces90/p22.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p23" src="assets/intro/pieces90/p23.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p24" src="assets/intro/pieces90/p24.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p25" src="assets/intro/pieces90/p25.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p26" src="assets/intro/pieces90/p26.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p27" src="assets/intro/pieces90/p27.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p28" src="assets/intro/pieces90/p28.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p29" src="assets/intro/pieces90/p29.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p30" src="assets/intro/pieces90/p30.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p31" src="assets/intro/pieces90/p31.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p32" src="assets/intro/pieces90/p32.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p33" src="assets/intro/pieces90/p33.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p34" src="assets/intro/pieces90/p34.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p35" src="assets/intro/pieces90/p35.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p36" src="assets/intro/pieces90/p36.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p37" src="assets/intro/pieces90/p37.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p38" src="assets/intro/pieces90/p38.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p39" src="assets/intro/pieces90/p39.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p40" src="assets/intro/pieces90/p40.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p41" src="assets/intro/pieces90/p41.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p42" src="assets/intro/pieces90/p42.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p43" src="assets/intro/pieces90/p43.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p44" src="assets/intro/pieces90/p44.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p45" src="assets/intro/pieces90/p45.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p46" src="assets/intro/pieces90/p46.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p47" src="assets/intro/pieces90/p47.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p48" src="assets/intro/pieces90/p48.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p49" src="assets/intro/pieces90/p49.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p50" src="assets/intro/pieces90/p50.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p51" src="assets/intro/pieces90/p51.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p52" src="assets/intro/pieces90/p52.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p53" src="assets/intro/pieces90/p53.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p54" src="assets/intro/pieces90/p54.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p55" src="assets/intro/pieces90/p55.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p56" src="assets/intro/pieces90/p56.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p57" src="assets/intro/pieces90/p57.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p58" src="assets/intro/pieces90/p58.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p59" src="assets/intro/pieces90/p59.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p60" src="assets/intro/pieces90/p60.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p61" src="assets/intro/pieces90/p61.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p62" src="assets/intro/pieces90/p62.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p63" src="assets/intro/pieces90/p63.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p64" src="assets/intro/pieces90/p64.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p65" src="assets/intro/pieces90/p65.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p66" src="assets/intro/pieces90/p66.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p67" src="assets/intro/pieces90/p67.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p68" src="assets/intro/pieces90/p68.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p69" src="assets/intro/pieces90/p69.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p70" src="assets/intro/pieces90/p70.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p71" src="assets/intro/pieces90/p71.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p72" src="assets/intro/pieces90/p72.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p73" src="assets/intro/pieces90/p73.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p74" src="assets/intro/pieces90/p74.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p75" src="assets/intro/pieces90/p75.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p76" src="assets/intro/pieces90/p76.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p77" src="assets/intro/pieces90/p77.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p78" src="assets/intro/pieces90/p78.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p79" src="assets/intro/pieces90/p79.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p80" src="assets/intro/pieces90/p80.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p81" src="assets/intro/pieces90/p81.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p82" src="assets/intro/pieces90/p82.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p83" src="assets/intro/pieces90/p83.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p84" src="assets/intro/pieces90/p84.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p85" src="assets/intro/pieces90/p85.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p86" src="assets/intro/pieces90/p86.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p87" src="assets/intro/pieces90/p87.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p88" src="assets/intro/pieces90/p88.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p89" src="assets/intro/pieces90/p89.webp" alt="" decoding="async" loading="eager" />
+      <img class="logo-piece" id="piece-p90" src="assets/intro/pieces90/p90.webp" alt="" decoding="async" loading="eager" />
+</div></div>
   </div>
 
   <button id="scrollArrow" class="scroll-arrow" aria-label="Descendre">↓</button>
@@ -421,5 +501,6 @@
 </div>
 
 </div>
+  <div id="revealCurtain" aria-hidden="true"></div>
 </body>
 </html>

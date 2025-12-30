@@ -1,287 +1,145 @@
-/* =========================
-   INTRO OVERLAY (fond global via canvas)
-   - Le fond animé reste visible car le canvas est hors #site
-   ========================= */
-
-body.intro-lock { overflow: hidden; }
-
-/* intro invisible jusqu'au 1er calcul de scale (évite le "flash" de recadrage) */
-.intro{
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  background: transparent;
-  pointer-events: auto;
-  opacity: 0;
-  transition: opacity .15s ease;
-}
-.intro.intro-ready{ opacity: 1; }
-
-/* centre */
-.intro-center{
-  position: relative;
-  width: min(86vw, 700px);
-  aspect-ratio: 1/1;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
+/* ===== INTRO OVERLAY ===== */
+:root {
+  --introFade: 1;
+  --reveal: 0;
 }
 
-/* logo logique 1200 */
-.logo-explode{
-  position: relative;
-  width: 1200px;
-  height: 1200px;
-  /* scale CSS dès le départ -> pas de saut visible */
-  --logoScale: calc(min(92vw, 760px) / 1200);
-  transform: scale(var(--logoScale));
-  transform-origin: center;
-}
-
-/* shards */
-.logo-piece{
-  position: absolute;
-  transform: translate3d(0,0,0);
-  will-change: transform, opacity;
-  opacity: 1;
-}
-
-/* flèche */
-.scroll-arrow{
-  position: absolute;
-  bottom: 24px;
-  z-index: 2;
-  border: 0;
-  background: transparent;
-  font-size: 38px;
-  color: #fff;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .35s ease;
-}
-
-.scroll-arrow.is-visible{
-  opacity: 1;
-  pointer-events: auto;
-  animation: intro-bob 1.15s ease-in-out infinite;
-}
-@keyframes intro-bob{
-  0%,100%{ transform: translateY(0); }
-  50%{ transform: translateY(8px); }
-}
-
-/* site masqué pendant intro */
-.site-hidden{ opacity:0; }
-
-/* Reveal du site (rideau doux) */
-#reveal-curtain{
-  position: fixed;
-  inset: 0;
-  z-index: 9000; /* sous l'intro (9999), au-dessus du site */
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,1) 40%,
-    rgba(0,0,0,0) 65%,
-    rgba(0,0,0,0) 100%
-  );
-  transform: translateY(0);
-}
-
-/* quand on révèle: le rideau descend et s'efface */
-#reveal-curtain.reveal-on{
-  opacity: 1;
-  transform: translateY(110%);
-  transition: transform 1.25s ease, opacity .2s ease;
-}
-
-/* IMPORTANT: ne jamais cacher le canvas de fond */
-#background-canvas{
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-
-/* Mobile safe-area */
-.intro{padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);} 
-
-
-/* Ignore legacy intro-bg blocks if present in HTML */
-.intro-bg{display:none !important;}
-
-/* Reveal curtain: bord doux + durée lisible */
-#reveal-curtain{
-  position: fixed;
-  inset: 0;
-  z-index: 9000;
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,1) 35%,
-    rgba(0,0,0,0.15) 58%,
-    rgba(0,0,0,0) 72%,
-    rgba(0,0,0,0) 100%
-  );
-  transform: translateY(0);
-}
-#reveal-curtain.reveal-on{
-  opacity: 1;
-  transform: translateY(120%);
-  transition: transform 1.6s ease, opacity .2s ease;
-}
-
-
-/* v6: intro always visible (no hidden state) */
-.intro{opacity:1 !important;}
-.site-hidden{opacity:0 !important; transform:none !important;}
-
-
-/* v7: robust mobile centering + consistent sizing */
-#intro{
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  z-index: 9999;
-}
-
-.intro-inner{
-  width: min(92vw, 820px);
-  max-width: 92vw;
-  padding: clamp(10px, 2.5vw, 22px);
-}
-
-#logoExplode{
-  width: 100%;
-  height: auto;
-  max-height: 72svh; /* better than vh on mobile */
-  object-fit: contain;
-  display: block;
-}
-
-/* keep shards aligned to the same center as the logo */
-#shards{
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.shard{
-  opacity: 1 !important;
-  will-change: transform, opacity;
-}
-
-/* Ensure intro spacer exists to enable scroll driving (even when intro is fixed) */
-#intro-spacer{
-  height: 220vh !important;
-}
-
-/* During lock, only prevent overscroll bounce, do not kill all touch events */
-body.intro-lock{
-  overflow: hidden;
+html.intro-lock, body.intro-lock {
+  height: 100%;
+  overflow: hidden !important;
+  overscroll-behavior: none;
   touch-action: none;
 }
 
-
-/* =========================
-   v8 - Mobile/desktop parity
-   - scale logo canvas (1200x1200) to fit viewport
-   - keep it centered
-   - avoid clipping shards
-   ========================= */
-
-#intro{
-  overflow: visible !important; /* do NOT clip shards */
+#intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: auto;
+  opacity: var(--introFade);
 }
 
-.intro-center{
-  width: 100vw !important;
-  height: 100svh !important;
-  display: grid !important;
-  place-items: center !important;
+/* Keep background visible: intro sits above the same gold/grey animated background */
+#introBg {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
 }
 
-#logoExplode{
-  width: 1200px !important;
-  height: 1200px !important;
-  position: relative !important;
-  transform-origin: 50% 50% !important;
-  transform: scale(var(--logo-scale, 0.55)) translateZ(0) !important;
-}
-
-.logo-piece{
+/* Centered stage */
+#introStage {
   position: absolute;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  transform: translate3d(0,0,0);
-}
-
-/* Arrow must remain clickable even if intro-center blocks events */
-#scrollArrow{
-  pointer-events: auto !important;
-  z-index: 10001 !important;
-}
-
-/* Ensure spacer provides scroll range */
-#intro-spacer{ height: 240svh !important; }
-
-/* During intro lock: only block scroll for a moment */
-body.intro-lock{
-  overflow: hidden !important;
-  touch-action: none !important;
-}
-
-
-
-/* v9: FIX scale/layout mismatch
-   .logo-explode becomes the visible box sized in JS; .logo-inner is the 1200x1200 design scaled inside */
-.logo-explode{
-  position: relative;
-  width: 320px; height: 320px; /* default, overridden by JS */
-  transform: none !important;
-}
-
-.logo-inner{
-  position: absolute;
-  left: 0; top: 0;
+  left: 50%;
+  top: 50%;
   width: 1200px;
-  height: 1200px;
-  transform-origin: 0 0;
+  height: 900px;
+  transform: translate(-50%, -50%) scale(var(--baseScale, 0.9));
+  transform-origin: center;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Shards layer inside stage: we scale it for zoom effect */
+#introShards {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
   will-change: transform;
 }
 
-/* ensure centering uses the true box size */
-.intro-center{
-  width: 100% !important;
-  height: 100% !important;
+.shard {
   position: absolute;
-  inset: 0;
+  display: block;
+  will-change: transform, opacity;
+  transform-origin: center;
+  backface-visibility: hidden;
+  image-rendering: auto;
+}
+
+/* Arrow */
+#introArrow {
+  position: absolute;
+  left: 50%;
+  bottom: 4.5vh;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
   display: grid;
   place-items: center;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 300ms ease;
+}
+#introArrow.visible {
+  opacity: 0.9;
+  pointer-events: auto;
 }
 
-/* allow scrollArrow clicks */
-.scroll-arrow{ pointer-events: auto; }
-
-/* optional gentle idle tremble (tiny) */
-@keyframes shardTremble{
-  0%{ transform: translate3d(0,0,0); }
-  25%{ transform: translate3d(0.6px,-0.4px,0); }
-  50%{ transform: translate3d(-0.5px,0.5px,0); }
-  75%{ transform: translate3d(0.3px,0.4px,0); }
-  100%{ transform: translate3d(0,0,0); }
+/* Halos: +20% size and +20% gradient/blur */
+.halo {
+  --haloScale: 1.44;
+  --haloBlur: 72;
+  transform: scale(var(--haloScale));
+  filter: blur(calc(var(--haloBlur) * 1px));
 }
-.logo-piece.idle{
-  animation: shardTremble 1.6s infinite;
+
+/* Fade state */
+#intro.fading {
+  transition: opacity 0.2s linear;
+}
+
+/* ===== SITE REVEAL CURTAIN ===== */
+/* Site is present but visually clipped during reveal */
+#site {
+  --reveal: 0;
+}
+#site.revealing {
+  clip-path: inset(0 0 calc((1 - var(--reveal)) * 100%) 0);
+  will-change: clip-path;
+}
+
+/* Soft-edge curtain overlay for the moving reveal line */
+#revealCurtain {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 140vh;
+  pointer-events: none;
+  z-index: 9000;
+  opacity: 0;
+  --reveal: 0;
+}
+#site.revealing + #revealCurtain,
+#site.revealing ~ #revealCurtain {
+  opacity: 1;
+}
+#revealCurtain::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(var(--reveal) * 100vh - 20vh);
+  width: 100%;
+  height: 40vh;
+  /* Soft, not a hard line */
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0.12) 35%,
+    rgba(0,0,0,0.22) 50%,
+    rgba(0,0,0,0.12) 65%,
+    rgba(0,0,0,0) 100%
+  );
+}
+
+/* Mobile: make stage smaller and guarantee it fits */
+@media (max-width: 768px) {
+  #introStage {
+    width: 1200px;
+    height: 900px;
+  }
+  #introArrow {
+    bottom: 3.5vh;
+  }
 }
