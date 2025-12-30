@@ -1,305 +1,211 @@
+
 (() => {
-  \1
+  "use strict";
 
-  // v7_UNLOCK_TIMER: always allow interaction after 3s (even if assets slow)
-  setTimeout(() => {
-    try { document.body.classList.remove('intro-lock'); } catch(e){}
-  }, 3000);
-const intro = document.getElementById("intro");
-  const site = document.getElementById("site");
+  const body = document.body;
+  const intro = document.getElementById("intro");
+  const site  = document.getElementById("site");
   const arrow = document.getElementById("scrollArrow");
-  const logo = document.getElementById("logoExplode");
+  const logoWrap = document.getElementById("logoExplode");
+  const logoInner = document.getElementById("logoInner") || logoWrap;
+  const spacer = document.getElementById("intro-spacer");
 
-  // v8: scale the 1200x1200 shards canvas to fit viewport (mobile-safe)
-  const DESIGN = 1200;
-  const applyLogoScale = () => {
-    try{
-      const vw = Math.max(320, window.innerWidth || 0);
-      // Use visualViewport when available (better on mobile URL bar)
-      const vh = Math.max(480, (window.visualViewport ? window.visualViewport.height : window.innerHeight) || 0);
-
-      // Keep some breathing room so corners never touch screen
-      const maxW = vw * 0.92;
-      const maxH = vh * 0.72;
-
-      const s = Math.max(0.18, Math.min(maxW / DESIGN, maxH / DESIGN));
-      logo.style.setProperty("--logo-scale", String(s));
-    }catch(e){}
-  };
-  applyLogoScale();
-  window.addEventListener("resize", applyLogoScale, {passive:true});
-  if (window.visualViewport){
-    window.visualViewport.addEventListener("resize", applyLogoScale, {passive:true});
-  }
-
-  // v8: lock scroll only 3s (to let the intro breathe) then unlock always
-  const unlockIntroLock = () => { try{ body.classList.remove("intro-lock"); }catch(e){} };
-  setTimeout(unlockIntroLock, 3000);
-
-  // v8: arrow click always works (even on mobile)
-  try{
-    arrow.addEventListener("click", (e)=>{
-      try{ e.preventDefault(); }catch(_){}
-      unlockIntroLock();
-      const spacer = document.getElementById("intro-spacer");
-      const target = spacer ? Math.round(spacer.offsetHeight * 0.55) : Math.round((window.innerHeight||800) * 0.55);
-      try{ window.scrollTo({top: target, behavior: "smooth"}); }catch(err){ window.scrollTo(0, target); }
-    }, {passive:false});
-
-    // Tap fallback
-    arrow.addEventListener("touchstart", (e)=>{
-      try{ e.preventDefault(); }catch(_){}
-      arrow.click();
-    }, {passive:false});
-  }catch(e){}
-
-
-  const KEY = "introDone_v4"; // nouvelle clé -> évite les états cassés
-  const LOCK_MS = 3000;
-
-  const failOpen = (why) => {
-    try { console.warn("Intro fail-open:", why); } catch(e){}
-    try { body.classList.remove("intro-lock"); } catch(e){}
-    try {
-      setTimeout(() => {
-        try { site?.classList.remove("site-hidden"); } catch(e){}
-        try { document.getElementById("reveal-curtain")?.remove(); } catch(e){}
-        try { unlockScroll?.(); } catch(e){}
-        try { intro?.remove(); } catch(e){}
-      }, 100);
-    } catch(e){}
-  };
-
-  window.addEventListener("error", (e) => failOpen(e?.message || "error"));
-  window.addEventListener("unhandledrejection", (e) => failOpen(e?.reason || "promise"));
-
-  
-  // v6: force intro to run every time
-  try{ site.classList.add('site-hidden'); }catch(e){}
-  try{ body.classList.add('intro-lock'); }catch(e){}
-  if (!intro || !site || !logo) { failOpen("missing nodes"); return; }
-
-  // Si déjà fait
-    intro.remove();
-    site.classList.remove("site-hidden");
+  if (!intro || !site || !logoWrap || !spacer) {
+    console.warn("[intro] missing nodes, fail-open");
     return;
   }
 
-  // --- bloque scroll 3s ---
-  let locked = true;
+  // Always start with intro active
+  site.classList.add("site-hidden");
   body.classList.add("intro-lock");
-  setTimeout(() => {
-    locked = false;
-    body.classList.remove("intro-lock");
-    arrow?.classList.add("is-visible");
-  }, LOCK_MS);
 
-  // --- scroll virtuel (évite la barre d'adresse qui saute) ---
-  function prevent(e){ e.preventDefault(); }
-  function lockScroll(){
-    window.addEventListener("wheel", prevent, { passive:false });
-    window.addEventListener("touchmove", prevent, { passive:false });
-  }
-  function unlockScroll(){
-    try { body.classList.remove("intro-lock"); } catch(e){}
-
+  // --- Scroll lock: max 3s (prevents accidental skip, never bricks mobile) ---
+  const prevent = (e) => { try { e.preventDefault(); } catch (_) {} };
+  const lockScroll = () => {
+    window.addEventListener("wheel", prevent, { passive: false });
+    window.addEventListener("touchmove", prevent, { passive: false });
+  };
+  const unlockScroll = () => {
     window.removeEventListener("wheel", prevent);
     window.removeEventListener("touchmove", prevent);
-    window.removeEventListener("touchstart", onTouchStart);
-    window.removeEventListener("touchmove", onTouchMove);
-    window.removeEventListener("wheel", onWheel);
-  }
-  lockScroll();
-
-  // --- scale sans flash: on calcule puis on affiche l'intro ---
-  function updateScale(){
-    try{
-      const box = logo.parentElement.getBoundingClientRect();
-      const scale = Math.min(box.width / 1200, box.height / 1200);
-      logo.style.setProperty("--logoScale", String(scale));
-    }catch(e){}
-  }
-  updateScale();
-  requestAnimationFrame(() => {
-    updateScale();
-    intro.classList.add("intro-ready");
-  });
-  // micro warmup (1s max)
-  let warmFrames = 0;
-  const warm = () => {
-    warmFrames++;
-    updateScale();
-    if (warmFrames < 30) requestAnimationFrame(warm);
+    body.classList.remove("intro-lock");
   };
-  requestAnimationFrame(warm);
 
-  // --- meta + pièces ---
-  let meta = null;
-  let pieces = [];
+  lockScroll();
+  setTimeout(unlockScroll, 3000);
 
-  // progress virtuelle
-  let v = 0;            // 0..1
-  let isAuto = false;
-  let autoStart = 0;
-  let autoV0 = 0;
+  // --- Responsive layout: fit 1200x1200 design into viewport ---
+  const DESIGN = 1200;
+  const layout = () => {
+    const vv = window.visualViewport;
+    const vw = Math.max(320, vv ? vv.width  : window.innerWidth);
+    const vh = Math.max(480, vv ? vv.height : window.innerHeight);
 
-  // timings
-  const AUTO_TRIGGER = 0.30;
-  const T_EXPLODE = 1.5;
-  const T_FADE = 1.0;
-  const T_PAUSE = 0.5;
-  const P_EXP_END = 0.70;
-  const P_FADE_END = 0.90;
+    // target: keep margins, also limit by height (mobile safe)
+    const maxW = vw * 0.88;
+    const maxH = vh * 0.62;
+    const size = Math.max(220, Math.min(maxW, maxH, 760));
 
-  const clamp01 = (x) => Math.min(1, Math.max(0, x));
+    logoWrap.style.width = `${size}px`;
+    logoWrap.style.height = `${size}px`;
+    const s = size / DESIGN;
+    logoInner.style.transform = `scale(${s})`;
+  };
 
-  function apply(vv){
-    if (!meta) return;
-    const explode = clamp01(vv / P_EXP_END);
-    const fade = vv <= P_EXP_END ? 0 : clamp01((vv - P_EXP_END) / (P_FADE_END - P_EXP_END));
-
-    const now = performance.now() / 1000;
-    const j = (1 - explode);
-
-    for (const el of pieces){
-      const id = el.dataset.pid;
-      const info = meta.piecesById[id];
-      if (!info) continue;
-
-      const tx = info.dir.x * info.mag * explode;
-      const ty = info.dir.y * info.mag * explode;
-
-      const jx = Math.sin(now * 2.2 + el.__seed) * 1.1 * j;
-      const jy = Math.cos(now * 2.0 + el.__seed * 0.7) * 1.1 * j;
-
-      el.style.transform = `translate3d(${tx + jx}px, ${ty + jy}px, 0)`;
-      el.style.opacity = String(1 - fade);
-    }
+  // initial layout before paint + on resize/orientation
+  layout();
+  window.addEventListener("resize", layout, { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", layout, { passive: true });
+    window.visualViewport.addEventListener("scroll", layout, { passive: true });
   }
 
-  function startAuto(){
-    if (isAuto) return;
-    isAuto = true;
-    autoStart = performance.now();
-    autoV0 = v;
-    arrow?.classList.remove("is-visible");
-  }
+  // --- Shard offsets (from meta, fallback radial) ---
+  const pieces = Array.from(intro.querySelectorAll(".logo-piece"));
+  pieces.forEach(p => p.classList.add("idle"));
 
-  function finish(){
-    try { body.classList.remove("intro-lock"); } catch(e){}
+  const fallbackOffsets = () => {
+    // compute offsets based on element position in design space
+    pieces.forEach((el) => {
+      const left = parseFloat(el.style.left || "0");
+      const top  = parseFloat(el.style.top  || "0");
+      const cx = left + (parseFloat(el.style.width||"0")/2);
+      const cy = top  + (parseFloat(el.style.height||"0")/2);
+      const vx = cx - DESIGN/2;
+      const vy = cy - DESIGN/2;
+      const len = Math.max(1, Math.hypot(vx, vy));
+      const ux = vx / len;
+      const uy = vy / len;
+      // explode distance tuned for mobile (design px)
+      el.dataset.dx = String(ux * 260);
+      el.dataset.dy = String(uy * 260);
+      el.dataset.rot = String((Math.random()*14-7));
+    });
+  };
 
+  const applyMeta = (meta) => {
+    // meta expected: { "p01": {dx,dy,rot}, ... } in design px
+    pieces.forEach((el) => {
+      const id = (el.id || "").replace("piece-", "");
+      const m = meta[id] || meta[(id||"").toLowerCase()] || null;
+      if (m && typeof m.dx === "number" && typeof m.dy === "number") {
+        el.dataset.dx = String(m.dx);
+        el.dataset.dy = String(m.dy);
+        el.dataset.rot = String(m.rot || 0);
+      }
+    });
+    // fill missing with fallback
+    pieces.forEach((el) => {
+      if (el.dataset.dx == null || el.dataset.dy == null) {
+        // mark so we only fill once
+        el.dataset.dx = el.dataset.dx ?? "0";
+      }
+    });
+    // if lots are zeros, use fallback
+    const nonZero = pieces.filter(p => Math.abs(parseFloat(p.dataset.dx||"0")) + Math.abs(parseFloat(p.dataset.dy||"0")) > 0.1).length;
+    if (nonZero < Math.floor(pieces.length * 0.6)) fallbackOffsets();
+  };
 
-    // L'intro disparaît (fond canvas reste en place => pas de saut)
-    intro.remove();
+  fetch("assets/intro/shards_meta.json", { cache: "no-store" })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error("meta http " + r.status)))
+    .then(applyMeta)
+    .catch((e) => {
+      console.warn("[intro] meta load failed, using fallback", e);
+      fallbackOffsets();
+    });
 
-    // Reveal du site avec rideau doux
+  // --- Animation driven by scroll progress ---
+  let introDone = false;
+  const clamp01 = (x) => Math.max(0, Math.min(1, x));
+
+  const setProgress = (p) => {
+    // p: 0..1 explode, then fade out afterwards via CSS variable
+    const explodeP = clamp01(p);
+    const ease = explodeP*explodeP*(3-2*explodeP); // smoothstep
+    const dist = 1 + ease;
+
+    pieces.forEach((el) => {
+      const dx = parseFloat(el.dataset.dx || "0") * ease;
+      const dy = parseFloat(el.dataset.dy || "0") * ease;
+      const rot = parseFloat(el.dataset.rot || "0") * ease;
+      el.style.transform = `translate3d(${dx}px, ${dy}px, 0) rotate(${rot}deg)`;
+      el.style.opacity = "1";
+      el.classList.toggle("idle", explodeP < 0.02);
+    });
+  };
+
+  const fadeLogo = (t01) => {
+    const o = 1 - clamp01(t01);
+    pieces.forEach((el) => { el.style.opacity = String(o); });
+  };
+
+  const revealSite = () => {
+    // remove intro overlay after reveal
     site.classList.remove("site-hidden");
+    // curtain reveal if present
     const curtain = document.getElementById("reveal-curtain");
     if (curtain) {
-      // démarre légèrement après la fin de fade (tu peux ajuster si besoin)
-      requestAnimationFrame(() => curtain.classList.add("reveal-on"));
-      setTimeout(() => curtain.remove(), 1900);
+      curtain.classList.add("reveal");
+      setTimeout(() => curtain.remove(), 1400);
+    }
+    // prevent going back to intro
+    setTimeout(() => {
+      intro.remove();
+      spacer.remove();
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }, 900);
+  };
+
+  const onScroll = () => {
+    if (introDone) return;
+
+    const maxScroll = Math.max(1, spacer.offsetHeight - window.innerHeight);
+    const y = window.scrollY || 0;
+    const p = clamp01(y / maxScroll);
+
+    // explode 0..0.6, then auto-finish (explode to max in 1.5s, fade 1s, reveal)
+    if (p < 0.6) {
+      setProgress(p / 0.6);
+      return;
     }
 
+    introDone = true;
+
+    // finish explode quickly
+    const start = performance.now();
+    const finishExplode = (now) => {
+      const t = clamp01((now - start) / 1500);
+      setProgress(1);
+      if (t < 1) requestAnimationFrame(finishExplode);
+    };
+    requestAnimationFrame(finishExplode);
+
+    // start fade slightly before end
+    setTimeout(() => {
+      const f0 = performance.now();
+      const step = (now) => {
+        const t = clamp01((now - f0) / 1000);
+        fadeLogo(t);
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }, 1300);
+
+    // reveal after small pause
+    setTimeout(revealSite, 2800);
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // Arrow triggers scroll progression (mobile-friendly)
+  const go = () => {
     unlockScroll();
+    window.scrollTo({ top: Math.round(window.innerHeight * 0.75), behavior: "smooth" });
+  };
+  arrow?.addEventListener("click", (e) => { e.preventDefault(); go(); });
+  arrow?.addEventListener("touchstart", (e) => { e.preventDefault(); go(); }, { passive: false });
 
-    // Empêche de remonter vers l'intro: on force un léger scroll et on nettoie
-    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" }));
-  }
+  // Kick initial state
+  setProgress(0);
 
-  // input
-  function onWheel(e){
-    if (locked || isAuto) return;
-    const delta = Math.max(-60, Math.min(60, e.deltaY));
-    v = clamp01(v + delta / 2600);
-  }
-
-  let touchY = null;
-  function onTouchStart(e){
-    if (locked || isAuto) return;
-    touchY = e.touches?.[0]?.clientY ?? null;
-  }
-  function onTouchMove(e){
-    if (locked || isAuto || touchY === null) return;
-    const y = e.touches?.[0]?.clientY ?? touchY;
-    const dy = touchY - y;
-    touchY = y;
-    const delta = Math.max(-40, Math.min(40, dy));
-    v = clamp01(v + delta / 1800);
-  }
-
-  arrow?.addEventListener("click", () => {
-    if (locked) return;
-    v = Math.max(v, AUTO_TRIGGER);
-    startAuto();
-  });
-
-  function tick(){
-    try{
-      if (!meta){ requestAnimationFrame(tick); return; }
-
-      if (!locked && !isAuto && v >= AUTO_TRIGGER) startAuto();
-
-      if (isAuto){
-        const t = (performance.now() - autoStart) / 1000;
-        const total = T_EXPLODE + T_FADE + T_PAUSE;
-        const u = clamp01(t / total);
-        v = clamp01(autoV0 + (1 - autoV0) * u);
-        apply(v);
-        if (t >= total){ finish(); return; }
-      } else {
-        apply(v);
-      }
-
-      requestAnimationFrame(tick);
-    } catch(err){
-      failOpen(err);
-    }
-  }
-
-  async function init(){
-    try{
-      const res = await fetch(`assets/intro/shards_meta.json?v=${Date.now()}`, { cache: "no-store" });
-      if (!res.ok) throw new Error("meta fetch failed: " + res.status);
-      meta = await res.json();
-      meta.piecesById = {};
-      for (const p of meta.pieces) meta.piecesById[p.id] = p;
-
-      pieces = Array.from(document.querySelectorAll(".logo-piece"));
-      if (!pieces.length) throw new Error("no pieces in DOM");
-
-      pieces.forEach((el, idx) => {
-        // Priorité de décodage/chargement (mobile)
-        try { el.loading = 'eager'; el.decoding = 'async'; if (idx < 6) el.fetchPriority = 'high'; } catch(e){}
-
-        const m = /piece-(p\\d+)/.exec(el.id);
-        el.dataset.pid = m ? m[1] : "";
-        el.__seed = idx + 1;
-      });
-
-      // masque le site pendant intro
-      site.classList.add("site-hidden");
-
-      // écouteurs
-      window.addEventListener("wheel", onWheel, { passive:false });
-      window.addEventListener("touchstart", onTouchStart, { passive:false });
-      window.addEventListener("touchmove", onTouchMove, { passive:false });
-      window.addEventListener("resize", updateScale);
-
-      // watchdog anti-écran figé
-      setTimeout(() => {
-          // si après 8s le site est toujours caché, on fail-open
-          failOpen("watchdog stuck");
-        }
-      }, 8000);
-
-      apply(0);
-      requestAnimationFrame(tick);
-    } catch(err){
-      failOpen(err);
-    }
-  }
-
-  init();
 })();
-// v/

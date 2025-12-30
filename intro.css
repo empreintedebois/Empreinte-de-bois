@@ -241,3 +241,47 @@ body.intro-lock{
   touch-action: none !important;
 }
 
+
+
+/* v9: FIX scale/layout mismatch
+   .logo-explode becomes the visible box sized in JS; .logo-inner is the 1200x1200 design scaled inside */
+.logo-explode{
+  position: relative;
+  width: 320px; height: 320px; /* default, overridden by JS */
+  transform: none !important;
+}
+
+.logo-inner{
+  position: absolute;
+  left: 0; top: 0;
+  width: 1200px;
+  height: 1200px;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* ensure centering uses the true box size */
+.intro-center{
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+/* allow scrollArrow clicks */
+.scroll-arrow{ pointer-events: auto; }
+
+/* optional gentle idle tremble (tiny) */
+@keyframes shardTremble{
+  0%{ transform: translate3d(0,0,0); }
+  25%{ transform: translate3d(0.6px,-0.4px,0); }
+  50%{ transform: translate3d(-0.5px,0.5px,0); }
+  75%{ transform: translate3d(0.3px,0.4px,0); }
+  100%{ transform: translate3d(0,0,0); }
+}
+.logo-piece.idle{
+  animation: shardTremble 1.6s infinite;
+}
