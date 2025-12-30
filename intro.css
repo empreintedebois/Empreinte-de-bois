@@ -61,7 +61,7 @@
 }
 .intro-arrow:active{transform:translateX(-50%) scale(0.98);}
 
-body.intro-locked{
+body.intro-lock{
   overflow:hidden;
   touch-action:none;
 }
@@ -76,7 +76,7 @@ body.intro-locked{
 }
 
 /* Reveal main site progressively */
-body.site-revealing{
+body.reveal-lock{
   overflow:hidden;
 }
 #site-reveal-mask{
@@ -114,43 +114,3 @@ body.site-revealing{
   opacity:0.85;
 }
 #site-reveal-edge.is-on{display:block;}
-
-/* --- Site reveal control (site content hidden until intro completes) --- */
-#siteRoot {
-  opacity: 0;
-  clip-path: inset(100% 0 0 0);
-  will-change: clip-path, opacity;
-}
-
-body.site-revealing #siteRoot,
-body.site-ready #siteRoot {
-  opacity: 1;
-}
-
-body.site-revealing #siteRoot {
-  /* JS drives --revealTop from 100% -> 0% */
-  clip-path: inset(var(--revealTop, 100%) 0 0 0);
-}
-
-body.site-ready #siteRoot {
-  clip-path: none;
-}
-
-body.intro-lockeded {
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
-}
-
-/* Override: reveal edge is always present; JS drives position/opacity */
-#site-reveal-edge {
-  display: block;
-  opacity: 0;
-  top: -200px;
-}
-
-body.intro-locked {
-  overflow: hidden;
-  height: 100vh;
-  touch-action: none;
-}

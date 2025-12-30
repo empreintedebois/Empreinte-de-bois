@@ -1,199 +1,196 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000">
-<defs>
-<image id="logo" href="logo.png" x="0" y="0" width="1000" height="1000" />
-<clipPath id="clip_0"><path d="M 680.96,0.00 525.96,0.00 529.47,159.50 620.46,189.37 680.96,0.00 Z"/></clipPath>
-<clipPath id="clip_1"><path d="M 338.45,231.55 270.74,166.36 227.43,176.78 207.25,205.86 208.17,224.68 315.45,271.17 340.83,248.13 338.45,231.55 Z"/></clipPath>
-<clipPath id="clip_2"><path d="M 632.86,681.20 636.01,752.72 673.09,778.19 736.14,694.19 754.95,633.34 716.43,571.81 632.86,681.20 Z"/></clipPath>
-<clipPath id="clip_3"><path d="M 759.81,149.57 743.58,223.63 904.46,234.80 1000.00,209.91 1000.00,0.00 905.20,0.00 759.81,149.57 Z"/></clipPath>
-<clipPath id="clip_4"><path d="M 343.21,101.04 441.12,164.66 507.64,172.57 529.47,159.50 525.96,0.00 342.01,0.00 343.21,101.04 Z"/></clipPath>
-<clipPath id="clip_5"><path d="M 153.97,477.98 134.06,502.93 180.11,544.03 314.25,541.15 349.09,421.83 321.69,410.67 308.66,410.11 153.97,477.98 Z"/></clipPath>
-<clipPath id="clip_6"><path d="M 48.87,319.64 51.14,317.50 127.17,198.23 5.62,119.43 0.00,117.04 0.00,329.53 48.87,319.64 Z"/></clipPath>
-<clipPath id="clip_7"><path d="M 510.83,468.68 512.95,549.99 537.86,566.56 716.44,571.71 734.35,528.00 734.58,526.53 690.27,475.23 511.92,468.59 510.83,468.68 Z"/></clipPath>
-<clipPath id="clip_8"><path d="M 348.45,686.37 314.25,541.15 180.11,544.03 212.66,638.50 348.45,686.37 Z"/></clipPath>
-<clipPath id="clip_9"><path d="M 759.81,149.57 905.20,0.00 703.72,0.00 759.81,149.57 Z"/></clipPath>
-<clipPath id="clip_10"><path d="M 754.95,633.34 736.14,694.19 841.39,689.83 866.10,678.07 862.28,665.98 856.45,663.41 754.95,633.34 Z"/></clipPath>
-<clipPath id="clip_11"><path d="M 414.25,189.56 441.12,164.66 343.21,101.04 270.74,166.36 338.45,231.55 414.25,189.56 Z"/></clipPath>
-<clipPath id="clip_12"><path d="M 904.46,234.80 860.53,396.87 946.42,426.84 1000.00,414.35 1000.00,209.91 904.46,234.80 Z"/></clipPath>
-<clipPath id="clip_13"><path d="M 227.43,176.78 196.88,112.35 5.62,119.43 127.17,198.23 207.25,205.86 227.43,176.78 Z"/></clipPath>
-<clipPath id="clip_14"><path d="M 766.06,552.88 856.45,663.41 862.28,665.98 876.03,612.14 766.06,552.88 Z"/></clipPath>
-<clipPath id="clip_15"><path d="M 841.39,689.83 736.14,694.19 673.09,778.19 692.93,804.45 841.39,689.83 Z"/></clipPath>
-<clipPath id="clip_16"><path d="M 425.06,808.87 399.17,1000.00 722.64,1000.00 425.06,808.87 Z"/></clipPath>
-<clipPath id="clip_17"><path d="M 472.95,416.65 446.83,400.14 349.09,421.83 314.25,541.15 348.45,686.37 382.22,725.92 512.95,549.99 510.83,468.68 472.95,416.65 Z"/></clipPath>
-<clipPath id="clip_18"><path d="M 716.44,571.71 716.43,571.81 754.95,633.34 856.45,663.41 766.06,552.88 734.35,528.00 716.44,571.71 Z"/></clipPath>
-<clipPath id="clip_19"><path d="M 734.35,528.00 766.06,552.88 876.03,612.14 899.36,564.53 882.71,531.18 803.22,495.74 734.58,526.53 734.35,528.00 Z"/></clipPath>
-<clipPath id="clip_20"><path d="M 743.58,223.63 759.81,149.57 703.72,0.00 680.96,0.00 620.46,189.37 706.83,246.40 707.67,246.58 743.58,223.63 Z"/></clipPath>
-<clipPath id="clip_21"><path d="M 321.69,410.67 297.71,313.66 207.36,235.52 203.33,246.06 195.84,329.32 308.66,410.11 321.69,410.67 Z"/></clipPath>
-<clipPath id="clip_22"><path d="M 207.25,205.86 127.17,198.23 51.14,317.50 203.33,246.06 207.36,235.52 208.17,224.68 207.25,205.86 Z"/></clipPath>
-<clipPath id="clip_23"><path d="M 203.33,246.06 51.14,317.50 48.87,319.64 151.34,356.69 195.84,329.32 203.33,246.06 Z"/></clipPath>
-<clipPath id="clip_24"><path d="M 723.10,320.64 707.67,246.58 706.83,246.40 472.95,416.65 510.83,468.68 511.92,468.59 717.11,336.98 723.10,320.64 Z"/></clipPath>
-<clipPath id="clip_25"><path d="M 381.69,286.52 414.25,189.56 338.45,231.55 340.83,248.13 381.69,286.52 Z"/></clipPath>
-<clipPath id="clip_26"><path d="M 383.46,736.65 253.98,796.45 276.72,1000.00 399.17,1000.00 425.06,808.87 421.59,780.52 383.46,736.65 Z"/></clipPath>
-<clipPath id="clip_27"><path d="M 537.86,566.56 632.86,681.20 716.43,571.81 716.44,571.71 537.86,566.56 Z"/></clipPath>
-<clipPath id="clip_28"><path d="M 0.00,767.10 0.00,843.78 253.98,796.45 383.46,736.65 382.22,725.92 348.45,686.37 212.66,638.50 0.00,767.10 Z"/></clipPath>
-<clipPath id="clip_29"><path d="M 195.84,329.32 151.34,356.69 153.97,477.98 308.66,410.11 195.84,329.32 Z"/></clipPath>
-<clipPath id="clip_30"><path d="M 899.36,564.53 876.03,612.14 862.28,665.98 866.10,678.07 1000.00,822.47 1000.00,570.72 899.36,564.53 Z"/></clipPath>
-<clipPath id="clip_31"><path d="M 512.95,549.99 382.22,725.92 383.46,736.65 421.59,780.52 636.01,752.72 632.86,681.20 537.86,566.56 512.95,549.99 Z"/></clipPath>
-<clipPath id="clip_32"><path d="M 866.10,678.07 841.39,689.83 692.93,804.45 785.17,1000.00 1000.00,1000.00 1000.00,822.47 866.10,678.07 Z"/></clipPath>
-<clipPath id="clip_33"><path d="M 196.88,112.35 227.43,176.78 270.74,166.36 343.21,101.04 342.01,0.00 184.67,0.00 196.88,112.35 Z"/></clipPath>
-<clipPath id="clip_34"><path d="M 315.45,271.17 297.71,313.66 321.69,410.67 349.09,421.83 446.83,400.14 446.82,399.44 381.69,286.52 340.83,248.13 315.45,271.17 Z"/></clipPath>
-<clipPath id="clip_35"><path d="M 253.98,796.45 0.00,843.78 0.00,1000.00 276.72,1000.00 253.98,796.45 Z"/></clipPath>
-<clipPath id="clip_36"><path d="M 723.10,320.64 830.45,404.83 860.53,396.87 904.46,234.80 743.58,223.63 707.67,246.58 723.10,320.64 Z"/></clipPath>
-<clipPath id="clip_37"><path d="M 511.92,468.59 690.27,475.23 717.11,336.98 511.92,468.59 Z"/></clipPath>
-<clipPath id="clip_38"><path d="M 946.42,426.84 860.53,396.87 830.45,404.83 803.22,495.74 882.71,531.18 946.42,426.84 Z"/></clipPath>
-<clipPath id="clip_39"><path d="M 208.17,224.68 207.36,235.52 297.71,313.66 315.45,271.17 208.17,224.68 Z"/></clipPath>
-<clipPath id="clip_40"><path d="M 706.83,246.40 620.46,189.37 529.47,159.50 507.64,172.57 446.82,399.44 446.83,400.14 472.95,416.65 706.83,246.40 Z"/></clipPath>
-<clipPath id="clip_41"><path d="M 692.93,804.45 673.09,778.19 636.01,752.72 421.59,780.52 425.06,808.87 722.64,1000.00 785.17,1000.00 692.93,804.45 Z"/></clipPath>
-<clipPath id="clip_42"><path d="M 446.82,399.44 507.64,172.57 441.12,164.66 414.25,189.56 381.69,286.52 446.82,399.44 Z"/></clipPath>
-<clipPath id="clip_43"><path d="M 946.42,426.84 882.71,531.18 899.36,564.53 1000.00,570.72 1000.00,414.35 946.42,426.84 Z"/></clipPath>
-<clipPath id="clip_44"><path d="M 5.62,119.43 196.88,112.35 184.67,0.00 0.00,0.00 0.00,117.04 5.62,119.43 Z"/></clipPath>
-<clipPath id="clip_45"><path d="M 212.66,638.50 180.11,544.03 134.06,502.93 0.00,528.08 0.00,767.10 212.66,638.50 Z"/></clipPath>
-<clipPath id="clip_46"><path d="M 690.27,475.23 734.58,526.53 803.22,495.74 830.45,404.83 723.10,320.64 717.11,336.98 690.27,475.23 Z"/></clipPath>
-<clipPath id="clip_47"><path d="M 134.06,502.93 153.97,477.98 151.34,356.69 48.87,319.64 0.00,329.53 0.00,528.08 134.06,502.93 Z"/></clipPath>
-</defs>
-<g id="shards">
-<g class="shard" id="shard_0" data-cx="592.50" data-cy="80.63">
-  <g clip-path="url(#clip_0)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_1" data-cx="273.35" data-cy="218.08">
-  <g clip-path="url(#clip_1)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_2" data-cx="690.94" data-cy="678.56">
-  <g clip-path="url(#clip_2)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_3" data-cx="894.60" data-cy="130.33">
-  <g clip-path="url(#clip_3)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_4" data-cx="442.56" data-cy="76.53">
-  <g clip-path="url(#clip_4)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_5" data-cx="252.56" data-cy="486.04">
-  <g clip-path="url(#clip_5)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_6" data-cx="45.10" data-cy="225.55">
-  <g clip-path="url(#clip_6)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_7" data-cx="616.40" data-cy="521.19">
-  <g clip-path="url(#clip_7)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_8" data-cx="268.57" data-cy="602.37">
-  <g clip-path="url(#clip_8)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_9" data-cx="789.58" data-cy="49.86">
-  <g clip-path="url(#clip_9)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_10" data-cx="794.26" data-cy="669.44">
-  <g clip-path="url(#clip_10)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_11" data-cx="352.44" data-cy="166.95">
-  <g clip-path="url(#clip_11)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_12" data-cx="942.41" data-cy="325.73">
-  <g clip-path="url(#clip_12)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_13" data-cx="138.02" data-cy="153.55">
-  <g clip-path="url(#clip_13)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_14" data-cx="834.41" data-cy="611.32">
-  <g clip-path="url(#clip_14)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_15" data-cx="744.18" data-cy="736.13">
-  <g clip-path="url(#clip_15)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_16" data-cx="515.62" data-cy="936.29">
-  <g clip-path="url(#clip_16)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_17" data-cx="409.78" data-cy="541.87">
-  <g clip-path="url(#clip_17)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_18" data-cx="773.02" data-cy="599.83">
-  <g clip-path="url(#clip_18)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_19" data-cx="827.18" data-cy="548.28">
-  <g clip-path="url(#clip_19)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_20" data-cx="694.62" data-cy="135.91">
-  <g clip-path="url(#clip_20)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_21" data-cx="253.96" data-cy="325.53">
-  <g clip-path="url(#clip_21)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_22" data-cx="138.42" data-cy="246.19">
-  <g clip-path="url(#clip_22)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_23" data-cx="144.32" data-cy="308.00">
-  <g clip-path="url(#clip_23)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_24" data-cx="607.78" data-cy="362.41">
-  <g clip-path="url(#clip_24)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_25" data-cx="375.95" data-cy="237.62">
-  <g clip-path="url(#clip_25)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_26" data-cx="341.76" data-cy="874.98">
-  <g clip-path="url(#clip_26)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_27" data-cx="629.08" data-cy="606.49">
-  <g clip-path="url(#clip_27)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_28" data-cx="183.64" data-cy="743.85">
-  <g clip-path="url(#clip_28)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_29" data-cx="208.30" data-cy="402.00">
-  <g clip-path="url(#clip_29)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_30" data-cx="944.63" data-cy="667.09">
-  <g clip-path="url(#clip_30)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_31" data-cx="514.87" data-cy="687.36">
-  <g clip-path="url(#clip_31)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_32" data-cx="861.91" data-cy="860.03">
-  <g clip-path="url(#clip_32)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_33" data-cx="263.90" data-cy="74.29">
-  <g clip-path="url(#clip_33)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_34" data-cx="360.89" data-cy="346.18">
-  <g clip-path="url(#clip_34)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_35" data-cx="138.78" data-cy="910.63">
-  <g clip-path="url(#clip_35)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_36" data-cx="808.13" data-cy="298.95">
-  <g clip-path="url(#clip_36)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_37" data-cx="639.77" data-cy="426.93">
-  <g clip-path="url(#clip_37)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_38" data-cx="869.23" data-cy="459.32">
-  <g clip-path="url(#clip_38)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_39" data-cx="267.93" data-cy="267.91">
-  <g clip-path="url(#clip_39)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_40" data-cx="556.63" data-cy="275.27">
-  <g clip-path="url(#clip_40)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_41" data-cx="617.62" data-cy="859.58">
-  <g clip-path="url(#clip_41)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_42" data-cx="443.02" data-cy="261.14">
-  <g clip-path="url(#clip_42)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_43" data-cx="953.52" data-cy="502.87">
-  <g clip-path="url(#clip_43)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_44" data-cx="94.49" data-cy="58.63">
-  <g clip-path="url(#clip_44)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_45" data-cx="87.32" data-cy="617.21">
-  <g clip-path="url(#clip_45)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_46" data-cx="754.96" data-cy="431.44">
-  <g clip-path="url(#clip_46)"><use href="#logo"/></g>
-</g>
-<g class="shard" id="shard_47" data-cx="71.37" data-cy="423.36">
-  <g clip-path="url(#clip_47)"><use href="#logo"/></g>
-</g>
-</g>
+  <defs>
+    <clipPath id="clip-0"><path d="M 500.00 500.00 L 1000.00 500.00 L 1000.00 534.44 L 1000.00 600.44 Z"/></clipPath>
+    <clipPath id="clip-1"><path d="M 500.00 500.00 L 1000.00 588.10 L 1000.00 714.51 L 1000.00 662.44 Z"/></clipPath>
+    <clipPath id="clip-2"><path d="M 500.00 500.00 L 1000.00 680.36 L 1000.00 725.09 L 1000.00 731.66 Z"/></clipPath>
+    <clipPath id="clip-3"><path d="M 500.00 500.00 L 1000.00 747.72 L 1000.00 849.27 L 1000.00 883.26 Z"/></clipPath>
+    <clipPath id="clip-4"><path d="M 500.00 500.00 L 1000.00 852.69 L 1000.00 889.64 L 1000.00 960.96 Z"/></clipPath>
+    <clipPath id="clip-5"><path d="M 500.00 500.00 L 982.70 859.30 L 1000.00 918.19 L 970.24 964.89 Z"/></clipPath>
+    <clipPath id="clip-6"><path d="M 500.00 500.00 L 1000.00 1000.00 L 1000.00 1000.00 L 966.95 1000.00 Z"/></clipPath>
+    <clipPath id="clip-7"><path d="M 500.00 500.00 L 906.43 1000.00 L 884.22 1000.00 L 895.45 1000.00 Z"/></clipPath>
+    <clipPath id="clip-8"><path d="M 500.00 500.00 L 824.98 1000.00 L 881.94 1000.00 L 775.49 1000.00 Z"/></clipPath>
+    <clipPath id="clip-9"><path d="M 500.00 500.00 L 802.80 1000.00 L 851.48 1000.00 L 689.40 1000.00 Z"/></clipPath>
+    <clipPath id="clip-10"><path d="M 500.00 500.00 L 695.85 1000.00 L 684.85 1000.00 L 598.55 1000.00 Z"/></clipPath>
+    <clipPath id="clip-11"><path d="M 500.00 500.00 L 616.64 1000.00 L 566.46 1000.00 L 521.47 1000.00 Z"/></clipPath>
+    <clipPath id="clip-12"><path d="M 500.00 500.00 L 519.04 1000.00 L 469.02 1000.00 L 431.17 1000.00 Z"/></clipPath>
+    <clipPath id="clip-13"><path d="M 500.00 500.00 L 433.60 1000.00 L 350.25 1000.00 L 377.53 1000.00 Z"/></clipPath>
+    <clipPath id="clip-14"><path d="M 500.00 500.00 L 354.91 1000.00 L 312.55 1000.00 L 279.70 1000.00 Z"/></clipPath>
+    <clipPath id="clip-15"><path d="M 500.00 500.00 L 267.77 1000.00 L 82.40 1000.00 L 181.40 1000.00 Z"/></clipPath>
+    <clipPath id="clip-16"><path d="M 500.00 500.00 L 199.85 1000.00 L 73.35 1000.00 L 103.89 1000.00 Z"/></clipPath>
+    <clipPath id="clip-17"><path d="M 500.00 500.00 L 59.93 1000.00 L 0.00 1000.00 L 57.66 986.69 Z"/></clipPath>
+    <clipPath id="clip-18"><path d="M 500.00 500.00 L 78.23 964.07 L 0.00 1000.00 L 0.00 979.51 Z"/></clipPath>
+    <clipPath id="clip-19"><path d="M 500.00 500.00 L 0.00 948.55 L 20.66 871.71 L 0.55 823.60 Z"/></clipPath>
+    <clipPath id="clip-20"><path d="M 500.00 500.00 L 0.00 929.63 L 0.00 805.73 L 0.00 824.94 Z"/></clipPath>
+    <clipPath id="clip-21"><path d="M 500.00 500.00 L 0.00 753.09 L 0.00 678.71 L 0.00 722.36 Z"/></clipPath>
+    <clipPath id="clip-22"><path d="M 500.00 500.00 L 0.00 698.87 L 0.00 657.42 L 0.00 598.87 Z"/></clipPath>
+    <clipPath id="clip-23"><path d="M 500.00 500.00 L 0.00 600.88 L 0.00 565.69 L 0.00 530.48 Z"/></clipPath>
+    <clipPath id="clip-24"><path d="M 500.00 500.00 L 0.00 534.13 L 0.00 511.34 L 0.00 426.90 Z"/></clipPath>
+    <clipPath id="clip-25"><path d="M 500.00 500.00 L 0.00 420.02 L 0.00 369.32 L 0.00 352.65 Z"/></clipPath>
+    <clipPath id="clip-26"><path d="M 500.00 500.00 L 0.00 330.86 L 0.00 314.03 L 0.00 264.50 Z"/></clipPath>
+    <clipPath id="clip-27"><path d="M 500.00 500.00 L 0.00 279.86 L 0.00 222.21 L 0.00 200.41 Z"/></clipPath>
+    <clipPath id="clip-28"><path d="M 500.00 500.00 L 0.00 211.54 L 0.00 139.75 L 1.21 149.01 Z"/></clipPath>
+    <clipPath id="clip-29"><path d="M 500.00 500.00 L 0.00 48.17 L 0.00 108.61 L 0.00 0.00 Z"/></clipPath>
+    <clipPath id="clip-30"><path d="M 500.00 500.00 L 0.00 0.00 L 0.00 0.00 L 99.71 0.64 Z"/></clipPath>
+    <clipPath id="clip-31"><path d="M 500.00 500.00 L 52.85 0.00 L 37.10 0.00 L 146.75 0.00 Z"/></clipPath>
+    <clipPath id="clip-32"><path d="M 500.00 500.00 L 176.91 0.00 L 158.41 0.00 L 260.60 0.00 Z"/></clipPath>
+    <clipPath id="clip-33"><path d="M 500.00 500.00 L 230.36 0.00 L 228.04 0.00 L 316.37 0.00 Z"/></clipPath>
+    <clipPath id="clip-34"><path d="M 500.00 500.00 L 348.88 0.00 L 314.52 0.00 L 418.60 0.00 Z"/></clipPath>
+    <clipPath id="clip-35"><path d="M 500.00 500.00 L 422.47 0.00 L 454.83 0.00 L 509.37 0.00 Z"/></clipPath>
+    <clipPath id="clip-36"><path d="M 500.00 500.00 L 509.65 0.00 L 616.03 0.00 L 603.56 0.00 Z"/></clipPath>
+    <clipPath id="clip-37"><path d="M 500.00 500.00 L 624.11 0.00 L 646.99 0.00 L 708.72 0.00 Z"/></clipPath>
+    <clipPath id="clip-38"><path d="M 500.00 500.00 L 726.34 0.00 L 877.51 0.00 L 843.93 0.00 Z"/></clipPath>
+    <clipPath id="clip-39"><path d="M 500.00 500.00 L 771.32 0.00 L 831.34 0.00 L 882.63 0.00 Z"/></clipPath>
+    <clipPath id="clip-40"><path d="M 500.00 500.00 L 833.40 0.00 L 959.42 0.00 L 945.85 0.00 Z"/></clipPath>
+    <clipPath id="clip-41"><path d="M 500.00 500.00 L 1000.00 0.00 L 1000.00 0.00 L 1000.00 37.40 Z"/></clipPath>
+    <clipPath id="clip-42"><path d="M 500.00 500.00 L 1000.00 0.00 L 1000.00 111.44 L 1000.00 91.03 Z"/></clipPath>
+    <clipPath id="clip-43"><path d="M 500.00 500.00 L 1000.00 122.29 L 1000.00 99.25 L 1000.00 125.81 Z"/></clipPath>
+    <clipPath id="clip-44"><path d="M 500.00 500.00 L 1000.00 147.53 L 1000.00 188.75 L 1000.00 279.51 Z"/></clipPath>
+    <clipPath id="clip-45"><path d="M 500.00 500.00 L 1000.00 218.82 L 1000.00 352.80 L 1000.00 344.84 Z"/></clipPath>
+    <clipPath id="clip-46"><path d="M 500.00 500.00 L 1000.00 343.37 L 1000.00 389.64 L 1000.00 404.70 Z"/></clipPath>
+    <clipPath id="clip-47"><path d="M 500.00 500.00 L 1000.00 417.91 L 1000.00 414.50 L 1000.00 500.00 Z"/></clipPath>
+  </defs>
+  <g id="shard-0" data-cx="833.33" data-cy="511.48" clip-path="url(#clip-0)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-1" data-cx="833.33" data-cy="600.87" clip-path="url(#clip-1)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-2" data-cx="833.33" data-cy="635.15" clip-path="url(#clip-2)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-3" data-cx="833.33" data-cy="699.00" clip-path="url(#clip-3)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-4" data-cx="833.33" data-cy="747.44" clip-path="url(#clip-4)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-5" data-cx="827.57" data-cy="759.16" clip-path="url(#clip-5)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-6" data-cx="833.33" data-cy="833.33" clip-path="url(#clip-6)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-7" data-cx="763.55" data-cy="833.33" clip-path="url(#clip-7)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-8" data-cx="735.64" data-cy="833.33" clip-path="url(#clip-8)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-9" data-cx="718.09" data-cy="833.33" clip-path="url(#clip-9)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-10" data-cx="626.90" data-cy="833.33" clip-path="url(#clip-10)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-11" data-cx="561.03" data-cy="833.33" clip-path="url(#clip-11)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-12" data-cx="496.02" data-cy="833.33" clip-path="url(#clip-12)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-13" data-cx="427.95" data-cy="833.33" clip-path="url(#clip-13)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-14" data-cx="389.15" data-cy="833.33" clip-path="url(#clip-14)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-15" data-cx="283.39" data-cy="833.33" clip-path="url(#clip-15)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-16" data-cx="257.73" data-cy="833.33" clip-path="url(#clip-16)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-17" data-cx="186.64" data-cy="833.33" clip-path="url(#clip-17)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-18" data-cx="192.74" data-cy="821.36" clip-path="url(#clip-18)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-19" data-cx="173.55" data-cy="773.42" clip-path="url(#clip-19)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-20" data-cx="166.67" data-cy="745.12" clip-path="url(#clip-20)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-21" data-cx="166.67" data-cy="643.93" clip-path="url(#clip-21)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-22" data-cx="166.67" data-cy="618.76" clip-path="url(#clip-22)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-23" data-cx="166.67" data-cy="555.53" clip-path="url(#clip-23)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-24" data-cx="166.67" data-cy="515.16" clip-path="url(#clip-24)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-25" data-cx="166.67" data-cy="429.78" clip-path="url(#clip-25)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-26" data-cx="166.67" data-cy="381.63" clip-path="url(#clip-26)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-27" data-cx="166.67" data-cy="334.02" clip-path="url(#clip-27)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-28" data-cx="166.67" data-cy="283.76" clip-path="url(#clip-28)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-29" data-cx="166.67" data-cy="218.92" clip-path="url(#clip-29)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-30" data-cx="166.67" data-cy="166.67" clip-path="url(#clip-30)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-31" data-cx="196.65" data-cy="166.67" clip-path="url(#clip-31)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-32" data-cx="278.44" data-cy="166.67" clip-path="url(#clip-32)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-33" data-cx="319.47" data-cy="166.67" clip-path="url(#clip-33)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-34" data-cx="387.80" data-cy="166.67" clip-path="url(#clip-34)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-35" data-cx="459.10" data-cy="166.67" clip-path="url(#clip-35)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-36" data-cx="541.89" data-cy="166.67" clip-path="url(#clip-36)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-37" data-cx="590.37" data-cy="166.67" clip-path="url(#clip-37)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-38" data-cx="701.28" data-cy="166.67" clip-path="url(#clip-38)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-39" data-cx="700.89" data-cy="166.67" clip-path="url(#clip-39)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-40" data-cx="764.27" data-cy="166.67" clip-path="url(#clip-40)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-41" data-cx="833.33" data-cy="166.67" clip-path="url(#clip-41)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-42" data-cx="833.33" data-cy="203.81" clip-path="url(#clip-42)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-43" data-cx="833.33" data-cy="240.52" clip-path="url(#clip-43)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-44" data-cx="833.33" data-cy="278.76" clip-path="url(#clip-44)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-45" data-cx="833.33" data-cy="357.21" clip-path="url(#clip-45)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-46" data-cx="833.33" data-cy="411.00" clip-path="url(#clip-46)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
+  <g id="shard-47" data-cx="833.33" data-cy="444.14" clip-path="url(#clip-47)">
+    <image href="logo.png" x="0" y="0" width="1000" height="1000" />
+  </g>
 </svg>

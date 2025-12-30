@@ -1,298 +1,280 @@
-/* Empreinte-de-bois - Intro controller */
 (() => {
-  'use strict';
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-  // --- Tunables ---
-  const LOCK_MS = 3000;              // hard lock at load
-  const EXPLODE_MS = 1500;           // forced explode duration
-  const FADE_MS = 1000;              // shards fade-out
-  const PAUSE_MS = 500;              // pause between fade and reveal
-  const REVEAL_MS = 9000;            // site reveal (8-10s)
-  const BASE_ZOOM = 1.0;
-  const EXPLODE_ZOOM = 1.35;         // “zoom violent” into the center
-  const MAX_EXPLODE = 1.2;           // 120% outward travel multiplier
+  const body = document.body;
+  const intro = $('#introOverlay');
+  const arrow = $('#introArrow');
+  const obj = $('#introSvgObj');
+  const logoWrap = $('#introLogoWrap');
+  const siteRoot = $('#siteRoot');
+  const revealMask = $('#site-reveal-mask');
+  const revealEdge = $('#site-reveal-edge');
 
-  // --- Helpers ---
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const clamp01 = (v) => Math.max(0, Math.min(1, v));
-  const now = () => performance.now();
-  const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
-  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+  if (!intro || !obj || !siteRoot) return;
 
-  // Ensure reload always starts at top (avoids “already exploded after refresh”)
-  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  // ---- config ----
+  const START_LOCK_MS = 3000;     // show intro for 3s, then allow interaction
+  const EXPLODE_DIST = 520;       // outward distance at progress=1
+  const ZOOM_MAX = 0.55;          // wrapper zoom added during explosion
+  const FADE_MS = 1000;           // shards fade to transparent
+  const WAIT_BEFORE_REVEAL_MS = 3000; // after fade, wait 3s
+  const REVEAL_MS = 9000;         // 8-10s, choose 9s
+  const EDGE_SOFTNESS = 0.22;     // edge height fraction of viewport (for softness)
 
-  function hardScrollTop() {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    window.scrollTo(0, 0);
-  }
-
-  // --- State ---
-  let started = false;
-  let allowTrigger = false;
-  let shardsReady = false;
-  let shardNodes = [];
-  let shardMeta = []; // { el, vx, vy, rot, cx, cy }
+  // ---- state ----
+  let shards = [];
+  let shardMeta = [];
+  let progress = 0;               // 0..1
+  let targetProgress = 0;
+  let ready = false;
+  let completed = false;
   let rafId = null;
+  let lastT = 0;
+  let touchY = null;
 
   function lockScroll() {
-    document.body.classList.add('intro-locked');
-    // prevent iOS rubber-band scroll
-    document.addEventListener('touchmove', prevent, { passive: false });
-    document.addEventListener('wheel', prevent, { passive: false });
+    body.classList.add('intro-lock');
+    body.classList.add('reveal-lock');
+    window.scrollTo(0, 0);
   }
-
   function unlockScroll() {
-    document.body.classList.remove('intro-locked');
-    document.removeEventListener('touchmove', prevent);
-    document.removeEventListener('wheel', prevent);
+    body.classList.remove('intro-lock');
+    body.classList.remove('reveal-lock');
   }
 
-  function prevent(e) {
-    // allow internal clicks (arrow, etc.), but block scroll gestures while locked
-    if (document.body.classList.contains('intro-locked')) e.preventDefault();
+  lockScroll();
+
+  // Ensure site is hidden behind reveal until we start revealing.
+  siteRoot.style.clipPath = 'inset(0 0 100% 0)';
+  siteRoot.style.willChange = 'clip-path';
+  revealMask.classList.add('is-on');
+  revealEdge.classList.add('is-on');
+
+  function setReveal(p) {
+    // p: 0..1
+    const bottom = Math.max(0, 100 - (p * 100));
+    siteRoot.style.clipPath = `inset(0 0 ${bottom}% 0)`;
+
+    const y = window.innerHeight * p;
+    const edgeH = window.innerHeight * EDGE_SOFTNESS;
+    revealEdge.style.top = `${Math.max(-edgeH/2, y - edgeH/2)}px`;
+    revealEdge.style.height = `${edgeH}px`;
+    revealEdge.style.opacity = p === 0 ? '0' : '0.85';
   }
 
-  function showArrow(show) {
-    const arrow = $('#intro-arrow');
-    if (!arrow) return;
-    arrow.style.opacity = show ? '1' : '0';
-    arrow.style.pointerEvents = show ? 'auto' : 'none';
-  }
+  function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
 
-  function setIntroOpacity(a) {
-    const overlay = $('#intro-overlay');
-    if (overlay) overlay.style.opacity = String(a);
-  }
+  function updateShards(t) {
+    const dt = Math.min(0.05, (t - lastT) / 1000);
+    lastT = t;
 
-  function setShardsOpacity(a) {
-    const obj = $('#intro-shards');
-    if (obj) obj.style.opacity = String(a);
-  }
+    // smooth progress
+    const k = 10; // responsiveness
+    progress += (targetProgress - progress) * (1 - Math.exp(-k * dt));
+    progress = Math.max(0, Math.min(1, progress));
 
-  function setZoom(z) {
-    const wrap = $('#intro-logo-wrap');
-    if (!wrap) return;
-    wrap.style.transform = `translate(-50%, -50%) scale(${z})`;
-  }
+    const p = progress;
+    const pe = easeOutCubic(p);
 
-  function applyExplosion(progress) {
-    const p = clamp01(progress);
-    const z = BASE_ZOOM + (EXPLODE_ZOOM - BASE_ZOOM) * easeInOut(p);
-    setZoom(z);
+    // Wrapper zoom: "rentrer dans l'explosion"
+    const zoom = 1 + pe * ZOOM_MAX;
+    logoWrap.style.transform = `scale(${zoom.toFixed(4)})`;
 
-    // “tremble” at idle is handled in CSS animation on wrapper,
-    // but once we start exploding we drive transforms per shard.
-    for (let i = 0; i < shardMeta.length; i++) {
+    // per-shard transform
+    for (let i = 0; i < shards.length; i++) {
+      const el = shards[i];
       const m = shardMeta[i];
-      const t = easeOutCubic(p) * MAX_EXPLODE;
-      const dx = m.vx * t;
-      const dy = m.vy * t;
-      const r = m.rot * t;
-      m.el.setAttribute('transform', `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) rotate(${r.toFixed(2)} ${m.cx.toFixed(2)} ${m.cy.toFixed(2)})`);
+
+      // gentle tremble always (less when exploding)
+      const trembleAmp = (1 - pe) * 1.8 + 0.3;
+      const wob = Math.sin(t*0.002 + m.phase) * trembleAmp;
+
+      // direction from center + small curve
+      const dist = pe * (EXPLODE_DIST * m.distMul);
+      const curve = Math.sin(pe * Math.PI) * (70 * m.curveMul);
+
+      const tx = (m.nx * dist) + (m.px * curve) + wob;
+      const ty = (m.ny * dist) + (m.py * curve) - wob;
+
+      const rot = (pe * m.rotMax) + (Math.sin(t*0.0018 + m.phase*2) * trembleAmp * 0.25);
+
+      el.setAttribute('transform', `translate(${tx.toFixed(2)} ${ty.toFixed(2)}) rotate(${rot.toFixed(2)} ${m.cx.toFixed(2)} ${m.cy.toFixed(2)})`);
     }
+
+    // If completed, keep final pose
+    rafId = requestAnimationFrame(updateShards);
   }
 
-  function buildShardMeta(svgDoc) {
-    // In shards.svg we generate <g class="shard" data-cx data-cy>
-    const nodes = Array.from(svgDoc.querySelectorAll('g.shard'));
-    shardNodes = nodes;
-    if (!nodes.length) return false;
+  function startRAF() {
+    if (rafId) cancelAnimationFrame(rafId);
+    lastT = performance.now();
+    rafId = requestAnimationFrame(updateShards);
+  }
 
-    // determine global center from average of centroids
-    let cx = 0, cy = 0;
-    const centers = nodes.map((el) => {
-      const x = parseFloat(el.getAttribute('data-cx') || '0');
-      const y = parseFloat(el.getAttribute('data-cy') || '0');
-      cx += x; cy += y;
-      return { x, y };
-    });
-    cx /= centers.length; cy /= centers.length;
+  function setupFromSvg(svgDoc) {
+    const svg = svgDoc.querySelector('svg');
+    if (!svg) return false;
 
-    const meta = nodes.map((el, idx) => {
-      const c = centers[idx];
-      // vector away from center + randomness
-      let vx = c.x - cx;
-      let vy = c.y - cy;
-      const len = Math.hypot(vx, vy) || 1;
-      vx /= len; vy /= len;
+    shards = $$('[id^="shard-"]', svg);
+    if (!shards.length) return false;
 
-      // outward distance (px) scaled by viewport; we pick a range so it looks violent on mobile
-      const dist = 220 + Math.random() * 480;
-      // add angular jitter
-      const jitter = (Math.random() - 0.5) * 0.55;
-      const ang = Math.atan2(vy, vx) + jitter;
-      vx = Math.cos(ang) * dist;
-      vy = Math.sin(ang) * dist;
+    shardMeta = shards.map((el, i) => {
+      const cx = parseFloat(el.getAttribute('data-cx') || '500');
+      const cy = parseFloat(el.getAttribute('data-cy') || '500');
+      const dx = cx - 500;
+      const dy = cy - 500;
+      const len = Math.max(1, Math.hypot(dx, dy));
+      const nx = dx / len, ny = dy / len;
+      // perpendicular
+      const px = -ny, py = nx;
 
-      const rot = (Math.random() - 0.5) * 80; // degrees
-
-      return { el, vx, vy, rot, cx: c.x, cy: c.y };
+      return {
+        cx, cy, nx, ny, px, py,
+        phase: Math.random() * Math.PI * 2,
+        distMul: 0.85 + Math.random() * 0.45, // 85%..130%
+        curveMul: -1 + Math.random() * 2,
+        rotMax: (-18 + Math.random() * 36)   // -18..+18 deg
+      };
     });
 
-    shardMeta = meta;
+    startRAF();
     return true;
   }
 
-  function wait(ms) {
-    return new Promise((r) => setTimeout(r, ms));
+  function allowInteraction() {
+    ready = true;
+    arrow.classList.add('is-ready');
   }
 
-  function animate(durationMs, onFrame) {
-    return new Promise((resolve) => {
-      const t0 = now();
-      const tick = () => {
-        const t = (now() - t0) / durationMs;
-        const p = clamp01(t);
-        onFrame(p);
-        if (p >= 1) {
-          resolve();
-          return;
-        }
-        rafId = requestAnimationFrame(tick);
-      };
-      rafId = requestAnimationFrame(tick);
-    });
+  function onWheel(e) {
+    if (!ready || completed) return;
+    // prevent actual page scroll
+    e.preventDefault();
+    const delta = Math.max(-120, Math.min(120, e.deltaY));
+    targetProgress = Math.max(0, Math.min(1, targetProgress + delta / 1800));
+    if (targetProgress >= 1) finishExplosion();
   }
 
-  async function runSequence() {
-    if (started) return;
-    started = true;
+  function onTouchStart(e){
+    if (!ready || completed) return;
+    touchY = e.touches && e.touches[0] ? e.touches[0].clientY : null;
+  }
+  function onTouchMove(e){
+    if (!ready || completed) return;
+    if (touchY == null) return;
+    e.preventDefault();
+    const y = e.touches && e.touches[0] ? e.touches[0].clientY : touchY;
+    const dy = touchY - y;
+    touchY = y;
+    targetProgress = Math.max(0, Math.min(1, targetProgress + dy / 900));
+    if (targetProgress >= 1) finishExplosion();
+  }
+  function onTouchEnd(){ touchY = null; }
 
-    // make sure top
-    hardScrollTop();
+  function autoToEnd() {
+    if (!ready || completed) return;
+    const start = performance.now();
+    const dur = 1500;
+    const from = targetProgress;
+    function step(t){
+      const x = Math.min(1, (t - start)/dur);
+      targetProgress = from + (1 - from) * easeOutCubic(x);
+      if (x < 1) requestAnimationFrame(step);
+      else finishExplosion();
+    }
+    requestAnimationFrame(step);
+  }
 
-    // Start: explode quickly to 100%
-    showArrow(false);
-    await animate(EXPLODE_MS, (p) => applyExplosion(p));
+  function finishExplosion() {
+    if (completed) return;
+    completed = true;
+    targetProgress = 1;
 
-    // Fade shards to transparent (not black)
-    await animate(FADE_MS, (p) => {
-      setShardsOpacity(1 - p);
-    });
+    // fade shards to transparent (not black)
+    intro.classList.add('is-fading');
 
-    await wait(PAUSE_MS);
+    // after fade, wait, then start reveal
+    setTimeout(() => {
+      startReveal();
+    }, FADE_MS + WAIT_BEFORE_REVEAL_MS);
+  }
 
-    // Start reveal AFTER fade is done (your “timer after fade”)
-    document.body.classList.add('site-revealing');
-    const edge = $('#site-reveal-edge');
-    if (edge) edge.style.opacity = '1';
+  function startReveal() {
+    const start = performance.now();
+    const dur = REVEAL_MS;
 
-    await animate(REVEAL_MS, (p) => {
-      const eased = easeInOut(p);
-      // revealTop goes from 100% (hidden) to 0% (fully visible)
-      const topPct = (100 - eased * 100).toFixed(2) + '%';
-      document.documentElement.style.setProperty('--revealTop', topPct);
+    function step(t){
+      const x = Math.min(1, (t - start)/dur);
+      const p = easeOutCubic(x);
+      setReveal(p);
+      if (x < 1) requestAnimationFrame(step);
+      else endIntro();
+    }
+    requestAnimationFrame(step);
+  }
 
-      if (edge) {
-        // Place the soft “curtain edge” at the reveal line
-        edge.style.top = `calc(${(eased * 100).toFixed(2)}vh - 120px)`;
-        edge.style.opacity = String(0.9 * (1 - eased * 0.15));
-      }
-    });
-
-    // End state
-    document.body.classList.remove('site-revealing');
-    document.body.classList.add('site-ready');
-    if (edge) edge.style.opacity = '0';
-    setIntroOpacity(0);
+  function endIntro() {
+    // remove overlay and allow normal scroll
+    intro.classList.add('is-hidden');
+    revealMask.classList.remove('is-on');
+    revealEdge.classList.remove('is-on');
+    siteRoot.style.clipPath = '';
+    siteRoot.style.willChange = '';
     unlockScroll();
 
-    const overlay = $('#intro-overlay');
-    if (overlay) overlay.style.display = 'none';
+    // Clean listeners
+    window.removeEventListener('wheel', onWheel);
+    window.removeEventListener('touchstart', onTouchStart);
+    window.removeEventListener('touchmove', onTouchMove);
+    window.removeEventListener('touchend', onTouchEnd);
+
+    // stop raf (optional)
+    if (rafId) cancelAnimationFrame(rafId);
   }
 
-  function initIntro() {
-    hardScrollTop();
-    lockScroll();
-    showArrow(false);
+  // Load SVG
+  obj.addEventListener('load', () => {
+    try {
+      const svgDoc = obj.contentDocument;
+      if (!svgDoc) return;
+      const ok = setupFromSvg(svgDoc);
+      if (!ok) return;
 
-    // Make site hidden and ready for reveal
-    document.documentElement.style.setProperty('--revealTop', '100%');
-    document.body.classList.remove('site-ready');
-    document.body.classList.remove('site-revealing');
+      // Begin lock period
+      setTimeout(() => {
+        allowInteraction();
+        // Attach listeners only when ready
+        window.addEventListener('wheel', onWheel, {passive:false});
+        window.addEventListener('touchstart', onTouchStart, {passive:false});
+        window.addEventListener('touchmove', onTouchMove, {passive:false});
+        window.addEventListener('touchend', onTouchEnd, {passive:true});
+      }, START_LOCK_MS);
 
-    // Load shards SVG
-    const obj = $('#intro-shards');
-    if (!obj) return;
-
-    const onSvgLoad = () => {
-      try {
-        const svgDoc = obj.contentDocument;
-        if (!svgDoc) return;
-        shardsReady = buildShardMeta(svgDoc);
-        if (!shardsReady) return;
-
-        // reset transforms
-        for (const m of shardMeta) m.el.removeAttribute('transform');
-        setShardsOpacity(1);
-        setIntroOpacity(1);
-        setZoom(BASE_ZOOM);
-
-        // Allow trigger after LOCK_MS
-        setTimeout(() => {
-          allowTrigger = true;
-          unlockScroll();     // allow the user gesture to be seen
-          lockScroll();       // ...but keep it locked until we trigger sequence
-          showArrow(true);
-        }, LOCK_MS);
-
-      } catch (e) {
-        // If anything fails, do not block the site forever.
-        console.error('[intro] SVG init error', e);
-        document.body.classList.add('site-ready');
-        setIntroOpacity(0);
-        unlockScroll();
-      }
-    };
-
-    // rebind load (works even on bfcache)
-    obj.addEventListener('load', onSvgLoad, { once: true });
-
-    // If already loaded (some browsers), call manually
-    if (obj.contentDocument) onSvgLoad();
-
-    // Trigger methods
-    const trigger = (e) => {
-      if (!allowTrigger) return;
-      e.preventDefault();
-      runSequence();
-    };
-
-    const arrow = $('#intro-arrow');
-    if (arrow) {
       arrow.addEventListener('click', (e) => {
-        if (!allowTrigger) return;
         e.preventDefault();
-        runSequence();
+        autoToEnd();
       });
+
+    } catch (err) {
+      // If SVG fails, just remove intro so site is usable.
+      intro.classList.add('is-hidden');
+      revealMask.classList.remove('is-on');
+      revealEdge.classList.remove('is-on');
+      siteRoot.style.clipPath = '';
+      unlockScroll();
     }
+  });
 
-    // Wheel / touch / key to trigger
-    window.addEventListener('wheel', (e) => {
-      if (!allowTrigger) return;
-      trigger(e);
-    }, { passive: false });
+  // Safety: if SVG never loads within 3s, don't block the site forever.
+  setTimeout(() => {
+    if (!shards.length) {
+      intro.classList.add('is-hidden');
+      revealMask.classList.remove('is-on');
+      revealEdge.classList.remove('is-on');
+      siteRoot.style.clipPath = '';
+      unlockScroll();
+    }
+  }, 3000);
 
-    window.addEventListener('touchstart', (e) => {
-      if (!allowTrigger) return;
-      trigger(e);
-    }, { passive: false });
-
-    window.addEventListener('keydown', (e) => {
-      if (!allowTrigger) return;
-      if (['ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) {
-        e.preventDefault();
-        runSequence();
-      }
-    });
-
-    // Avoid partial states when navigating back/forward
-    window.addEventListener('pageshow', () => {
-      hardScrollTop();
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', initIntro, { once: true });
 })();
