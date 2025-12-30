@@ -1,1 +1,156 @@
-/* intro css patch placeholder */
+/* Intro overlay (fixed) */
+.intro-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:auto;
+  background: transparent; /* keep global animated background visible */
+  overflow:hidden;
+}
+.intro-overlay.is-hidden{display:none;}
+.intro-center{
+  position:relative;
+  width:min(92vw, 92vh);
+  max-width:900px;
+  max-height:900px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.intro-logo-wrap{
+  width:100%;
+  height:auto;
+  aspect-ratio:1 / 1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transform-origin:50% 50%;
+  will-change:transform, opacity;
+}
+.intro-svg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+.intro-arrow{
+  position:absolute;
+  left:50%;
+  bottom:-64px;
+  transform:translateX(-50%);
+  width:52px;
+  height:52px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.18);
+  background:rgba(0,0,0,0.35);
+  color:#fff;
+  font-size:28px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease;
+}
+.intro-arrow.is-ready{
+  opacity:1;
+  pointer-events:auto;
+}
+.intro-arrow:active{transform:translateX(-50%) scale(0.98);}
+
+body.intro-locked{
+  overflow:hidden;
+  touch-action:none;
+}
+
+/* Fade out intro */
+.intro-overlay.is-fading{
+  pointer-events:none;
+}
+.intro-overlay.is-fading .intro-logo-wrap{
+  opacity:0;
+  transition:opacity 1s ease;
+}
+
+/* Reveal main site progressively */
+body.site-revealing{
+  overflow:hidden;
+}
+#site-reveal-mask{
+  position:fixed;
+  inset:0;
+  z-index:9998; /* under intro, above site */
+  pointer-events:none;
+  background: transparent;
+  display:none;
+}
+#site-reveal-mask.is-on{
+  display:block;
+}
+/* Mask uses clip-path via CSS variable, and a soft edge gradient */
+#site-reveal-mask::before{
+  content:"";
+  position:absolute;
+  left:0; top:0;
+  width:100%;
+  height:100%;
+  /* cover the part NOT revealed yet */
+  background: rgba(0,0,0,0.0);
+  backdrop-filter: none;
+}
+#site-reveal-edge{
+  position:fixed;
+  left:0;
+  width:100%;
+  height:22vh;
+  z-index:9998;
+  pointer-events:none;
+  display:none;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.35), rgba(0,0,0,0.0));
+  filter: blur(10px);
+  opacity:0.85;
+}
+#site-reveal-edge.is-on{display:block;}
+
+/* --- Site reveal control (site content hidden until intro completes) --- */
+#siteRoot {
+  opacity: 0;
+  clip-path: inset(100% 0 0 0);
+  will-change: clip-path, opacity;
+}
+
+body.site-revealing #siteRoot,
+body.site-ready #siteRoot {
+  opacity: 1;
+}
+
+body.site-revealing #siteRoot {
+  /* JS drives --revealTop from 100% -> 0% */
+  clip-path: inset(var(--revealTop, 100%) 0 0 0);
+}
+
+body.site-ready #siteRoot {
+  clip-path: none;
+}
+
+body.intro-lockeded {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+/* Override: reveal edge is always present; JS drives position/opacity */
+#site-reveal-edge {
+  display: block;
+  opacity: 0;
+  top: -200px;
+}
+
+body.intro-locked {
+  overflow: hidden;
+  height: 100vh;
+  touch-action: none;
+}
