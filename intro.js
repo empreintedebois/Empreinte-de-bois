@@ -14,11 +14,11 @@
   if (!intro || !obj || !siteRoot) return;
 
   // ---- config ----
-  const START_LOCK_MS = 3000;     // show intro for 3s, then allow interaction
+  const START_LOCK_MS = 0;          // no forced wait
   const EXPLODE_DIST = 520;       // outward distance at progress=1
-  const ZOOM_MAX = 0.55;          // wrapper zoom added during explosion
+  const ZOOM_MAX = 3;              // zoom 1..4 during explosion
   const FADE_MS = 1000;           // shards fade to transparent
-  const WAIT_BEFORE_REVEAL_MS = 3000; // after fade, wait 3s
+  const WAIT_BEFORE_REVEAL_MS = 0; // no extra wait (reveal starts after fade)
   const REVEAL_MS = 9000;         // 8-10s, choose 9s
   const EDGE_SOFTNESS = 0.22;     // edge height fraction of viewport (for softness)
 
@@ -152,6 +152,7 @@
   }
 
   function onWheel(e) {
+    if (arrow) arrow.classList.add('is-hidden');
     if (!ready || completed) return;
     // prevent actual page scroll
     e.preventDefault();
@@ -161,6 +162,7 @@
   }
 
   function onTouchStart(e){
+    if (arrow) arrow.classList.add('is-hidden');
     if (!ready || completed) return;
     touchY = e.touches && e.touches[0] ? e.touches[0].clientY : null;
   }
@@ -250,15 +252,13 @@
       const ok = setupFromSvg(svgDoc);
       if (!ok) return;
 
-      // Begin lock period
-      setTimeout(() => {
-        allowInteraction();
-        // Attach listeners only when ready
-        window.addEventListener('wheel', onWheel, {passive:false});
-        window.addEventListener('touchstart', onTouchStart, {passive:false});
-        window.addEventListener('touchmove', onTouchMove, {passive:false});
-        window.addEventListener('touchend', onTouchEnd, {passive:true});
-      }, START_LOCK_MS);
+      // Ready immediately (no forced wait)
+      allowInteraction();
+      // Attach listeners immediately
+      window.addEventListener('wheel', onWheel, {passive:false});
+      window.addEventListener('touchstart', onTouchStart, {passive:false});
+      window.addEventListener('touchmove', onTouchMove, {passive:false});
+      window.addEventListener('touchend', onTouchEnd, {passive:true});
 
       arrow.addEventListener('click', (e) => {
         e.preventDefault();
