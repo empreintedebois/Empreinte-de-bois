@@ -1,120 +1,195 @@
-/* Intro overlay (fixed) */
-.intro-overlay{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  pointer-events:auto;
-  background: transparent; /* keep global animated background visible */
-  overflow:hidden;
-}
-.intro-overlay.is-hidden{display:none;}
-.intro-center{
-  position:relative;
-  width:min(92vw, 92vh);
-  max-width:900px;
-  max-height:900px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.intro-logo-wrap{
-  width:100%;
-  height:auto;
-  aspect-ratio:1 / 1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transform-origin:50% 50%;
-  will-change:transform, opacity;
-}
-.intro-svg{
-  width:100%;
-  height:100%;
-  display:block;
-}
-.intro-arrow{
-  position:absolute;
-  left:50%;
-  bottom:-64px;
-  transform:translateX(-50%);
-  width:52px;
-  height:52px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,0.18);
-  background:rgba(0,0,0,0.35);
-  color:#fff;
-  font-size:28px;
-  line-height:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .25s ease, transform .25s ease;
-}
-.intro-arrow.is-ready{
-  opacity:1;
-  pointer-events:auto;
-}
-.intro-arrow:active{transform:translateX(-50%) scale(0.98);}
+/* Intro overlay styles (v15)
+   Keep background/halos handled by existing site CSS.
+   This file only controls the intro overlay + shards + motif merge + reveal curtain.
+*/
 
-body.intro-lock{
-  overflow:hidden;
-  touch-action:none;
+:root {
+  --intro-max-w: min(92vw, 1100px);
+  --intro-gap: clamp(8px, 2vw, 24px);
+  --intro-text-max-h: min(42vh, 320px);
 }
 
-/* Fade out intro */
-.intro-overlay.is-fading{
-  pointer-events:none;
-}
-.intro-overlay.is-fading .intro-logo-wrap{
-  opacity:0;
-  transition:opacity 1s ease;
+#introOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
 }
 
-/* Reveal main site progressively */
-body.reveal-lock{
-  overflow:hidden;
+#introOverlay.is-hidden {
+  display: none;
 }
-#site-reveal-mask{
-  position:fixed;
-  inset:0;
-  z-index:9998; /* under intro, above site */
-  pointer-events:none;
-  background: transparent;
-  display:none;
+
+.intro-stage {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  place-items: center;
 }
-#site-reveal-mask.is-on{
-  display:block;
+
+/* container that holds motif L, logo-text, motif R */
+.intro-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--intro-gap);
+  padding: 0 4vw;
+  transform: translate3d(0,0,0);
 }
-/* Mask uses clip-path via CSS variable, and a soft edge gradient */
-#site-reveal-mask::before{
-  content:"";
-  position:absolute;
-  left:0; top:0;
-  width:100%;
-  height:100%;
-  /* cover the part NOT revealed yet */
-  background: rgba(0,0,0,0.0);
-  backdrop-filter: none;
+
+.motif {
+  width: clamp(72px, 12vw, 210px);
+  height: auto;
+  opacity: 0.92;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.45));
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+  user-select: none;
+  -webkit-user-drag: none;
 }
-#site-reveal-edge{
-  position:fixed;
-  left:0;
-  width:100%;
-  height:22vh;
-  z-index:9998;
-  pointer-events:none;
-  display:none;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.35), rgba(0,0,0,0.0));
+
+.logo-text {
+  position: relative;
+  width: min(var(--intro-max-w), 92vw);
+  display: grid;
+  place-items: center;
+}
+
+#logoTextImg {
+  width: 100%;
+  height: auto;
+  max-height: var(--intro-text-max-h);
+  object-fit: contain;
+  opacity: 0; /* hidden; shards render the logo */
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* host that shards are positioned into */
+#shardsHost {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transform: translate3d(0,0,0);
+}
+
+.shard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: 100% 100%;
+  will-change: transform, opacity;
+}
+
+/* arrow */
+#introArrow {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 10001;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+#introArrow.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#introArrow svg {
+  width: 22px;
+  height: 22px;
+  opacity: 0.9;
+}
+
+/* reveal curtain */
+#revealCurtain {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(0,0,0);
+}
+
+#revealCurtain.is-active {
+  opacity: 1;
+}
+
+/* dark sheet that slides down, with a soft edge */
+#revealCurtain .curtain {
+  position: absolute;
+  inset: -20vh 0 0 0;
+  transform: translateY(-100%);
+  background:
+    linear-gradient(to bottom,
+      rgba(0,0,0,1) 0%,
+      rgba(0,0,0,1) calc(100% - 140px),
+      rgba(0,0,0,0) 100%);
+  filter: blur(0px);
+  will-change: transform;
+}
+
+/* laser line glow (pure CSS) */
+#revealCurtain .laser {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 110px;
+  top: 0;
+  transform: translateY(-100%);
+  background:
+    radial-gradient(closest-side, rgba(255, 190, 90, 0.25), rgba(255, 190, 90, 0)) 50% 50% / 100% 100% no-repeat,
+    linear-gradient(to bottom, rgba(255,190,90,0), rgba(255,190,90,0.25), rgba(255,190,90,0));
+  mix-blend-mode: screen;
   filter: blur(10px);
-  opacity:0.85;
+  will-change: transform;
 }
-#site-reveal-edge.is-on{display:block;}
 
-html.intro-lock, body.intro-lock { overflow: hidden !important; height: 100%; }
+/* shockwave ring */
+#shockwave {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 200, 120, 0.55);
+  transform: translate(-50%, -50%) scale(0.1);
+  opacity: 0;
+  z-index: 10000;
+  pointer-events: none;
+  filter: blur(0.2px);
+}
 
-#introArrow.is-hidden{ opacity:0 !important; pointer-events:none !important; visibility:hidden !important; }
+/* Mobile tweaks */
+@media (max-width: 520px) {
+  :root {
+    --intro-text-max-h: min(34vh, 260px);
+  }
+
+  .motif {
+    width: clamp(56px, 16vw, 140px);
+  }
+}

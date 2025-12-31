@@ -371,16 +371,29 @@
   <script src="intro.js" defer></script>
   </div>
 
-  <div id="site-reveal-mask"></div>
-  <div id="site-reveal-edge"></div>
+  <!-- v15 reveal curtain (laser-style) -->
+  <div id="revealCurtain" aria-hidden="true"></div>
   </div>
 
-<div id="introOverlay" class="intro-overlay">
-    <div class="intro-center">
-      <div id="introLogoWrap" class="intro-logo-wrap">
-        <object id="introSvgObj" type="image/svg+xml" data="assets/intro/shards.svg" class="intro-svg"></object>
+  <!-- v15 Intro overlay -->
+  <div id="introOverlay" aria-hidden="false">
+    <div id="introStage">
+      <div id="motifLeftWrap" class="motifWrap" aria-hidden="true">
+        <img id="motifLeft" class="motifImg" src="assets/intro/logo-motif-left.png" alt="" />
       </div>
-      <button id="introArrow" class="intro-arrow" aria-label="Défiler">↓</button>
+
+      <div id="logoTextWrap" aria-label="Logo Empreinte de Bois">
+        <img id="logoTextImg" src="assets/intro/logo-texte.png" alt="Empreinte de bois" />
+        <div id="shardsHost" aria-hidden="true"></div>
+      </div>
+
+      <div id="motifRightWrap" class="motifWrap" aria-hidden="true">
+        <img id="motifRight" class="motifImg" src="assets/intro/logo-motif-right.png" alt="" />
+      </div>
+
+      <div id="shockwave" aria-hidden="true"></div>
+
+      <button id="introArrow" aria-label="Lancer l'intro">↓</button>
     </div>
   </div>
 </body>
