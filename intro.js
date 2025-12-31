@@ -5,9 +5,9 @@
    - arrow-only progression (one-way). After intro, normal scroll is restored.
 
    Expected assets:
-     assets/intro/logo-texte.png
-     assets/intro/logo-motif-left.png
-     assets/intro/logo-motif-right.png
+     assets/intro/logo-texte.webp
+     assets/intro/logo-motif-left.webp
+     assets/intro/logo-motif-right.webp
      assets/intro/voronoi-48-16x9.svg
 */
 
@@ -85,18 +85,23 @@
     const polys = [];
 
     for (const p of paths) {
-      const d = (p.getAttribute('d') || '').trim();
+      let d = (p.getAttribute('d') || '').trim();
       if (!d) continue;
-      // Match subpaths: M x y (L x y)* Z
-      const re = /M\s*([\d.]+)\s*([\d.]+)((?:\s*L\s*[\d.]+\s*[\d.]+)+)\s*Z/gi;
-      let m;
-      while ((m = re.exec(d))) {
+      // Robust parsing for "M x,y ... Z" subpaths.
+      // We don't rely on explicit "L" (some SVG writers omit it) and we accept commas, minus, scientific notation.
+      d = d.replace(/,/g, ' ');
+      const subpaths = d.split(/\bM\b/i).map((s) => s.trim()).filter(Boolean);
+      for (const sp of subpaths) {
+        const beforeZ = sp.split(/\bZ\b/i)[0];
+        if (!beforeZ) continue;
+        const nums = beforeZ.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi) || [];
+        if (nums.length < 6) continue;
         const pts = [];
-        pts.push([parseFloat(m[1]), parseFloat(m[2])]);
-        const seg = m[3];
-        const reL = /L\s*([\d.]+)\s*([\d.]+)/gi;
-        let ml;
-        while ((ml = reL.exec(seg))) pts.push([parseFloat(ml[1]), parseFloat(ml[2])]);
+        for (let i = 0; i + 1 < nums.length; i += 2) {
+          const x = parseFloat(nums[i]);
+          const y = parseFloat(nums[i + 1]);
+          if (isFinite(x) && isFinite(y)) pts.push([x, y]);
+        }
         if (pts.length >= 3) polys.push(pts);
       }
     }
@@ -346,7 +351,7 @@
     const imgUrl = getComputedStyle(logoTextImg).getPropertyValue('--logoTextUrl').trim();
     const shards = shardsHost.querySelectorAll('.shard');
     shards.forEach((s) => {
-      s.style.backgroundImage = imgUrl || `url(assets/intro/logo-texte.png)`;
+      s.style.backgroundImage = imgUrl || `url(assets/intro/logo-texte.webp)`;
     });
 
     wireArrow();
