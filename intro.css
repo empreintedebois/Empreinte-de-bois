@@ -40,9 +40,16 @@
   transform: translate3d(0,0,0);
 }
 
+/*
+  Motifs (left/right) are tall (1:3). If we size them by width, mobile layouts
+  can push the whole intro row wider than the viewport, causing offsets.
+  We therefore size them by HEIGHT, matching the logo-texte visual height.
+*/
 .motif {
-  width: clamp(72px, 12vw, 210px);
-  height: auto;
+  height: var(--intro-text-max-h);
+  width: auto;
+  max-height: var(--intro-text-max-h);
+  max-width: min(24vw, 220px);
   opacity: 0.92;
   filter: drop-shadow(0 10px 20px rgba(0,0,0,0.45));
   transform-origin: 50% 50%;
