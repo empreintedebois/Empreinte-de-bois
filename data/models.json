@@ -3,14 +3,14 @@
     {
       "id": "M01",
       "title": "Rond Sapin",
-      "thumb": "",
-      "full": "",
+      "thumb": "assets/bandeaux/M01/image.webp",
+      "full": "assets/bandeaux/M01/image.webp",
       "variants": [
         {
           "id": "base",
           "name": "Base",
-          "thumb": "",
-          "full": "",
+          "thumb": "assets/bandeaux/M01/image.webp",
+          "full": "assets/bandeaux/M01/image.webp",
           "fields": {},
           "finitions": [],
           "notes": "Épaisseur: 15 mm — Diamètre: 100 mm\nLot: 4 pièces minimum\nLivré avec ses petits patins"
@@ -20,14 +20,14 @@
     {
       "id": "M02",
       "title": "Rond Contreplaqué",
-      "thumb": "",
-      "full": "",
+      "thumb": "assets/bandeaux/M02/image.webp",
+      "full": "assets/bandeaux/M02/image.webp",
       "variants": [
         {
           "id": "base",
           "name": "Base",
-          "thumb": "",
-          "full": "",
+          "thumb": "assets/bandeaux/M02/image.webp",
+          "full": "assets/bandeaux/M02/image.webp",
           "fields": {},
           "finitions": [],
           "notes": "Épaisseur: 3 mm — Diamètre: 100 mm\nLot: 4 pièces minimum"
@@ -37,14 +37,14 @@
     {
       "id": "M03",
       "title": "Rond Similicuir Ø100 mm",
-      "thumb": "",
-      "full": "",
+      "thumb": "assets/bandeaux/M03/image.webp",
+      "full": "assets/bandeaux/M03/image.webp",
       "variants": [
         {
           "id": "base",
           "name": "Base",
-          "thumb": "",
-          "full": "",
+          "thumb": "assets/bandeaux/M03/image.webp",
+          "full": "assets/bandeaux/M03/image.webp",
           "fields": {},
           "finitions": [],
           "notes": "Couleurs: blanc — Lot: 6 pièces\n1 Support inclus pas lot."
@@ -54,14 +54,14 @@
     {
       "id": "M04",
       "title": "Rond Similicuir Ø100 mm",
-      "thumb": "assets/bandeaux/M04/image_w640.webp",
-      "full": "assets/bandeaux/M04/image_w1024.webp",
+      "thumb": "assets/bandeaux/M04/image.webp",
+      "full": "assets/bandeaux/M04/image.webp",
       "variants": [
         {
           "id": "base",
           "name": "Base",
-          "thumb": "assets/bandeaux/M04/image_w640.webp",
-          "full": "assets/bandeaux/M04/image_w1024.webp",
+          "thumb": "assets/bandeaux/M04/image.webp",
+          "full": "assets/bandeaux/M04/image.webp",
           "fields": {},
           "finitions": [],
           "notes": "Couleurs: rouge — Lot: 6 pièces\n1 Support inclus par lot"
@@ -71,14 +71,14 @@
     {
       "id": "M05",
       "title": "Carré Bois 100×100 mm",
-      "thumb": "",
-      "full": "",
+      "thumb": "assets/bandeaux/M05/image.webp",
+      "full": "assets/bandeaux/M05/image.webp",
       "variants": [
         {
           "id": "base",
           "name": "Base",
-          "thumb": "",
-          "full": "",
+          "thumb": "assets/bandeaux/M05/image.webp",
+          "full": "assets/bandeaux/M05/image.webp",
           "fields": {},
           "finitions": [],
           "notes": "Épaisseur: 5 mm\nEssences: Sapin"
@@ -88,14 +88,14 @@
     {
       "id": "M06",
       "title": "Carré Bois 100×100 mm",
-      "thumb": "",
-      "full": "",
+      "thumb": "assets/bandeaux/M06/image.webp",
+      "full": "assets/bandeaux/M06/image.webp",
       "variants": [
         {
           "id": "base",
           "name": "Base",
-          "thumb": "",
-          "full": "",
+          "thumb": "assets/bandeaux/M06/image.webp",
+          "full": "assets/bandeaux/M06/image.webp",
           "fields": {},
           "finitions": [],
           "notes": "Épaisseur: 5 mm\nEssences:  Noyer"
@@ -105,14 +105,14 @@
     {
       "id": "M07",
       "title": "Carré Bois décaissé 100×100 mm",
-      "thumb": "",
-      "full": "",
+      "thumb": "assets/bandeaux/M07/image.webp",
+      "full": "assets/bandeaux/M07/image.webp",
       "variants": [
         {
           "id": "base",
           "name": "Base",
-          "thumb": "",
-          "full": "",
+          "thumb": "assets/bandeaux/M07/image.webp",
+          "full": "assets/bandeaux/M07/image.webp",
           "fields": {},
           "finitions": [],
           "notes": "Épaisseur: 5 mm — Légère cavité\nEssences: Noyer ou Sapin\nSUIVANT DISPONIBILITÉ"
@@ -122,14 +122,14 @@
     {
       "id": "M08",
       "title": "Carte de visite en métal !",
-      "thumb": "",
-      "full": "",
+      "thumb": "assets/bandeaux/M08/image.webp",
+      "full": "assets/bandeaux/M08/image.webp",
       "variants": [
         {
           "id": "base",
           "name": "Base",
-          "thumb": "",
-          "full": "",
+          "thumb": "assets/bandeaux/M08/image.webp",
+          "full": "assets/bandeaux/M08/image.webp",
           "fields": {},
           "finitions": [],
           "notes": "Parfait pour des invitations, des éléments décoratifs.\nÉpaisseur: 0.2 mm - Souple\nMatière : Aluminium"
@@ -139,14 +139,14 @@
     {
       "id": "M09",
       "title": "À vous de jouer !",
-      "thumb": "",
-      "full": "",
+      "thumb": "assets/bandeaux/M09/image.webp",
+      "full": "assets/bandeaux/M09/image.webp",
       "variants": [
         {
           "id": "base",
           "name": "Base",
-          "thumb": "",
-          "full": "",
+          "thumb": "assets/bandeaux/M09/image.webp",
+          "full": "assets/bandeaux/M09/image.webp",
           "fields": {},
           "finitions": [],
           "notes": "Zonne de gravure maximum 400x400.\nAu plaisir d'en discuter.\nPlanche à découper, Manches, Verre, Plastique, Stensils, Guitare, Outils... ( Bientôt possible sur certains métaux)"
@@ -156,14 +156,14 @@
     {
       "id": "M10",
       "title": "Planche 200×300 mm",
-      "thumb": "",
-      "full": "",
+      "thumb": "assets/bandeaux/M10/image.webp",
+      "full": "assets/bandeaux/M10/image.webp",
       "variants": [
         {
           "id": "base",
           "name": "Base",
-          "thumb": "",
-          "full": "",
+          "thumb": "assets/bandeaux/M10/image.webp",
+          "full": "assets/bandeaux/M10/image.webp",
           "fields": {},
           "finitions": [],
           "notes": "Épaisseur: 2 mm — Facile à découper\nEssences: contre-plaqué"

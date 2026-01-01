@@ -5,12 +5,12 @@
     "summary": "M01",
     "description": "Description courte du matériau M01.",
     "subtext": "Texte complémentaire configurable.",
-    "imageBase": "assets/materiaux/M01_neutre.webp",
+    "imageBase": "assets/bandeaux/M01/image.webp",
     "options": [
       {
         "id": "neutre",
         "label": "Neutre",
-        "image": "assets/materiaux/M01_neutre.webp",
+        "image": "assets/bandeaux/M01/image.webp",
         "formTag": "M01:Neutre"
       }
     ]
@@ -21,12 +21,12 @@
     "summary": "M02",
     "description": "Description courte du matériau M02.",
     "subtext": "Texte complémentaire configurable.",
-    "imageBase": "assets/materiaux/M02_neutre.webp",
+    "imageBase": "assets/bandeaux/M02/image.webp",
     "options": [
       {
         "id": "neutre",
         "label": "Neutre",
-        "image": "assets/materiaux/M02_neutre.webp",
+        "image": "assets/bandeaux/M02/image.webp",
         "formTag": "M02:Neutre"
       }
     ]
@@ -37,12 +37,12 @@
     "summary": "M03",
     "description": "Description courte du matériau M03.",
     "subtext": "Texte complémentaire configurable.",
-    "imageBase": "assets/materiaux/M03_neutre.webp",
+    "imageBase": "assets/bandeaux/M03/image.webp",
     "options": [
       {
         "id": "neutre",
         "label": "Neutre",
-        "image": "assets/materiaux/M03_neutre.webp",
+        "image": "assets/bandeaux/M03/image.webp",
         "formTag": "M03:Neutre"
       }
     ]
@@ -53,12 +53,12 @@
     "summary": "M04",
     "description": "Description courte du matériau M04.",
     "subtext": "Texte complémentaire configurable.",
-    "imageBase": "assets/materiaux/M04_neutre.webp",
+    "imageBase": "assets/bandeaux/M04/image.webp",
     "options": [
       {
         "id": "neutre",
         "label": "Neutre",
-        "image": "assets/materiaux/M04_neutre.webp",
+        "image": "assets/bandeaux/M04/image.webp",
         "formTag": "M04:Neutre"
       }
     ]
@@ -69,12 +69,12 @@
     "summary": "M05",
     "description": "Description courte du matériau M05.",
     "subtext": "Texte complémentaire configurable.",
-    "imageBase": "assets/materiaux/M05_neutre.webp",
+    "imageBase": "assets/bandeaux/M05/image.webp",
     "options": [
       {
         "id": "neutre",
         "label": "Neutre",
-        "image": "assets/materiaux/M05_neutre.webp",
+        "image": "assets/bandeaux/M05/image.webp",
         "formTag": "M05:Neutre"
       }
     ]
@@ -85,12 +85,12 @@
     "summary": "M06",
     "description": "Description courte du matériau M06.",
     "subtext": "Texte complémentaire configurable.",
-    "imageBase": "assets/materiaux/M06_neutre.webp",
+    "imageBase": "assets/bandeaux/M06/image.webp",
     "options": [
       {
         "id": "neutre",
         "label": "Neutre",
-        "image": "assets/materiaux/M06_neutre.webp",
+        "image": "assets/bandeaux/M06/image.webp",
         "formTag": "M06:Neutre"
       }
     ]
@@ -101,12 +101,12 @@
     "summary": "M07",
     "description": "Description courte du matériau M07.",
     "subtext": "Texte complémentaire configurable.",
-    "imageBase": "assets/materiaux/M07_neutre.webp",
+    "imageBase": "assets/bandeaux/M07/image.webp",
     "options": [
       {
         "id": "neutre",
         "label": "Neutre",
-        "image": "assets/materiaux/M07_neutre.webp",
+        "image": "assets/bandeaux/M07/image.webp",
         "formTag": "M07:Neutre"
       }
     ]
@@ -117,12 +117,12 @@
     "summary": "M08",
     "description": "Description courte du matériau M08.",
     "subtext": "Texte complémentaire configurable.",
-    "imageBase": "assets/materiaux/M08_neutre.webp",
+    "imageBase": "assets/bandeaux/M08/image.webp",
     "options": [
       {
         "id": "neutre",
         "label": "Neutre",
-        "image": "assets/materiaux/M08_neutre.webp",
+        "image": "assets/bandeaux/M08/image.webp",
         "formTag": "M08:Neutre"
       }
     ]
@@ -133,12 +133,12 @@
     "summary": "M09",
     "description": "Description courte du matériau M09.",
     "subtext": "Texte complémentaire configurable.",
-    "imageBase": "assets/materiaux/M09_neutre.webp",
+    "imageBase": "assets/bandeaux/M09/image.webp",
     "options": [
       {
         "id": "neutre",
         "label": "Neutre",
-        "image": "assets/materiaux/M09_neutre.webp",
+        "image": "assets/bandeaux/M09/image.webp",
         "formTag": "M09:Neutre"
       }
     ]
@@ -149,12 +149,12 @@
     "summary": "M10",
     "description": "Description courte du matériau M10.",
     "subtext": "Texte complémentaire configurable.",
-    "imageBase": "assets/materiaux/M10_neutre.webp",
+    "imageBase": "assets/bandeaux/M10/image.webp",
     "options": [
       {
         "id": "neutre",
         "label": "Neutre",
-        "image": "assets/materiaux/M10_neutre.webp",
+        "image": "assets/bandeaux/M10/image.webp",
         "formTag": "M10:Neutre"
       }
     ]
