@@ -9,15 +9,25 @@
 <link href="styles.css" rel="stylesheet"/>
 <!-- Intro CSS (isolé, n'affecte pas le site hors overlay) -->
 <link href="assets/intro/intro.css" rel="stylesheet"/>
+<script>document.documentElement.classList.add("intro-pre");</script>
 </head>
 <body>
 <!-- INTRO OVERLAY -->
-<div aria-hidden="true" id="intro-overlay">
-<div id="intro-stage">
-<img alt="" class="logo logo-motif logo-motif-left" src="assets/intro/logo-motif-left.webp"/>
-<img alt="" class="logo logo-text" src="assets/intro/logo-texte.webp"/>
-<img alt="" class="logo logo-motif logo-motif-right" src="assets/intro/logo-motif-right.webp"/>
-<div aria-hidden="true" id="shards-layer"></div>
+<!-- INTRO OVERLAY -->
+<div id="intro-overlay" aria-hidden="true">
+  <div id="intro-stage">
+    <div id="intro-row">
+      <img id="intro-logo-left" class="logo-motif left" src="assets/intro/logo-motif-left.webp" alt="" />
+      <img id="intro-logo-text" class="logo-text" src="assets/intro/logo-texte.webp" alt="" />
+      <img id="intro-logo-right" class="logo-motif right" src="assets/intro/logo-motif-right.webp" alt="" />
+    </div>
+
+    <div id="intro-shards" aria-hidden="true">
+      <div id="intro-shards-box"></div>
+    </div>
+
+    <div id="intro-shockwave" aria-hidden="true"></div>
+  </div>
 </div>
 </div>
 <div id="site-root">
