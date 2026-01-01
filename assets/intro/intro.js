@@ -1,103 +1,123 @@
 /*
-INTRO PATCH v18
-- G0: load & decode logos only (shards not visible)
-- G1: fade-in text + motifs (overlay opacity)
-- T0: wait until all shards decoded; ONLY then proceed
-- T4: no tremble during merge (CSS: body.merge)
-Paths (relative to root):
-- assets/intro/logo-texte.webp
-- assets/intro/logo-motif-left.webp
-- assets/intro/logo-motif-right.webp
-- assets/intro/shards_meta.json
-- assets/intro/shards/shard_XXX.webp
+INTRO META FIX PATCH
+Fix: supports shards_meta.json formats:
+A) { shards: [{file, x?, y?, w?, h?}, ...] }
+B) { count: N, files: ["shard_001.webp", ...] }
+
+Also:
+- Only crossfade logo-text -> shards if shards actually exist.
+- Adds body class 'has-shards' when shards were instantiated or already present.
 */
 
-const state = { logosReady:false, shardsReady:false };
+const state = { logosReady:false, shardsReady:false, hasShards:false };
 
-function waitImg(img, timeoutMs = 8000){
-  const p = (img.decode ? img.decode().catch(()=>new Promise(r=>img.onload=()=>r())) : new Promise(r=>img.onload=()=>r()));
+function waitImg(img){
+  const timeoutMs = 4000;
+  const p = img.decode
+    ? img.decode().catch(()=>new Promise(r=>img.onload=()=>r()))
+    : new Promise(r=>img.onload=()=>r());
   return Promise.race([p, new Promise(r=>setTimeout(r, timeoutMs))]);
 }
 
 async function loadLogos(){
-  const imgs = document.querySelectorAll('.logo-text, .logo-motif');
-  await Promise.all([...imgs].map(i => waitImg(i, 5000)));
+  const imgs = document.querySelectorAll('.logo-text,.logo-motif');
+  await Promise.all([...imgs].map(waitImg));
   state.logosReady = true;
 }
 
-async function mountShardsIfNeeded(){
+async function ensureShardsInDom(){
   const layer = document.getElementById('shards-layer');
-  if(!layer) return [];
-  // if already mounted, return list
-  const existing = [...layer.querySelectorAll('img.shard')];
-  if(existing.length) return existing;
+  if(!layer) return;
 
-  // mount from meta
+  // already present
+  if(layer.querySelector('.shard')){
+    state.hasShards = true;
+    document.body.classList.add('has-shards');
+    return;
+  }
+
   try{
-    const res = await fetch('assets/intro/shards_meta.json', { cache: 'no-store' });
-    if(!res.ok) return [];
+    const res = await fetch('assets/intro/shards_meta.json', { cache:'no-store' });
+    if(!res.ok) return;
     const meta = await res.json();
-    if(!meta || !Array.isArray(meta.shards)) return [];
+
+    let shardList = [];
+    if (meta && Array.isArray(meta.shards)) {
+      shardList = meta.shards.map(s => ({ file: s.file, x: s.x, y: s.y, w: s.w, h: s.h }));
+    } else if (meta && Array.isArray(meta.files)) {
+      shardList = meta.files.map(f => ({ file: f }));
+    }
+
+    if(!shardList.length) return;
 
     const frag = document.createDocumentFragment();
-    const shards = [];
-    for(const s of meta.shards){
+    for(const s of shardList){
+      if(!s.file) continue;
       const img = document.createElement('img');
       img.className = 'shard';
       img.alt = '';
       img.decoding = 'async';
       img.loading = 'eager';
       img.src = `assets/intro/shards/${s.file}`;
-      // If your shards are full-canvas (same origin), keep inset:0 (CSS).
-      // If you later switch to per-shard bbox positioning, you can use s.x/s.y/s.w/s.h here.
+
+      // If per-shard positioning exists, apply it; otherwise keep full inset (same origin canvas)
+      if (Number.isFinite(s.x)) img.style.left = s.x + 'px';
+      if (Number.isFinite(s.y)) img.style.top  = s.y + 'px';
+      if (Number.isFinite(s.w)) img.style.width  = s.w + 'px';
+      if (Number.isFinite(s.h)) img.style.height = s.h + 'px';
+
       frag.appendChild(img);
-      shards.push(img);
     }
     layer.appendChild(frag);
-    return shards;
-  }catch(_){
-    return [];
-  }
+
+    // Mark availability
+    if(layer.querySelector('.shard')){
+      state.hasShards = true;
+      document.body.classList.add('has-shards');
+    }
+  } catch(_) {}
 }
 
 async function loadShards(){
-  const shards = await mountShardsIfNeeded();
+  await ensureShardsInDom();
+  const shards = document.querySelectorAll('.shard');
   if(!shards.length){
-    // No shards: don't block forever. Mark ready to avoid black screen.
     state.shardsReady = true;
     return;
   }
-  await Promise.all(shards.map(i => waitImg(i, 8000)));
+  await Promise.all([...shards].map(waitImg));
   state.shardsReady = true;
 }
 
-function failSafeSkip(){
-  document.body.classList.add('intro-skip');
+function endIntroFallback(){
+  // Never block the site
   const ov = document.getElementById('intro-overlay');
   if(ov) ov.remove();
 }
 
 async function start(){
   try{
-    // G0: logos only
+    // G0
     await loadLogos();
 
-    // G1: fade-in overlay (text+motifs visible)
+    // G1 fade-in overlay (logos only)
     document.body.classList.add('intro-visible');
 
-    // T0: hold until shards are ready (shards still hidden)
-    await loadShards();
+    // T0 wait shards decoded (with 6s failsafe)
+    const shardsPromise = (async()=>{ await loadShards(); })();
+    await Promise.race([shardsPromise, new Promise(r=>setTimeout(r, 6000))]);
 
-    // If shards failed to load, we still continue (but the effect will be degraded)
-    document.body.classList.add('shards-visible'); // T1 crossfade text->shards
+    // Only switch to shards mode if shards exist
+    if (state.hasShards) {
+      document.body.classList.add('shards-visible'); // crossfade text -> shards
+    }
 
-    // Hooks: your existing animation code can key off these classes
-    document.body.classList.add('explode');        // T2
-    // Timings as discussed earlier (can be refined later)
-    setTimeout(()=>document.body.classList.add('recoil'), 1500); // T3
-    setTimeout(()=>document.body.classList.add('merge'), 2500);  // T4 (no tremble)
-  }catch(e){
-    failSafeSkip();
+    document.body.classList.add('explode'); // continues timeline hooks
+    setTimeout(()=>document.body.classList.add('recoil'),1500);
+    setTimeout(()=>document.body.classList.add('merge'),2500);
+
+  } catch(e){
+    endIntroFallback();
   }
 }
 
