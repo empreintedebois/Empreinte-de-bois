@@ -21,6 +21,12 @@ html.intro-pre #site-root{
   pointer-events: none;
 }
 
+/* Legacy safety: JS uses body.intro-lock */
+body.intro-lock #site-root{
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* During intro */
 body.intro-running #site-root{
   opacity: 0;
