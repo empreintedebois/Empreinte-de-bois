@@ -1,139 +1,153 @@
-/* INTRO GOOD PATCH
-   Scope: only affects #intro-overlay subtree
-   Goals:
-   - Fix layout/sizing responsive (16:9 stage)
-   - Restore tremble
-   - Keep G0 no shards visible
-   - Crossfade text -> shards only if body.has-shards + .shards-visible
-   - Provide basic explode/recoil/merge animations (hooked via body classes)
-*/
+
+/* assets/intro/intro.css */
+
+:root{
+  --intro-bg: #000;
+  --intro-z: 99999;
+}
+
+html.intro-lock,
+html.intro-lock body{
+  overflow: hidden !important;
+  height: 100% !important;
+  touch-action: none !important;
+}
 
 #intro-overlay{
-  position:fixed;
-  inset:0;
-  display:grid;
-  place-items:center;
-  z-index:9999;
-  background: transparent;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .5s ease;
+  position: fixed;
+  inset: 0;
+  background: var(--intro-bg);
+  z-index: var(--intro-z);
+  display: none;
 }
 
-body.intro-visible #intro-overlay{
-  opacity:1;
-  pointer-events:auto;
+#intro-overlay.is-on{
+  display: block;
 }
 
-/* Stage = 16:9 reference box, scales with viewport */
 #intro-stage{
-  position:relative;
-  width:min(92vw, 1200px);
-  aspect-ratio:16/9;
-  overflow:visible;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
 }
 
-/* Base logo rules */
-#intro-stage .logo{
-  position:absolute;
-  top:50%;
-  height:100%;
-  width:auto;
-  transform:translateY(-50%);
-  pointer-events:none;
-  user-select:none;
-  -webkit-user-drag:none;
+/* zone centrale pilotée par l’écran (évite les tailles cassées) */
+.intro-wrap{
+  width: min(92vw, 1100px);
+  height: min(62vh, 520px);
+  display: grid;
+  align-items: center;
+}
+
+.intro-row{
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: clamp(10px, 2vw, 28px);
+  height: 100%;
+}
+
+/* IMPORTANT: mêmes hauteurs base */
+.logo-motif,
+.logo-text{
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* tes assets “noir transparent” => on rend le noir visuellement invisible */
+.logo-motif,
+.logo-text,
+.intro-shard{
+  mix-blend-mode: screen;   /* noir -> transparent visuellement sur fond noir */
+  image-rendering: auto;
+}
+
+/* logo texte au centre */
+.logo-text{
+  justify-self: center;
+}
+
+/* motifs sur les côtés */
+.logo-motif.left{ justify-self: end; }
+.logo-motif.right{ justify-self: start; }
+
+/* couche shards par-dessus le logo texte */
+#intro-shards{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shards-box{
+  position: absolute;
+  /* calé sur la zone exacte du logo texte */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--textW, 60%);
+  height: var(--textH, 60%);
+}
+
+.intro-shard{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transform: translate3d(0,0,0) rotate(0deg) scale(1);
   will-change: transform, opacity;
 }
 
-/* Positions: left / center / right */
-#intro-stage .logo-text{
-  left:50%;
-  transform:translate(-50%,-50%);
-  transition:opacity .2s ease;
+/* FX simples */
+.fade-in{
+  animation: introFadeIn var(--dur, 500ms) ease-out forwards;
 }
-#intro-stage .logo-motif-left{ left:0; }
-#intro-stage .logo-motif-right{ right:0; }
-
-/* Tremble (Phase T0) */
-body.tremble #intro-stage .logo{
-  animation:intro-tremble .14s infinite alternate;
-}
-body.merge #intro-stage .logo{
-  animation:none; /* T4: stop tremble */
+@keyframes introFadeIn{
+  from{ opacity: 0; }
+  to{ opacity: 1; }
 }
 
-@keyframes intro-tremble{
-  from{ transform:translateY(-50%) translateX(-1.2px) rotate(-0.15deg); }
-  to  { transform:translateY(-50%) translateX( 1.2px) rotate( 0.15deg); }
+.shake-strong{
+  animation: introShake 140ms infinite linear;
 }
-/* Keep special transforms for center logo */
-body.tremble #intro-stage .logo-text{
-  animation:intro-tremble-center .14s infinite alternate;
-}
-@keyframes intro-tremble-center{
-  from{ transform:translate(-50%,-50%) translateX(-1.2px) rotate(-0.12deg); }
-  to  { transform:translate(-50%,-50%) translateX( 1.2px) rotate( 0.12deg); }
+@keyframes introShake{
+  0%{ transform: translate3d(0,0,0); }
+  25%{ transform: translate3d(2px,-1px,0); }
+  50%{ transform: translate3d(-2px,1px,0); }
+  75%{ transform: translate3d(1px,2px,0); }
+  100%{ transform: translate3d(0,0,0); }
 }
 
-/* Shards layer */
-#shards-layer{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  will-change: transform;
+/* onde de choc */
+#intro-shockwave{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 999px;
+  transform: translate(-50%, -50%) scale(0.2);
+  opacity: 0;
+  pointer-events: none;
 }
 
-#shards-layer .shard{
-  position:absolute;
-  inset:0;          /* same origin/canvas */
-  width:100%;
-  height:100%;
-  opacity:0;        /* G0: invisible */
-  transform: translate(0px,0px) scale(1);
-  will-change: transform, opacity;
+#intro-shockwave.ping{
+  animation: introPing 420ms ease-out forwards;
+}
+@keyframes introPing{
+  0%{ opacity: .9; transform: translate(-50%,-50%) scale(0.2); }
+  100%{ opacity: 0; transform: translate(-50%,-50%) scale(7); }
 }
 
-/* Only show shards when they exist and we explicitly reveal them */
-body.has-shards.shards-visible #shards-layer .shard{
-  opacity:1;
+/* responsive mobile : on évite le logo microscopique */
+@media (max-width: 520px){
+  .intro-wrap{ width: 94vw; height: min(56vh, 460px); }
+  .intro-row{ grid-template-columns: 1fr auto 1fr; gap: 10px; }
 }
-
-/* Crossfade: hide logo-text only if shards exist and are being shown */
-body.has-shards.shards-visible #intro-stage .logo-text{
-  opacity:0;
-}
-
-/* Explosion (T2): 1.5s, shards move outward + zoom-in feel */
-body.explode #shards-layer .shard{
-  transition: transform 1.5s cubic-bezier(.2,.8,.2,1), opacity .6s ease;
-  transform: translate(var(--dx,0px), var(--dy,0px)) scale(var(--ds,1));
-}
-
-/* Fade shards after explosion when class fade-shards is set */
-body.fade-shards #shards-layer .shard{
-  opacity:0;
-  transition: opacity .6s ease;
-}
-
-/* Recoil (T3): motifs pull back slightly */
-body.recoil #intro-stage .logo-motif-left{
-  transition: transform 1s ease;
-  transform: translateY(-50%) translateX(-4%) scale(.98);
-}
-body.recoil #intro-stage .logo-motif-right{
-  transition: transform 1s ease;
-  transform: translateY(-50%) translateX( 4%) scale(.98);
-}
-
-/* Merge (T4): motifs snap to center, no tremble */
-body.merge #intro-stage .logo-motif-left,
-body.merge #intro-stage .logo-motif-right{
-  transition: transform .8s cubic-bezier(.15,.9,.2,1);
-  /* move to center; JS sets --mx to half width offset if needed; default 0 works when symmetric */
-}
-body.merge #intro-stage .logo-motif-left{ transform: translateY(-50%) translateX(var(--mxL, 50%)) scale(1); }
-body.merge #intro-stage .logo-motif-right{ transform: translateY(-50%) translateX(var(--mxR, -50%)) scale(1); }
-
-/* Safety: if intro is skipped */
-body.intro-skip #intro-overlay{ display:none !important; }
