@@ -1,371 +1,336 @@
-/* Empreinte-de-bois – Intro animation (v15)
-   - Voronoi shards built from assets/intro/voronoi-48-16x9.svg
-   - logo-texte shards explode + zoom
-   - logo-motif left/right recoil then fuse with shockwave + zoom-to-height
-   - arrow-only progression (one-way). After intro, normal scroll is restored.
-
-   Expected assets:
-     assets/intro/logo-texte.webp
-     assets/intro/logo-motif-left.webp
-     assets/intro/logo-motif-right.webp
-     assets/intro/voronoi-48-16x9.svg
+/* Empreinte-de-bois Intro v16 (static shards from assets/intro/shards_meta.json)
+   - logo-motif-left + logo-texte (shards) + logo-motif-right
+   - responsive sizing based on viewport
+   - black treated as transparent in provided webp assets
 */
+(() => {
+  const ASSET_BASE = 'assets/intro';
+  const META_URL = `${ASSET_BASE}/shards_meta.json`;
+  const LOGO_TEXT_URL = `${ASSET_BASE}/logo-texte.webp`;
+  const MOTIF_L_URL = `${ASSET_BASE}/logo-motif-left.webp`;
+  const MOTIF_R_URL = `${ASSET_BASE}/logo-motif-right.webp`;
 
-(function () {
-  'use strict';
+  // Timing (seconds)
+  const T = {
+    // phase 0 start
+    explodeStart: 0.0,
+    recoilStart: 0.5,
+    shardsFadeStart: 0.75,
+    mergeStart: 1.0,
+    mergeEnd: 1.9,
+    overlayFadeStart: 2.0,
+    overlayFadeEnd: 2.35,
+    revealStart: 2.0,   // starts right after merge, no pause
+    revealEnd: 2.8
+  };
 
-  const $ = (sel, root = document) => root.querySelector(sel);
+  // Motion
+  const EXPLODE = {
+    duration: 1.0,     // from explodeStart
+    zoomTo: 4.0,       // global zoom during explosion
+    maxTravel: 1.25,   // as fraction of viewport max(vw,vh)
+    rotMaxDeg: 22
+  };
 
-  const overlay = $('#introOverlay');
-  if (!overlay) return;
+  const MOTIF = {
+    trembleAmpPx: 6,
+    trembleFreqHz: 20,
+    recoilPx: 26,
+    mergeOvershootPx: 6
+  };
 
-  const arrow = $('#introArrow');
-  const shardsHost = $('#introShards');
-  const logoTextImg = $('#introLogoText');
-  const motifL = $('#introMotifLeft');
-  const motifR = $('#introMotifRight');
-  const shock = $('#introShockwave');
-  const siteRoot = $('#siteRoot');
-  const curtain = $('#revealCurtain');
-
-  // --- Config ---
-  const VORONOI_SVG = 'assets/intro/voronoi-48-16x9.svg';
-  const MAX_SHARDS = 48; // keep it sane on mobile
-
-  // Timeline (normalized 0..1)
-  // t in [0..1] is driven by arrow click/hold (not scroll)
-  const SPEED = 0.9; // seconds to reach t=1 when holding (approx)
-  const HOLD_ACCEL = 6.0;
-
-  // Key moments
-  const T_EXPLODE_START = 0.05;
-  const T_MOTIF_RECOIL_START = 0.50;
-  const T_SHARDS_FADE_START = 0.75;
-  const T_MOTIF_FUSE_START = 0.80;
-  const T_MOTIF_FUSE_HIT = 0.93;
-  const T_END = 1.00;
-
-  // --- Helpers ---
-  const clamp01 = (x) => Math.max(0, Math.min(1, x));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const lerp = (a, b, t) => a + (b - a) * t;
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
   const easeInCubic = (t) => t * t * t;
-  const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  const now = () => performance.now() / 1000;
+  const easeInOutCubic = (t) => (t < 0.5) ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
 
-  function prefersReducedMotion() {
-    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const rand = (seed) => {
+    // simple deterministic RNG (LCG)
+    let s = seed >>> 0;
+    return () => {
+      s = (1664525 * s + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  };
+
+  function ensureOverlay() {
+    let overlay = document.getElementById('intro-overlay');
+    if (overlay) return overlay;
+
+    overlay = document.createElement('div');
+    overlay.id = 'intro-overlay';
+    overlay.innerHTML = `
+      <div class="intro-bg"></div>
+      <div class="intro-stage" aria-hidden="true">
+        <div class="intro-row">
+          <img class="intro-motif intro-motif-left" alt="" />
+          <div class="intro-textwrap">
+            <img class="intro-logo-text-fallback" alt="" />
+            <div class="intro-shards" aria-hidden="true"></div>
+          </div>
+          <img class="intro-motif intro-motif-right" alt="" />
+        </div>
+        <div class="intro-shockwave" aria-hidden="true"></div>
+      </div>
+      <button class="intro-skip" type="button">Passer</button>
+      <div class="intro-reveal" aria-hidden="true"></div>
+    `;
+    document.body.appendChild(overlay);
+    return overlay;
   }
 
-  function lockScroll() {
+  function setResponsiveSizing(overlay) {
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+    // The important constraint: logo-motif and logo-texte must share the same HEIGHT base.
+    // We set a base height that works on mobile and desktop.
+    const baseH = clamp(vh * 0.46, 220, 620); // px
+    overlay.style.setProperty('--intro-base-h', `${baseH}px`);
+
+    // Horizontal spacing shrinks on mobile
+    overlay.style.setProperty('--intro-gap', `${clamp(vw * 0.02, 8, 22)}px`);
+  }
+
+  async function loadMeta() {
+    const res = await fetch(META_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Intro meta load failed: ${res.status}`);
+    return res.json();
+  }
+
+  function buildShards(overlay, meta) {
+    const container = overlay.querySelector('.intro-shards');
+    container.innerHTML = '';
+    const files = meta.files || [];
+
+    // seed based on files length for determinism
+    const r = rand(1337 + files.length);
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    const travel = Math.max(vw, vh) * EXPLODE.maxTravel;
+
+    // Precompute shard motion targets
+    const shardData = files.map((fn, i) => {
+      // angle spread with some jitter
+      const a = (i / files.length) * Math.PI * 2 + (r() - 0.5) * 0.35;
+      const dist = lerp(travel * 0.35, travel * 1.0, Math.pow(r(), 0.55));
+      const dx = Math.cos(a) * dist;
+      const dy = Math.sin(a) * dist;
+      const rot = (r() - 0.5) * 2 * EXPLODE.rotMaxDeg;
+      const z = 0.2 + r() * 0.8; // for slight depth ordering
+      return { fn, dx, dy, rot, z };
+    }).sort((a,b) => a.z - b.z);
+
+    for (const d of shardData) {
+      const img = document.createElement('img');
+      img.className = 'intro-shard';
+      img.alt = '';
+      img.decoding = 'async';
+      img.loading = 'eager';
+      img.src = `${ASSET_BASE}/shards/${d.fn}`;
+      img.dataset.dx = String(d.dx);
+      img.dataset.dy = String(d.dy);
+      img.dataset.rot = String(d.rot);
+      container.appendChild(img);
+    }
+    return shardData;
+  }
+
+  function showFallbackUntilShards(overlay, visible) {
+    const fb = overlay.querySelector('.intro-logo-text-fallback');
+    const shards = overlay.querySelector('.intro-shards');
+    if (visible) {
+      fb.style.opacity = '1';
+      shards.style.opacity = '0';
+    } else {
+      fb.style.opacity = '0';
+      shards.style.opacity = '1';
+    }
+  }
+
+  function startTimeline(overlay) {
+    const t0 = performance.now();
+
+    const stage = overlay.querySelector('.intro-stage');
+    const row = overlay.querySelector('.intro-row');
+    const motifL = overlay.querySelector('.intro-motif-left');
+    const motifR = overlay.querySelector('.intro-motif-right');
+    const shock = overlay.querySelector('.intro-shockwave');
+    const shardsWrap = overlay.querySelector('.intro-shards');
+    const reveal = overlay.querySelector('.intro-reveal');
+
+    let finished = false;
+
+    const tick = () => {
+      if (finished) return;
+
+      const now = performance.now();
+      const t = (now - t0) / 1000;
+
+      // Strong tremble early (T0 -> T1)
+      const tremblePhase = clamp(t / T.mergeStart, 0, 1);
+      const trembleAmt = (1 - tremblePhase) * MOTIF.trembleAmpPx;
+      const tremble = (Math.sin(t * MOTIF.trembleFreqHz * Math.PI * 2) + Math.sin(t * (MOTIF.trembleFreqHz * 0.77) * Math.PI * 2)) * 0.5;
+      const trembleX = tremble * trembleAmt;
+      const trembleY = Math.cos(t * MOTIF.trembleFreqHz * Math.PI * 2) * trembleAmt * 0.6;
+
+      // Motif recoil starts at 0.5
+      let recoil = 0;
+      if (t >= T.recoilStart && t < T.mergeStart) {
+        const u = clamp((t - T.recoilStart) / (T.mergeStart - T.recoilStart), 0, 1);
+        recoil = easeOutCubic(u) * MOTIF.recoilPx;
+      }
+
+      // Explosion progress
+      let explodeU = 0;
+      if (t >= T.explodeStart && t <= (T.explodeStart + EXPLODE.duration)) {
+        explodeU = clamp((t - T.explodeStart) / EXPLODE.duration, 0, 1);
+      } else if (t > (T.explodeStart + EXPLODE.duration)) {
+        explodeU = 1;
+      }
+      const e = easeOutCubic(explodeU);
+      const globalZoom = lerp(1.0, EXPLODE.zoomTo, e);
+
+      // Apply shard transforms (only logo-texte shards)
+      const shardImgs = shardsWrap.querySelectorAll('.intro-shard');
+      shardImgs.forEach((el) => {
+        const dx = parseFloat(el.dataset.dx || '0');
+        const dy = parseFloat(el.dataset.dy || '0');
+        const rot = parseFloat(el.dataset.rot || '0');
+        const tx = dx * e;
+        const ty = dy * e;
+        const rz = rot * e;
+        el.style.transform = `translate(${tx}px, ${ty}px) rotate(${rz}deg) scale(${globalZoom})`;
+      });
+
+      // Shards fade out from 0.75 -> 1.0
+      let shardAlpha = 1;
+      if (t >= T.shardsFadeStart && t < T.mergeStart) {
+        const u = clamp((t - T.shardsFadeStart) / (T.mergeStart - T.shardsFadeStart), 0, 1);
+        shardAlpha = 1 - easeInOutCubic(u);
+      } else if (t >= T.mergeStart) {
+        shardAlpha = 0;
+      }
+      shardsWrap.style.opacity = String(shardAlpha);
+
+      // Motifs: early tremble + recoil
+      motifL.style.transform = `translate(${trembleX - recoil}px, ${trembleY}px)`;
+      motifR.style.transform = `translate(${trembleX + recoil}px, ${trembleY}px)`;
+
+      // Merge phase: motifs rush to center + zoom to fill height, then shockwave
+      if (t >= T.mergeStart && t <= T.mergeEnd) {
+        const u = clamp((t - T.mergeStart) / (T.mergeEnd - T.mergeStart), 0, 1);
+        const m = easeInCubic(u);
+
+        // bring motifs into center
+        const mergeDx = lerp(recoil, -MOTIF.mergeOvershootPx, m);
+        motifL.style.transform = `translate(${mergeDx}px, 0px)`;
+        motifR.style.transform = `translate(${-mergeDx}px, 0px)`;
+
+        // zoom stage so motif fills viewport height (approx)
+        const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+        const baseH = parseFloat(getComputedStyle(overlay).getPropertyValue('--intro-base-h')) || (vh*0.46);
+        const targetScale = clamp((vh * 0.92) / baseH, 1.0, 3.2);
+        const s = lerp(1.0, targetScale, easeInOutCubic(u));
+        stage.style.transform = `scale(${s})`;
+      } else if (t > T.mergeEnd) {
+        // keep stage at final scale
+      }
+
+      // Shockwave pulse at mergeEnd
+      if (t >= (T.mergeEnd - 0.08) && t <= (T.mergeEnd + 0.28)) {
+        const u = clamp((t - (T.mergeEnd - 0.08)) / 0.36, 0, 1);
+        const s = lerp(0.2, 2.6, easeOutCubic(u));
+        const a = 1 - easeOutCubic(u);
+        shock.style.opacity = String(a);
+        shock.style.transform = `translate(-50%, -50%) scale(${s})`;
+      } else {
+        shock.style.opacity = '0';
+      }
+
+      // Overlay fade out
+      if (t >= T.overlayFadeStart && t <= T.overlayFadeEnd) {
+        const u = clamp((t - T.overlayFadeStart) / (T.overlayFadeEnd - T.overlayFadeStart), 0, 1);
+        overlay.style.opacity = String(1 - easeInOutCubic(u));
+      } else if (t > T.overlayFadeEnd) {
+        overlay.style.opacity = '0';
+      }
+
+      // Laser-engraving reveal: a bright band sweeping down
+      if (t >= T.revealStart && t <= T.revealEnd) {
+        const u = clamp((t - T.revealStart) / (T.revealEnd - T.revealStart), 0, 1);
+        reveal.style.opacity = '1';
+        reveal.style.transform = `translateY(${lerp(-30, 120, u)}vh)`;
+      } else if (t > T.revealEnd) {
+        reveal.style.opacity = '0';
+      }
+
+      if (t > (T.revealEnd + 0.1)) {
+        finished = true;
+        overlay.remove();
+        document.documentElement.classList.remove('intro-lock');
+        document.body.classList.remove('intro-lock');
+      } else {
+        requestAnimationFrame(tick);
+      }
+    };
+
+    requestAnimationFrame(tick);
+  }
+
+  async function init() {
+    const overlay = ensureOverlay();
+
+    // lock scroll only during overlay; but keep minimal blocking: allow user to still scroll after merge/fade quickly
     document.documentElement.classList.add('intro-lock');
     document.body.classList.add('intro-lock');
-  }
-  function unlockScroll() {
-    document.documentElement.classList.remove('intro-lock');
-    document.body.classList.remove('intro-lock');
-  }
 
-  // --- Voronoi parsing ---
-  function parseVoronoiPathsFromSVGText(svgText) {
-    const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
-    const svg = doc.querySelector('svg');
-    if (!svg) throw new Error('SVG voronoi invalide');
+    setResponsiveSizing(overlay);
+    window.addEventListener('resize', () => setResponsiveSizing(overlay), { passive: true });
 
-    const viewBox = (svg.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number);
-    const vb = {
-      x: viewBox[0] || 0,
-      y: viewBox[1] || 0,
-      w: viewBox[2] || 1920,
-      h: viewBox[3] || 1080,
-    };
+    const motifL = overlay.querySelector('.intro-motif-left');
+    const motifR = overlay.querySelector('.intro-motif-right');
+    const fb = overlay.querySelector('.intro-logo-text-fallback');
+    motifL.src = MOTIF_L_URL;
+    motifR.src = MOTIF_R_URL;
+    fb.src = LOGO_TEXT_URL;
 
-    // Many voronoi SVGs come as a single <path> with many subpaths.
-    const paths = Array.from(doc.querySelectorAll('path'));
-    const polys = [];
-
-    for (const p of paths) {
-      let d = (p.getAttribute('d') || '').trim();
-      if (!d) continue;
-      // Robust parsing for "M x,y ... Z" subpaths.
-      // We don't rely on explicit "L" (some SVG writers omit it) and we accept commas, minus, scientific notation.
-      d = d.replace(/,/g, ' ');
-      const subpaths = d.split(/\bM\b/i).map((s) => s.trim()).filter(Boolean);
-      for (const sp of subpaths) {
-        const beforeZ = sp.split(/\bZ\b/i)[0];
-        if (!beforeZ) continue;
-        const nums = beforeZ.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi) || [];
-        if (nums.length < 6) continue;
-        const pts = [];
-        for (let i = 0; i + 1 < nums.length; i += 2) {
-          const x = parseFloat(nums[i]);
-          const y = parseFloat(nums[i + 1]);
-          if (isFinite(x) && isFinite(y)) pts.push([x, y]);
-        }
-        if (pts.length >= 3) polys.push(pts);
-      }
-    }
-
-    // Fallback: try polygons
-    const polyEls = Array.from(doc.querySelectorAll('polygon'));
-    for (const pe of polyEls) {
-      const ptsRaw = (pe.getAttribute('points') || '').trim();
-      if (!ptsRaw) continue;
-      const pts = ptsRaw
-        .split(/\s+/)
-        .map((pair) => pair.split(',').map(Number))
-        .filter((a) => a.length === 2 && isFinite(a[0]) && isFinite(a[1]));
-      if (pts.length >= 3) polys.push(pts);
-    }
-
-    // Remove the largest polygon if it's the outer border.
-    function area(pts) {
-      let s = 0;
-      for (let i = 0; i < pts.length; i++) {
-        const [x1, y1] = pts[i];
-        const [x2, y2] = pts[(i + 1) % pts.length];
-        s += x1 * y2 - x2 * y1;
-      }
-      return Math.abs(s) / 2;
-    }
-    const withArea = polys.map((p) => ({ p, a: area(p) })).sort((a, b) => b.a - a.a);
-    if (withArea.length > MAX_SHARDS) {
-      // If one is absurdly large (outer), drop it.
-      const biggest = withArea[0];
-      const second = withArea[1];
-      if (second && biggest.a > second.a * 2.2) withArea.shift();
-    }
-    const selected = withArea.slice(0, MAX_SHARDS).map((x) => x.p);
-
-    // Convert to clip-path polygons in percentage.
-    const clips = selected.map((pts) => {
-      const pct = pts
-        .map(([x, y]) => {
-          const px = ((x - vb.x) / vb.w) * 100;
-          const py = ((y - vb.y) / vb.h) * 100;
-          return `${px.toFixed(3)}% ${py.toFixed(3)}%`;
-        })
-        .join(', ');
-      return `polygon(${pct})`;
-    });
-
-    return clips;
-  }
-
-  async function buildShards() {
-    const res = await fetch(VORONOI_SVG, { cache: 'force-cache' });
-    if (!res.ok) throw new Error('Voronoi SVG introuvable');
-    const svgText = await res.text();
-    const clips = parseVoronoiPathsFromSVGText(svgText);
-
-    shardsHost.innerHTML = '';
-
-    // All shards share the same background image (logo-texte) and are clipped.
-    // Each shard is positioned inside a fixed-size "logo box" so background alignment is consistent.
-    const frag = document.createDocumentFragment();
-    for (let i = 0; i < clips.length; i++) {
-      const el = document.createElement('div');
-      el.className = 'shard';
-      el.style.clipPath = clips[i];
-      el.style.webkitClipPath = clips[i];
-      // Stable per-shard random.
-      const r1 = (Math.sin((i + 1) * 999) + 1) / 2;
-      const r2 = (Math.sin((i + 1) * 1337) + 1) / 2;
-      const angle = r1 * Math.PI * 2;
-      const bias = (r2 - 0.5) * 0.35;
-      const dxn = Math.cos(angle) + bias;
-      const dyn = Math.sin(angle) + bias;
-      el.dataset.dxn = String(dxn);
-      el.dataset.dyn = String(dyn);
-      el.dataset.rot = String((r2 - 0.5) * 38);
-      el.dataset.spin = String((r1 - 0.5) * 120);
-      frag.appendChild(el);
-    }
-    shardsHost.appendChild(frag);
-  }
-
-  // --- Layout sizing ---
-  function updateLogoBoxSizing() {
-    // Keep the logo-texte within safe bounds for all viewports.
-    // Goal: always fully visible with some breathing room.
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const boxW = Math.min(vw * 0.90, 980);
-    const boxH = Math.min(vh * 0.42, 420);
-    overlay.style.setProperty('--logoBoxW', `${boxW}px`);
-    overlay.style.setProperty('--logoBoxH', `${boxH}px`);
-
-    // Motif target: fill height at fusion moment.
-    overlay.style.setProperty('--motifTargetH', `${vh}px`);
-  }
-
-  // --- Animation driver ---
-  let t = 0;
-  let isHolding = false;
-  let tVel = 0;
-  let startTime = 0;
-  let done = false;
-
-  function setArrowVisible(v) {
-    arrow.classList.toggle('is-hidden', !v);
-  }
-
-  function endIntro() {
-    if (done) return;
-    done = true;
-    setArrowVisible(false);
-    overlay.classList.add('is-done');
-    unlockScroll();
-
-    // Start reveal curtain immediately (no pause)
-    curtain.classList.add('reveal-go');
-
-    // Remove overlay after curtain mostly done to avoid accidental interactions.
-    setTimeout(() => {
+    // skip button
+    overlay.querySelector('.intro-skip').addEventListener('click', () => {
       overlay.remove();
-    }, 1500);
-  }
-
-  function applyPhaseTransforms(tt) {
-    const shards = shardsHost.querySelectorAll('.shard');
-
-    // Jitter always a bit in phase 0/1
-    const jitterAmt = lerp(1.6, 0.6, Math.min(1, tt / 0.35));
-    const jx = Math.sin((now() * 11.0) + 1.2) * jitterAmt;
-    const jy = Math.cos((now() * 13.0) + 0.7) * jitterAmt;
-
-    // Explosion progress
-    const expl = clamp01((tt - T_EXPLODE_START) / (T_SHARDS_FADE_START - T_EXPLODE_START));
-    const explE = easeOutCubic(expl);
-
-    // Violent zoom on shards (x4 at end of explosion)
-    const zoom = lerp(1.0, 4.0, explE);
-
-    // Overshoot distance so shards leave visible area on all formats.
-    const distBase = Math.max(window.innerWidth, window.innerHeight) * 1.25;
-    const dist = distBase * explE;
-
-    // Shards fade out around T_SHARDS_FADE_START..T_MOTIF_FUSE_START
-    const fade = clamp01((tt - T_SHARDS_FADE_START) / (T_MOTIF_FUSE_START - T_SHARDS_FADE_START));
-    const alpha = 1 - easeInOut(fade);
-
-    // Apply to each shard
-    shards.forEach((el) => {
-      const dxn = parseFloat(el.dataset.dxn || '0');
-      const dyn = parseFloat(el.dataset.dyn || '0');
-      const rot0 = parseFloat(el.dataset.rot || '0');
-      const spin = parseFloat(el.dataset.spin || '0');
-      const rot = rot0 + spin * explE;
-      const x = dxn * dist + jx;
-      const y = dyn * dist + jy;
-      el.style.opacity = String(alpha);
-      el.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${zoom.toFixed(3)})`;
+      document.documentElement.classList.remove('intro-lock');
+      document.body.classList.remove('intro-lock');
     });
 
-    // Also apply jitter/zoom to the intact logo image under shards (helps when alpha is low)
-    logoTextImg.style.transform = `translate3d(${jx.toFixed(2)}px, ${jy.toFixed(2)}px, 0) scale(${lerp(1, 1.08, explE).toFixed(3)})`;
-    logoTextImg.style.opacity = String(alpha);
-
-    // Motifs: tremble strong at start, recoil at T_MOTIF_RECOIL_START, then accelerate inward + zoom-to-height
-    const trem = Math.max(0.2, 1 - tt) * 1.6;
-    const mtX = Math.sin(now() * 10.7) * trem;
-    const mtY = Math.cos(now() * 12.3) * trem;
-
-    const recoilP = clamp01((tt - T_MOTIF_RECOIL_START) / (T_MOTIF_FUSE_START - T_MOTIF_RECOIL_START));
-    const recoilE = easeOutCubic(recoilP);
-
-    const fuseP = clamp01((tt - T_MOTIF_FUSE_START) / (T_END - T_MOTIF_FUSE_START));
-    const fuseE = easeInCubic(fuseP);
-
-    // Base offsets in vw to keep them around the center line.
-    const baseGap = Math.min(window.innerWidth * 0.10, 90);
-    const recoilOut = lerp(0, Math.min(window.innerWidth * 0.08, 80), recoilE);
-    const inMove = lerp(0, baseGap + recoilOut, fuseE);
-
-    // Zoom motif group to fill height as we fuse (dominant by end)
-    const motifZoom = lerp(1.0, 2.25, fuseE); // visual zoom; actual fit comes from CSS height
-    overlay.style.setProperty('--motifZoom', motifZoom.toFixed(3));
-
-    motifL.style.transform = `translate3d(${(-recoilOut + inMove + mtX).toFixed(2)}px, ${mtY.toFixed(2)}px, 0)`;
-    motifR.style.transform = `translate3d(${(recoilOut - inMove + mtX).toFixed(2)}px, ${mtY.toFixed(2)}px, 0)`;
-
-    // Shockwave at hit moment
-    const hit = clamp01((tt - T_MOTIF_FUSE_HIT) / 0.03);
-    const hitE = easeOutCubic(hit);
-    shock.style.opacity = String(lerp(0, 0.55, hitE));
-    shock.style.transform = `translate(-50%, -50%) scale(${lerp(0.25, 2.4, hitE).toFixed(3)})`;
-  }
-
-  function rafLoop(ts) {
-    if (!startTime) startTime = ts;
-
-    // Drive t
-    if (isHolding) {
-      tVel = Math.min(1.6, tVel + (HOLD_ACCEL / 60));
-    } else {
-      tVel = Math.max(0, tVel - (HOLD_ACCEL / 45));
-    }
-
-    t += (tVel * (1 / Math.max(0.001, SPEED))) * (1 / 60);
-    t = clamp01(t);
-
-    applyPhaseTransforms(t);
-
-    if (t >= 0.999) {
-      endIntro();
+    // load meta + build shards; keep fallback visible until first shard loads
+    showFallbackUntilShards(overlay, true);
+    let meta;
+    try {
+      meta = await loadMeta();
+    } catch (e) {
+      // fallback only, no crash
+      console.warn(e);
+      startTimeline(overlay);
       return;
     }
-    requestAnimationFrame(rafLoop);
-  }
+    buildShards(overlay, meta);
 
-  function wireArrow() {
-    // hold-to-play on mobile + desktop
-    const onDown = (e) => {
-      e.preventDefault();
-      isHolding = true;
-    };
-    const onUp = () => {
-      isHolding = false;
-    };
-
-    arrow.addEventListener('pointerdown', onDown, { passive: false });
-    window.addEventListener('pointerup', onUp, { passive: true });
-    window.addEventListener('pointercancel', onUp, { passive: true });
-    window.addEventListener('blur', onUp, { passive: true });
-  }
-
-  async function boot() {
-    if (prefersReducedMotion()) {
-      // Skip intro
-      overlay.remove();
-      curtain.classList.add('reveal-go');
-      return;
+    // wait first shard decode (best effort)
+    const first = overlay.querySelector('.intro-shard');
+    if (first && first.decode) {
+      try { await first.decode(); } catch (_) {}
     }
+    showFallbackUntilShards(overlay, false);
 
-    lockScroll();
-    setArrowVisible(true);
-    updateLogoBoxSizing();
-    await buildShards();
-
-    // Make sure shards align with the logo-texte image.
-    const imgUrl = getComputedStyle(logoTextImg).getPropertyValue('--logoTextUrl').trim();
-    const shards = shardsHost.querySelectorAll('.shard');
-    shards.forEach((s) => {
-      s.style.backgroundImage = imgUrl || `url(assets/intro/logo-texte.webp)`;
-    });
-
-    wireArrow();
-    requestAnimationFrame(rafLoop);
+    startTimeline(overlay);
   }
 
-  window.addEventListener('resize', () => {
-    updateLogoBoxSizing();
-  });
-
-  // Start once DOM is ready + images are likely cached.
+  // Only run on homepage / when intro.js is present
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot, { once: true });
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    boot();
+    init();
   }
 })();
