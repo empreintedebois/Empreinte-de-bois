@@ -1,62 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Empreinte-de-bois</title>
-
-  <!-- Site CSS -->
-  <link rel="stylesheet" href="styles.css" />
-  <!-- Intro CSS (isolé, n'affecte pas le site hors overlay) -->
-  <link rel="stylesheet" href="assets/intro/intro.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Empreinte-de-bois</title>
+<!-- Site CSS -->
+<link href="styles.css" rel="stylesheet"/>
+<!-- Intro CSS (isolé, n'affecte pas le site hors overlay) -->
+<link href="assets/intro/intro.css" rel="stylesheet"/>
 </head>
 <body>
-
-  <!-- INTRO OVERLAY -->
-  <div id="intro-overlay" aria-hidden="true">
-    <div id="intro-stage">
-      <img class="logo logo-motif logo-motif-left" src="assets/intro/logo-motif-left.webp" alt="" />
-      <img class="logo logo-text" src="assets/intro/logo-texte.webp" alt="" />
-      <img class="logo logo-motif logo-motif-right" src="assets/intro/logo-motif-right.webp" alt="" />
-      <div id="shards-layer" aria-hidden="true"></div>
-    </div>
-  </div>
-
-  <!-- SITE (squelette minimal compatible avec page.js) -->
-  <header class="page-shell">
-    <div class="hero">
-      <img class="hero-bg" src="assets/hero-bg.webp" alt="" />
-      <div class="hero-content">
-        <img class="brand-logo" src="assets/logo.webp" alt="Empreinte de bois" />
-      </div>
-    </div>
-  </header>
-
-  <main class="page-shell">
-    <section id="models">
-      <h2>Modèles</h2>
-      <div id="modelsGrid"></div>
-    </section>
-
-    <section id="contact">
-      <h2>Contact</h2>
-      <!-- ton formulaire existe déjà probablement via page.js / HTML; ici placeholder safe -->
-      <div class="contact-placeholder"></div>
-    </section>
-  </main>
-
-  <!-- Modal modelbox attendu par page.js -->
-  <div id="modelbox" class="modelbox" hidden>
-    <div id="modelbox-content">
-      <img id="modelbox-img" alt="" />
-    </div>
-  </div>
-
-  <!-- Site JS -->
-  <script src="page.js" defer></script>
-  <script src="gallery.js" defer></script>
-
-  <!-- Intro JS -->
-  <script src="assets/intro/intro.js" defer></script>
+<!-- INTRO OVERLAY -->
+<div aria-hidden="true" id="intro-overlay">
+<div id="intro-stage">
+<img alt="" class="logo logo-motif logo-motif-left" src="assets/intro/logo-motif-left.webp"/>
+<img alt="" class="logo logo-text" src="assets/intro/logo-texte.webp"/>
+<img alt="" class="logo logo-motif logo-motif-right" src="assets/intro/logo-motif-right.webp"/>
+<div aria-hidden="true" id="shards-layer"></div>
+</div>
+</div>
+<!-- SITE (squelette minimal compatible avec page.js) -->
+<header class="page-shell">
+<div class="hero">
+<img alt="" class="hero-bg" src="assets/hero-bg.webp"/>
+<div class="hero-content">
+<img alt="Empreinte de bois" class="brand-logo" src="assets/logo.webp"/>
+</div>
+</div>
+</header>
+<main class="page-shell">
+<section id="models">
+<h2>Modèles</h2>
+<div id="modelsGrid"></div>
+</section>
+<section id="contact">
+<h2>Contact</h2>
+<!-- ton formulaire existe déjà probablement via page.js / HTML; ici placeholder safe -->
+<div class="contact-placeholder"></div>
+</section>
+</main>
+<!-- Modal modelbox attendu par page.js -->
+<div class="modelbox" hidden="" id="modelbox">
+<div id="modelbox-content">
+<img alt="" id="modelbox-img"/>
+</div>
+</div>
+<!-- Site JS -->
+<script defer="" src="page.js"></script>
+<script defer="" src="gallery.js"></script>
+<!-- Intro JS -->
+<script defer="True" src="assets/intro/intro.js"></script>
 </body>
 </html>
