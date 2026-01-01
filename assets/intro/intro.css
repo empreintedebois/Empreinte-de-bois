@@ -1,16 +1,17 @@
-/* INTRO PATCH v17 - Root index + assets/intro */
-
-:root { color-scheme: dark; }
-html,body{margin:0;padding:0;width:100%;height:100%;background:transparent;}
-body{opacity:0;transition:opacity .5s ease;overflow:hidden;}
-body.intro-visible{opacity:1;}
-
+/* INTRO BLACKFIX PATCH */
+/* IMPORTANT: Do not set body opacity 0 globally. Overlay handles visibility. */
+html,body{margin:0;padding:0;width:100%;height:100%;}
+/* Overlay hidden by default to avoid flash; becomes visible on .intro-visible */
 #intro-overlay{
   position:fixed; inset:0;
   display:grid; place-items:center;
   background:transparent;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .5s ease;
   z-index:9999;
 }
+body.intro-visible #intro-overlay{ opacity:1; pointer-events:auto; }
 
 #intro-stage{
   position:relative;
@@ -21,41 +22,29 @@ body.intro-visible{opacity:1;}
 .logo{
   position:absolute;
   top:50%;
-  transform:translateY(-50%);
   height:100%;
   width:auto;
+  transform:translateY(-50%);
   pointer-events:none;
   user-select:none;
   -webkit-user-drag:none;
   animation:tremble .15s infinite alternate;
 }
+.logo-text{ left:50%; transform:translate(-50%,-50%); }
+.logo-motif-left{ left:0; }
+.logo-motif-right{ right:0; }
 
-.logo-text{left:50%; transform:translate(-50%,-50%);}
-.logo-motif-left{left:0%;}
-.logo-motif-right{right:0%;}
+body.merge .logo{ animation:none; } /* T4 no tremble */
 
-body.merge .logo{animation:none;} /* T4 no tremble */
-
-#shards-layer{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-}
-
-.shard{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  opacity:0; /* G0 */
-  transform:translateZ(0);
-}
-
-body.shards-visible .shard{opacity:1;}
-/* When shards visible, hide the original logo-text (crossfade can be added if you prefer) */
-body.shards-visible .logo-text{opacity:0; transition:opacity .2s ease;}
+#shards-layer{ position:absolute; inset:0; pointer-events:none; }
+.shard{ position:absolute; inset:0; width:100%; height:100%; opacity:0; }
+body.shards-visible .shard{ opacity:1; }
+body.shards-visible .logo-text{ opacity:0; transition: opacity .2s ease; }
 
 @keyframes tremble{
-  from{transform:translateY(-50%) translateX(-1px);}
-  to{transform:translateY(-50%) translateX(1px);}
+  from{ transform:translateY(-50%) translateX(-1px); }
+  to{ transform:translateY(-50%) translateX(1px); }
 }
+
+/* Failsafe: if intro skipped */
+body.intro-skip #intro-overlay{ display:none !important; }

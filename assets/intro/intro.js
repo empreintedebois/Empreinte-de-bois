@@ -1,48 +1,48 @@
 /*
-INTRO PATCH v17
-Arborescence:
-- index.html (root)
-- assets/intro/intro.js
-- assets/intro/intro.css
-- assets/intro/assets/*  (vos webp + shards_meta + shards/)
+INTRO BLACKFIX PATCH
+Fixes black screen by:
+- Correct asset paths (assets/intro/*)
+- Never keeping body at opacity:0 (overlay handles fade)
+- Gating: G0 loads logos only (no shards visible)
+- G1 fades in text+motif
+- T0 waits until shards decoded (with timeout failsafe)
+- T4 disables tremble during merge
 */
 
 const state = { logosReady:false, shardsReady:false };
 
 function waitImg(img){
-  if (img.decode) return img.decode().catch(()=>new Promise(r=>img.onload=()=>r()));
-  return new Promise(r=>img.onload=()=>r());
+  // If 404, neither decode nor load will resolve reliably; we add timeout.
+  const timeoutMs = 3000;
+  const p = img.decode ? img.decode().catch(()=>new Promise(r=>img.onload=()=>r())) : new Promise(r=>img.onload=()=>r());
+  return Promise.race([p, new Promise(r=>setTimeout(r, timeoutMs))]);
 }
 
 async function loadLogos(){
-  const imgs=document.querySelectorAll('.logo-text,.logo-motif');
+  const imgs = document.querySelectorAll('.logo-text,.logo-motif');
   await Promise.all([...imgs].map(waitImg));
-  state.logosReady=true;
+  state.logosReady = true;
 }
 
 async function ensureShardsInDom(){
-  const layer=document.getElementById('shards-layer');
+  const layer = document.getElementById('shards-layer');
   if(!layer) return;
   if(layer.querySelector('.shard')) return;
 
-  // Create shard <img> from meta if available
   try{
-    const res=await fetch('assets/intro/assets/shards_meta.json',{cache:'no-store'});
+    const res = await fetch('assets/intro/shards_meta.json', { cache:'no-store' });
     if(!res.ok) return;
-    const meta=await res.json();
+    const meta = await res.json();
     if(!meta || !Array.isArray(meta.shards)) return;
 
-    const frag=document.createDocumentFragment();
+    const frag = document.createDocumentFragment();
     for(const s of meta.shards){
-      const img=document.createElement('img');
-      img.className='shard';
-      img.alt='';
-      img.decoding='async';
-      img.loading='eager';
-      img.src=`assets/intro/assets/shards/${s.file}`;
-      // All shards share same origin/canvas => keep inset:0 via CSS
-      // If you want per-shard offsets, uncomment:
-      // img.style.left=(s.x||0)+'px'; img.style.top=(s.y||0)+'px';
+      const img = document.createElement('img');
+      img.className = 'shard';
+      img.alt = '';
+      img.decoding = 'async';
+      img.loading = 'eager';
+      img.src = `assets/intro/shards/${s.file}`;
       frag.appendChild(img);
     }
     layer.appendChild(frag);
@@ -51,32 +51,43 @@ async function ensureShardsInDom(){
 
 async function loadShards(){
   await ensureShardsInDom();
-  const shards=document.querySelectorAll('.shard');
+  const shards = document.querySelectorAll('.shard');
   if(!shards.length){ state.shardsReady=true; return; }
   await Promise.all([...shards].map(waitImg));
-  state.shardsReady=true;
+  state.shardsReady = true;
+}
+
+function endIntroFallback(){
+  // If something goes wrong, remove overlay and let site work.
+  document.body.classList.add('intro-skip');
+  const ov = document.getElementById('intro-overlay');
+  if(ov) ov.remove();
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
 }
 
 async function start(){
-  // G0: load only logos (no shards visible)
-  await loadLogos();
+  try{
+    // G0
+    await loadLogos();
+    document.body.classList.add('intro-visible'); // G1 fade in overlay
 
-  // G1: fade in logos/text/motif
-  document.body.classList.add('intro-visible');
+    // T0: wait shards (failsafe 6s)
+    const shardsPromise = (async()=>{ await loadShards(); })();
+    await Promise.race([
+      shardsPromise,
+      new Promise(r=>setTimeout(r, 6000))
+    ]);
 
-  // T0: wait until shards loaded (still not visible)
-  loadShards();
-  await new Promise(r=>{
-    const t=setInterval(()=>{ if(state.shardsReady){clearInterval(t);r();}},50);
-  });
+    // Continue even if shards not ready after timeout (but better than black screen)
+    document.body.classList.add('shards-visible'); // T1
+    document.body.classList.add('explode');        // T2
+    setTimeout(()=>document.body.classList.add('recoil'),1500); // T3
+    setTimeout(()=>document.body.classList.add('merge'),2500);  // T4
 
-  // T1: crossfade text -> shards
-  document.body.classList.add('shards-visible');
-
-  // Continue with your existing timeline hooks:
-  document.body.classList.add('explode');        // T2 (duration handled in your CSS/JS)
-  setTimeout(()=>document.body.classList.add('recoil'),1500); // T3
-  setTimeout(()=>document.body.classList.add('merge'),2500);  // T4 (no tremble)
+  }catch(e){
+    endIntroFallback();
+  }
 }
 
 window.addEventListener('DOMContentLoaded', start);
