@@ -1,358 +1,355 @@
-/* assets/intro/intro.js — FIX v21 (no deadlock, responsive, strict shards gating)
-   Macro flow (based on our agreed variables):
-   - G0: show 3 logos (no shards), strong shake during rest
-   - G1: fade-in 0.5s
-   - Hold >= 2s with shake while preloading shards
-   - T0: wait until ALL shards loaded/decoded
-   - Crossfade logo-text -> shards (0.5s)
-   - Explosion 1.5s
-   - Recoil 1.0s
-   - Merge motifs (compute px offsets so they TOUCH, not overlap), stop shake at T4
-   - Contemplation 2.0s
-   - Fade out overlay -> show site, unlock scroll
+/* assets/intro/intro.js — INTRO v24 (responsive + strict gating + full sequence)
+   Sequence (macro actions):
+   G0: show 3 logos (motif L + texte + motif R) WITHOUT shards, strong tremble (>=2s)
+   T0: shards preload in background; when all shards loaded => fade text->shards (G1)
+   P2: explode shards (~1.5s) + motifs recoil+shake
+   P3: motifs accelerate+merge while camera zooms so motif fills height
+   P4: reunite shards to original positions + swap back to logo-texte
+   P5: contemplation 2s (full logo visible)
+   P6: fade logos, keep dynamic background
+   P7: 1s pause with background only
+   P8: laser-curtain reveal (1s) then remove overlay, show site
 */
 
 (() => {
-  "use strict";
+  const qs = (s, r=document) => r.querySelector(s);
 
-  const DUR = {
-    fadeIn: 500,
-    rest: 2000,
-    crossfade: 500,
-    explode: 1500,
-    recoil: 1000,
-    mergeMove: 520,
-    contemplation: 2000,
-    overlayFadeOut: 650,
+  const BASE = 'assets/intro';
+  const PATHS = {
+    left:  `${BASE}/logo-motif-left.webp`,
+    right: `${BASE}/logo-motif-right.webp`,
+    text:  `${BASE}/logo-texte.webp`,
+    meta:  `${BASE}/shards_meta.json`,
+    shardsDir: `${BASE}/shards`,
+    bg:    `assets/fond/fond-gris-h.webp`,
   };
 
-  const PATH = {
-    left: "assets/intro/logo-motif-left.webp",
-    right: "assets/intro/logo-motif-right.webp",
-    text: "assets/intro/logo-texte.webp",
-    meta: "assets/intro/shards_meta.json",
-    shardsDir: "assets/intro/shards/"
+  const DUR = {
+    trembleMin: 2000,
+    explode: 1500,
+    recoil: 1000,
+    merge: 900,
+    reunite: 900,
+    contemplate: 2000,
+    fadeOut: 700,
+    bgPause: 1000,
+    reveal: 1000,
+    bootFade: 500,
   };
 
   function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-  function waitImg(img){
-    return new Promise(resolve => {
-      if (!img) return resolve(false);
-      if (img.complete && img.naturalWidth > 0) return resolve(true);
-      img.addEventListener("load", () => resolve(true), { once:true });
-      img.addEventListener("error", () => resolve(false), { once:true });
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+  function createOverlay(){
+    const ov = document.createElement('div');
+    ov.className = 'intro-overlay';
+    ov.innerHTML = `
+      <div class="intro-bg" aria-hidden="true">
+        <div class="bg-layer bg-base"></div>
+        <div class="bg-layer bg-glow"></div>
+        <div class="bg-layer bg-noise"></div>
+      </div>
+      <div class="intro-stage" id="intro-stage">
+        <div class="intro-logo-row" id="intro-row">
+          <img id="intro-motif-left" class="intro-logo intro-motif" alt="" decoding="async" />
+          <div class="intro-center">
+            <img id="intro-logo-text" class="intro-logo intro-text" alt="" decoding="async" />
+            <div id="intro-shards" class="shards-box" aria-hidden="true"></div>
+          </div>
+          <img id="intro-motif-right" class="intro-logo intro-motif" alt="" decoding="async" />
+        </div>
+      </div>
+      <div class="intro-reveal" id="intro-reveal" aria-hidden="true">
+        <div class="laser-head"></div>
+      </div>
+    `;
+    document.body.appendChild(ov);
+
+    // Background assets
+    ov.querySelector('.bg-base').style.backgroundImage = `url('${PATHS.bg}')`;
+    return ov;
+  }
+
+  function loadImage(url){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('Failed to load ' + url));
+      img.src = url;
     });
   }
 
-  async function preloadUrl(url){
-    const img = new Image();
-    img.decoding = "async";
-    img.loading = "eager";
-    img.src = url;
-    const ok = await waitImg(img);
-    // decode improves rendering readiness (avoid half shards popping)
-    if (ok && img.decode){
-      try{ await img.decode(); }catch{}
-    }
-    return ok;
+  async function fetchJSON(url){
+    const res = await fetch(url, {cache: 'no-store'});
+    if (!res.ok) throw new Error(`fetch ${url} -> ${res.status}`);
+    return await res.json();
   }
 
-  function lockScroll(){
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.touchAction = "none";
-  }
-  function unlockScroll(){
-    document.documentElement.style.overflow = "";
-    document.body.style.overflow = "";
-    document.documentElement.style.touchAction = "";
-  }
+  function computeLayout(){
+    const vw = Math.max(320, window.innerWidth);
+    const vh = Math.max(480, window.innerHeight);
 
-  function ensureDom(){
-    // overlay
-    let overlay = document.getElementById("intro-overlay");
-    if (!overlay){
-      overlay = document.createElement("div");
-      overlay.id = "intro-overlay";
-      document.body.appendChild(overlay);
-    }
+    // Aspect ratios
+    const arText = 16/9;
+    const arMotif = 1/3; // width/height
 
-    let stage = document.getElementById("intro-stage");
-    if (!stage){
-      stage = document.createElement("div");
-      stage.id = "intro-stage";
-      overlay.appendChild(stage);
-    }
+    // Total width coef: 2*arMotif + arText + gapCoef
+    const gapCoef = 0.06;
+    const totalCoef = (2*arMotif) + arText + gapCoef;
 
-    let row = document.getElementById("intro-row");
-    if (!row){
-      row = document.createElement("div");
-      row.id = "intro-row";
-      stage.appendChild(row);
-    }
+    let hFromWidth = (vw * 0.95) / totalCoef;
+    let hFromHeight = vh * 0.52;
+    const h = clamp(Math.min(hFromWidth, hFromHeight), 120, 520);
 
-    function ensureImg(id, cls, src){
-      let el = document.getElementById(id);
-      if (!el){
-        el = document.createElement("img");
-        el.id = id;
-        el.className = cls;
-        row.appendChild(el);
-      }
-      el.src = src;
-      return el;
-    }
+    const motifW = h * arMotif;
+    const textW = h * arText;
+    const gap = h * gapCoef;
 
-    const left = ensureImg("intro-logo-left", "logo-motif left", PATH.left);
-    const text = ensureImg("intro-logo-text", "logo-text", PATH.text);
-    const right = ensureImg("intro-logo-right", "logo-motif right", PATH.right);
-
-    // shards layer
-    let shards = document.getElementById("intro-shards");
-    if (!shards){
-      shards = document.createElement("div");
-      shards.id = "intro-shards";
-      stage.appendChild(shards);
-    }
-    let box = document.getElementById("intro-shards-box");
-    if (!box){
-      box = document.createElement("div");
-      box.id = "intro-shards-box";
-      shards.appendChild(box);
-    }
-
-    // shockwave
-    let shock = document.getElementById("intro-shockwave");
-    if (!shock){
-      shock = document.createElement("div");
-      shock.id = "intro-shockwave";
-      stage.appendChild(shock);
-    }
-
-    return { overlay, stage, row, left, text, right, shards, box, shock };
+    return { vw, vh, h, motifW, textW, gap };
   }
 
-  function measureTextBox(wrapEls){
-    const { stage, text } = wrapEls;
-    const stageRect = stage.getBoundingClientRect();
-    const textRect = text.getBoundingClientRect();
-    const w = Math.max(10, textRect.width);
-    const h = Math.max(10, textRect.height);
-    const pctW = (w / stageRect.width) * 100;
-    const pctH = (h / stageRect.height) * 100;
-    stage.style.setProperty("--textW", pctW.toFixed(3) + "%");
-    stage.style.setProperty("--textH", pctH.toFixed(3) + "%");
+  function applyLayout(stage){
+    const {h, motifW, textW, gap} = computeLayout();
+    stage.style.setProperty('--logoH', `${h}px`);
+    stage.style.setProperty('--motifW', `${motifW}px`);
+    stage.style.setProperty('--textW', `${textW}px`);
+    stage.style.setProperty('--logoGap', `${gap}px`);
   }
 
-  async function loadMetaFiles(){
-    try{
-      const res = await fetch(PATH.meta, { cache:"no-store" });
-      if (!res.ok) return null;
-      const j = await res.json();
-      if (Array.isArray(j.files) && j.files.length) return j.files;
-      if (Array.isArray(j.shards) && j.shards.length) return j.shards.map(s => s.file).filter(Boolean);
-      if (Number.isFinite(j.count)){
-        const out = [];
-        for (let i=1;i<=j.count;i++){
-          out.push("shard_" + String(i).padStart(3,"0") + ".webp");
-        }
-        return out;
-      }
-      return null;
-    }catch{
-      return null;
-    }
+  function setVisibility(el, on){
+    el.style.opacity = on ? '1' : '0';
+    el.style.pointerEvents = on ? 'auto' : 'none';
   }
 
-  async function preloadAllShards(files){
-    // strict preload: ALL shards must be loaded/decoded before we show them
-    const urls = files.map(f => PATH.shardsDir + f);
-    const results = await Promise.all(urls.map(preloadUrl));
-    const okCount = results.filter(Boolean).length;
-    return { urls, results, okCount };
+  function startTremble(row){
+    row.classList.add('tremble');
+  }
+  function stopTremble(row){
+    row.classList.remove('tremble');
   }
 
-  function buildShardDom(box, urls){
-    box.innerHTML = "";
-    const frag = document.createDocumentFragment();
-    const imgs = [];
-    for (const url of urls){
-      const img = document.createElement("img");
-      img.className = "intro-shard";
-      img.alt = "";
-      img.decoding = "async";
-      img.loading = "eager";
-      img.src = url;
-      frag.appendChild(img);
-      imgs.push(img);
-    }
-    box.appendChild(frag);
-    return imgs;
+  function makeShardEl(src){
+    const img = document.createElement('img');
+    img.className = 'shard';
+    img.decoding = 'async';
+    img.alt = '';
+    img.draggable = false;
+    img.src = src;
+    return img;
   }
 
-  function setOpacity(el, v){ el.style.opacity = String(v); }
-
-  function addShake(els, on){
-    [els.left, els.text, els.right].forEach(e => e.classList.toggle("shake-strong", !!on));
+  function getRect(el){
+    const r = el.getBoundingClientRect();
+    return {x:r.left, y:r.top, w:r.width, h:r.height};
   }
 
-  function ping(els){
-    els.shock.classList.remove("ping");
-    void els.shock.offsetWidth;
-    els.shock.classList.add("ping");
-  }
-
-  function computeMergeTouchOffsets(els){
-    // Goal: make left/right motifs TOUCH (their inner edges meet), regardless of screen size
-    const sb = els.stage.getBoundingClientRect();
-    const lb = els.left.getBoundingClientRect();
-    const rb = els.right.getBoundingClientRect();
-    const center = sb.left + sb.width/2;
-
-    const leftInnerEdge = lb.left + lb.width;
-    const rightInnerEdge = rb.left;
-
-    const dxL = center - leftInnerEdge;   // push left toward center
-    const dxR = center - rightInnerEdge;  // push right toward center
-
-    return { dxL, dxR };
-  }
+  function randomSigned(){ return (Math.random()*2-1); }
 
   async function run(){
-    const els = ensureDom();
+    const html = document.documentElement;
+    html.classList.add('intro-active');
 
-    // prevent site flash
-    document.documentElement.classList.add("intro-pre");
-    document.body.classList.add("intro-running");
+    const overlay = createOverlay();
+    const stage = qs('#intro-stage', overlay);
+    const row = qs('#intro-row', overlay);
+    const imgL = qs('#intro-motif-left', overlay);
+    const imgR = qs('#intro-motif-right', overlay);
+    const imgT = qs('#intro-logo-text', overlay);
+    const shardsBox = qs('#intro-shards', overlay);
+    const reveal = qs('#intro-reveal', overlay);
 
-    lockScroll();
+    // Bind assets
+    imgL.src = PATHS.left;
+    imgR.src = PATHS.right;
+    imgT.src = PATHS.text;
 
-    // G0: preload logos only
-    await Promise.all([waitImg(els.left), waitImg(els.text), waitImg(els.right)]);
-    if (els.left.decode) { try{ await els.left.decode(); }catch{} }
-    if (els.text.decode) { try{ await els.text.decode(); }catch{} }
-    if (els.right.decode){ try{ await els.right.decode(); }catch{} }
+    // Layout
+    const relayout = () => applyLayout(stage);
+    relayout();
+    window.addEventListener('resize', relayout);
 
-    // measure after images are ready
-    measureTextBox(els);
-    window.addEventListener("resize", () => measureTextBox(els), { passive:true });
-
-    // fade-in overlay + logos
-    els.overlay.style.opacity = "1";
-    setOpacity(els.left, 0); setOpacity(els.text, 0); setOpacity(els.right, 0);
-
-    els.left.animate([{opacity:0},{opacity:1}], { duration:DUR.fadeIn, fill:"forwards", easing:"ease-out" });
-    els.text.animate([{opacity:0},{opacity:1}], { duration:DUR.fadeIn, fill:"forwards", easing:"ease-out" });
-    els.right.animate([{opacity:0},{opacity:1}],{ duration:DUR.fadeIn, fill:"forwards", easing:"ease-out" });
-
-    // strong shake during rest
-    addShake(els, true);
-
-    // Start shards preload during rest
-    const files = (await loadMetaFiles()) || [];
-    const shardsJob = (files.length ? preloadAllShards(files) : Promise.resolve({urls:[], results:[], okCount:0}));
-
-    // Rest minimum 2s
-    await sleep(DUR.rest);
-
-    // T0: wait until ALL shards loaded (strict)
-    const shardInfo = await shardsJob;
-    const allOk = shardInfo.urls.length > 0 && shardInfo.okCount === shardInfo.urls.length;
-
-    // If shards not all OK, we do NOT switch to shards (avoids "half shards" state)
-    // We still continue the sequence using the logo-text as fallback.
-    let shardImgs = [];
-    if (allOk){
-      shardImgs = buildShardDom(els.box, shardInfo.urls);
-      // Wait DOM imgs decode too (avoid partial draw)
-      await Promise.all(shardImgs.map(waitImg));
-      for (const im of shardImgs){
-        if (im.decode){ try{ await im.decode(); }catch{} }
-      }
-      // Allow the browser to paint once
-      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-    }
-
-    // Crossfade text -> shards (0.5s)
-    if (allOk){
-      // show shards
-      shardImgs.forEach(im => setOpacity(im, 1));
-      const aText = els.text.animate([{opacity:1},{opacity:0}], { duration:DUR.crossfade, fill:"forwards", easing:"ease-in-out" });
-      shardImgs.forEach(im => im.animate([{opacity:0},{opacity:1}], { duration:DUR.crossfade, fill:"forwards", easing:"ease-in-out" }));
-      try{ await aText.finished; }catch{}
-    }
-
-    // T4: stop shake before explosion/merge
-    addShake(els, false);
-
-    // Explosion 1.5s (shards if available, else logo-text)
-    const W = window.innerWidth;
-    const H = window.innerHeight;
-    const radius = Math.hypot(W, H) * 0.75;
-
-    const explodeTargets = allOk ? shardImgs : [els.text];
-    const N = explodeTargets.length;
-
-    explodeTargets.forEach((t, i) => {
-      const ang = (i / Math.max(1, N)) * Math.PI * 2;
-      const dx = Math.cos(ang) * radius;
-      const dy = Math.sin(ang) * radius;
-      const rot = (Math.random()*140 - 70);
-      const sc  = 0.9 + Math.random()*0.7;
-      t.animate(
-        [{ transform:"translate3d(0,0,0) rotate(0deg) scale(1)", opacity:1 },
-         { transform:`translate3d(${dx}px,${dy}px,0) rotate(${rot}deg) scale(${sc})`, opacity:0 }],
-        { duration:DUR.explode, fill:"forwards", easing:"cubic-bezier(.2,.9,.2,1)" }
-      );
+    // Boot fade so everything appears cleanly
+    overlay.style.opacity = '0';
+    requestAnimationFrame(() => {
+      overlay.style.transition = `opacity ${DUR.bootFade}ms ease`;
+      overlay.style.opacity = '1';
     });
 
-    await sleep(DUR.explode);
+    // G0: show logos without shards
+    shardsBox.innerHTML = '';
+    shardsBox.classList.remove('on');
+    setVisibility(imgT, true);
 
-    // Recoil 1s (subtle zoom back of the whole stage)
-    els.stage.animate([{transform:"scale(1)"},{transform:"scale(0.96)"}], { duration:DUR.recoil, fill:"forwards", easing:"ease-in-out" });
-    await sleep(120);
+    startTremble(row);
 
-    // Merge: compute px offsets so motifs TOUCH
-    const { dxL, dxR } = computeMergeTouchOffsets(els);
+    // Start shards preload in parallel
+    let meta, shardUrls = [];
+    try {
+      meta = await fetchJSON(PATHS.meta);
+      const count = Number(meta.count) || 0;
+      for (let i=0;i<count;i++) shardUrls.push(`${PATHS.shardsDir}/${String(i).padStart(2,'0')}.webp`);
+    } catch(e){
+      console.warn('[intro] shards_meta missing/invalid', e);
+    }
 
-    const aL = els.left.animate(
-      [{ transform:"translate3d(0,0,0)"},{ transform:`translate3d(${dxL}px,0,0)`}],
-      { duration:DUR.mergeMove, fill:"forwards", easing:"cubic-bezier(.2,.9,.2,1)" }
-    );
-    const aR = els.right.animate(
-      [{ transform:"translate3d(0,0,0)"},{ transform:`translate3d(${dxR}px,0,0)`}],
-      { duration:DUR.mergeMove, fill:"forwards", easing:"cubic-bezier(.2,.9,.2,1)" }
-    );
+    // Preload core images first (motifs + text) so they don't pop
+    await Promise.allSettled([loadImage(PATHS.left), loadImage(PATHS.right), loadImage(PATHS.text)]);
 
+    const shardLoadTimeout = 12000;
+    const shardLoadStart = performance.now();
+
+    let shardOk = false;
+    if (shardUrls.length){
+      const results = await Promise.allSettled(shardUrls.map(loadImage));
+      const ok = results.filter(r => r.status==='fulfilled').length;
+      shardOk = ok === shardUrls.length;
+      if (!shardOk) console.warn(`[intro] shards loaded ${ok}/${shardUrls.length}`);
+    }
+
+    // Ensure tremble lasts at least DUR.trembleMin even if shards load fast
+    const elapsed = performance.now() - shardLoadStart;
+    if (elapsed < DUR.trembleMin) await sleep(DUR.trembleMin - elapsed);
+
+    // G1: if shards ready -> fade text to shards
+    if (shardOk){
+      // Build shard elements
+      shardsBox.innerHTML = '';
+      shardUrls.forEach((u) => shardsBox.appendChild(makeShardEl(u)));
+      shardsBox.classList.add('on');
+
+      // Align shardsBox exactly over text image
+      // (It already shares the same center box; sizing via CSS vars)
+
+      // Crossfade
+      imgT.style.transition = 'opacity 400ms ease';
+      shardsBox.style.transition = 'opacity 400ms ease';
+      setVisibility(imgT, false);
+      shardsBox.style.opacity = '1';
+      await sleep(450);
+    } else {
+      // Stay on text only
+      shardsBox.style.opacity = '0';
+    }
+
+    // P2: explode shards
+    stopTremble(row);
+
+    const shards = Array.from(shardsBox.querySelectorAll('img.shard'));
+    const boxRect = getRect(shardsBox);
+
+    // Prime positions so reunite works
+    shards.forEach((s) => {
+      s.style.position = 'absolute';
+      s.style.inset = '0';
+      s.style.transform = 'translate3d(0,0,0) rotate(0deg) scale(1)';
+      s.dataset.tx0 = '0';
+      s.dataset.ty0 = '0';
+      s.dataset.r0 = '0';
+    });
+
+    // Explosion (only if we have shards)
+    if (shards.length){
+      const maxTravel = Math.max(boxRect.w, boxRect.h) * 1.6;
+      const centerBias = 0.25;
+
+      shards.forEach((s, idx) => {
+        const a = (idx / shards.length) * Math.PI*2;
+        const jitter = randomSigned() * 0.6;
+        const dirx = Math.cos(a) + jitter;
+        const diry = Math.sin(a) - 0.2 + randomSigned()*0.5;
+        const len = maxTravel * (0.65 + Math.random()*0.55);
+
+        const tx = dirx * len;
+        const ty = diry * len;
+        const rot = randomSigned() * (30 + Math.random()*60);
+        const sc = 1 + Math.random()*0.25;
+
+        s.dataset.tx1 = String(tx);
+        s.dataset.ty1 = String(ty);
+        s.dataset.r1 = String(rot);
+        s.dataset.s1 = String(sc);
+
+        s.style.transition = `transform ${DUR.explode}ms cubic-bezier(.2,.9,.2,1), opacity ${DUR.explode}ms ease`;
+        s.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotate(${rot}deg) scale(${sc})`;
+        s.style.opacity = '1';
+      });
+
+      // Fade shards slightly near end so they don't stick in view
+      setTimeout(() => {
+        shards.forEach((s)=>{ s.style.opacity = '0.0'; });
+      }, Math.max(0, DUR.explode - 400));
+
+      // Motifs recoil while shards explode
+      row.classList.add('recoil');
+      await sleep(DUR.explode);
+      row.classList.remove('recoil');
+    }
+
+    // P3: motifs merge + strong zoom (motif fills screen height)
+    // We zoom the whole row while moving motifs toward center.
+    row.classList.add('merge');
+    await sleep(DUR.merge);
+    row.classList.remove('merge');
+
+    // P4: reunite shards and swap back to logo text
+    if (shards.length){
+      shards.forEach((s) => {
+        s.style.transition = `transform ${DUR.reunite}ms cubic-bezier(.2,.7,.2,1), opacity ${DUR.reunite}ms ease`;
+        s.style.transform = 'translate3d(0,0,0) rotate(0deg) scale(1)';
+        s.style.opacity = '1';
+      });
+      await sleep(DUR.reunite);
+
+      // Swap back
+      shardsBox.style.transition = 'opacity 350ms ease';
+      imgT.style.transition = 'opacity 350ms ease';
+      shardsBox.style.opacity = '0';
+      setVisibility(imgT, true);
+      await sleep(380);
+      shardsBox.classList.remove('on');
+      shardsBox.innerHTML = '';
+    }
+
+    // P5: contemplation
+    startTremble(row);
+    await sleep(300);
+    stopTremble(row);
+    await sleep(DUR.contemplate);
+
+    // P6: fade logos out, keep bg
+    row.style.transition = `opacity ${DUR.fadeOut}ms ease`;
+    row.style.opacity = '0';
+    await sleep(DUR.fadeOut + 30);
+
+    // P7: pause on background only
+    await sleep(DUR.bgPause);
+
+    // P8: laser curtain reveal
+    reveal.classList.add('on');
+    await sleep(DUR.reveal);
+
+    // Done
+    html.classList.remove('intro-active');
+    html.classList.add('intro-done');
+
+    overlay.style.transition = 'opacity 400ms ease';
+    overlay.style.opacity = '0';
     await sleep(420);
-    ping(els);
-    try{ await Promise.all([aL.finished, aR.finished]); }catch{}
-
-    // Contemplation 2s
-    await sleep(DUR.contemplation);
-
-    // Fade out overlay -> reveal site
-    await els.overlay.animate([{opacity:1},{opacity:0}], { duration:DUR.overlayFadeOut, fill:"forwards", easing:"ease-in-out" }).finished.catch(()=>{});
-
-    // End intro
-    try{ els.overlay.remove(); }catch{}
-    document.body.classList.remove("intro-running");
-    document.body.classList.add("intro-done");
-    document.documentElement.classList.remove("intro-pre");
-
-    unlockScroll();
+    overlay.remove();
   }
 
-  window.addEventListener("DOMContentLoaded", () => {
-    // Start immediately; if it crashes, don't keep the site hidden.
-    run().catch(() => {
-      document.body.classList.remove("intro-running");
-      document.body.classList.add("intro-done");
-      document.documentElement.classList.remove("intro-pre");
-      unlockScroll();
-      const ov = document.getElementById("intro-overlay");
-      if (ov) { try{ ov.remove(); }catch{} }
-    });
-  });
+  // Kick ASAP (works with defer)
+  try {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, {once:true});
+    } else {
+      run();
+    }
+  } catch(e){
+    console.error('[intro] fatal', e);
+    document.documentElement.classList.remove('intro-active');
+    document.documentElement.classList.add('intro-done');
+  }
 })();
