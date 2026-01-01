@@ -1,0 +1,61 @@
+/* INTRO PATCH v17 - Root index + assets/intro */
+
+:root { color-scheme: dark; }
+html,body{margin:0;padding:0;width:100%;height:100%;background:transparent;}
+body{opacity:0;transition:opacity .5s ease;overflow:hidden;}
+body.intro-visible{opacity:1;}
+
+#intro-overlay{
+  position:fixed; inset:0;
+  display:grid; place-items:center;
+  background:transparent;
+  z-index:9999;
+}
+
+#intro-stage{
+  position:relative;
+  width:min(92vw, 1100px);
+  aspect-ratio:16/9;
+}
+
+.logo{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  height:100%;
+  width:auto;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+  animation:tremble .15s infinite alternate;
+}
+
+.logo-text{left:50%; transform:translate(-50%,-50%);}
+.logo-motif-left{left:0%;}
+.logo-motif-right{right:0%;}
+
+body.merge .logo{animation:none;} /* T4 no tremble */
+
+#shards-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.shard{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0; /* G0 */
+  transform:translateZ(0);
+}
+
+body.shards-visible .shard{opacity:1;}
+/* When shards visible, hide the original logo-text (crossfade can be added if you prefer) */
+body.shards-visible .logo-text{opacity:0; transition:opacity .2s ease;}
+
+@keyframes tremble{
+  from{transform:translateY(-50%) translateX(-1px);}
+  to{transform:translateY(-50%) translateX(1px);}
+}
