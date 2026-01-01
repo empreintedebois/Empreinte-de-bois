@@ -1,11 +1,139 @@
-/* INTRO META FIX PATCH */
-/* Keep overlay-based fade; do not hide the whole page */
-#intro-overlay{opacity:0;pointer-events:none;transition:opacity .5s ease;}
-body.intro-visible #intro-overlay{opacity:1;pointer-events:auto;}
+/* INTRO GOOD PATCH
+   Scope: only affects #intro-overlay subtree
+   Goals:
+   - Fix layout/sizing responsive (16:9 stage)
+   - Restore tremble
+   - Keep G0 no shards visible
+   - Crossfade text -> shards only if body.has-shards + .shards-visible
+   - Provide basic explode/recoil/merge animations (hooked via body classes)
+*/
 
-/* Shards hidden by default */
-.shard{opacity:0;}
-/* Show shards only when both: has-shards and shards-visible */
-body.has-shards.shards-visible .shard{opacity:1;}
-/* Hide logo-text only if shards exist and are shown */
-body.has-shards.shards-visible .logo-text{opacity:0;transition:opacity .2s ease;}
+#intro-overlay{
+  position:fixed;
+  inset:0;
+  display:grid;
+  place-items:center;
+  z-index:9999;
+  background: transparent;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .5s ease;
+}
+
+body.intro-visible #intro-overlay{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* Stage = 16:9 reference box, scales with viewport */
+#intro-stage{
+  position:relative;
+  width:min(92vw, 1200px);
+  aspect-ratio:16/9;
+  overflow:visible;
+}
+
+/* Base logo rules */
+#intro-stage .logo{
+  position:absolute;
+  top:50%;
+  height:100%;
+  width:auto;
+  transform:translateY(-50%);
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+  will-change: transform, opacity;
+}
+
+/* Positions: left / center / right */
+#intro-stage .logo-text{
+  left:50%;
+  transform:translate(-50%,-50%);
+  transition:opacity .2s ease;
+}
+#intro-stage .logo-motif-left{ left:0; }
+#intro-stage .logo-motif-right{ right:0; }
+
+/* Tremble (Phase T0) */
+body.tremble #intro-stage .logo{
+  animation:intro-tremble .14s infinite alternate;
+}
+body.merge #intro-stage .logo{
+  animation:none; /* T4: stop tremble */
+}
+
+@keyframes intro-tremble{
+  from{ transform:translateY(-50%) translateX(-1.2px) rotate(-0.15deg); }
+  to  { transform:translateY(-50%) translateX( 1.2px) rotate( 0.15deg); }
+}
+/* Keep special transforms for center logo */
+body.tremble #intro-stage .logo-text{
+  animation:intro-tremble-center .14s infinite alternate;
+}
+@keyframes intro-tremble-center{
+  from{ transform:translate(-50%,-50%) translateX(-1.2px) rotate(-0.12deg); }
+  to  { transform:translate(-50%,-50%) translateX( 1.2px) rotate( 0.12deg); }
+}
+
+/* Shards layer */
+#shards-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  will-change: transform;
+}
+
+#shards-layer .shard{
+  position:absolute;
+  inset:0;          /* same origin/canvas */
+  width:100%;
+  height:100%;
+  opacity:0;        /* G0: invisible */
+  transform: translate(0px,0px) scale(1);
+  will-change: transform, opacity;
+}
+
+/* Only show shards when they exist and we explicitly reveal them */
+body.has-shards.shards-visible #shards-layer .shard{
+  opacity:1;
+}
+
+/* Crossfade: hide logo-text only if shards exist and are being shown */
+body.has-shards.shards-visible #intro-stage .logo-text{
+  opacity:0;
+}
+
+/* Explosion (T2): 1.5s, shards move outward + zoom-in feel */
+body.explode #shards-layer .shard{
+  transition: transform 1.5s cubic-bezier(.2,.8,.2,1), opacity .6s ease;
+  transform: translate(var(--dx,0px), var(--dy,0px)) scale(var(--ds,1));
+}
+
+/* Fade shards after explosion when class fade-shards is set */
+body.fade-shards #shards-layer .shard{
+  opacity:0;
+  transition: opacity .6s ease;
+}
+
+/* Recoil (T3): motifs pull back slightly */
+body.recoil #intro-stage .logo-motif-left{
+  transition: transform 1s ease;
+  transform: translateY(-50%) translateX(-4%) scale(.98);
+}
+body.recoil #intro-stage .logo-motif-right{
+  transition: transform 1s ease;
+  transform: translateY(-50%) translateX( 4%) scale(.98);
+}
+
+/* Merge (T4): motifs snap to center, no tremble */
+body.merge #intro-stage .logo-motif-left,
+body.merge #intro-stage .logo-motif-right{
+  transition: transform .8s cubic-bezier(.15,.9,.2,1);
+  /* move to center; JS sets --mx to half width offset if needed; default 0 works when symmetric */
+}
+body.merge #intro-stage .logo-motif-left{ transform: translateY(-50%) translateX(var(--mxL, 50%)) scale(1); }
+body.merge #intro-stage .logo-motif-right{ transform: translateY(-50%) translateX(var(--mxR, -50%)) scale(1); }
+
+/* Safety: if intro is skipped */
+body.intro-skip #intro-overlay{ display:none !important; }
