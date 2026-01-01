@@ -109,6 +109,32 @@ html.intro-lock, body.intro-lock {
   will-change: transform, opacity;
 }
 
+/* Reveal band that runs AFTER the intro, on top of the site */
+#site-reveal{
+  position: fixed;
+  left: -10vw;
+  width: 120vw;
+  height: 9vh;
+  top: -30vh;
+  z-index: 9998;
+  background: linear-gradient(to bottom, transparent, rgba(255,200,80,0.16), rgba(255,255,255,0.10), transparent);
+  filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+#site-reveal.on{
+  opacity: 1;
+  transform: translateY(130vh);
+  transition: transform 1.2s ease-in-out, opacity 0.2s linear;
+}
+
+#site-reveal.off{
+  opacity: 0;
+  transition: opacity 0.25s linear;
+}
+
 #intro-overlay .intro-skip{
   position: absolute;
   right: 14px;

@@ -11,22 +11,53 @@
   const MOTIF_R_URL = `${ASSET_BASE}/logo-motif-right.webp`;
 
   // Timing (seconds)
-  const T = {
-    // phase 0 start
-    explodeStart: 0.0,
-    recoilStart: 0.5,
-    shardsFadeStart: 0.75,
-    mergeStart: 1.0,
-    mergeEnd: 1.9,
-    overlayFadeStart: 2.0,
-    overlayFadeEnd: 2.35,
-    revealStart: 2.0,   // starts right after merge, no pause
-    revealEnd: 2.8
+  // Requested:
+  // - Hold all 3 logos visible with tremble >= 2s
+  // - Explosion
+  // - Reunion
+  // - 2s contemplation
+  // - Fade -> site
+  // - Site visible 1s -> reveal sweep
+  const TIMING = {
+    hold: 2.0,
+    explode: 1.1,
+    merge: 0.9,
+    contemplate: 2.0,
+    overlayFade: 0.6,
+    siteHoldBeforeReveal: 1.0,
+    reveal: 1.2,
   };
+
+  const T = (() => {
+    const holdStart = 0.0;
+    const explodeStart = holdStart + TIMING.hold;
+    const explodeEnd = explodeStart + TIMING.explode;
+    const mergeStart = explodeEnd;
+    const mergeEnd = mergeStart + TIMING.merge;
+    const contemplateEnd = mergeEnd + TIMING.contemplate;
+    const overlayFadeStart = contemplateEnd;
+    const overlayFadeEnd = overlayFadeStart + TIMING.overlayFade;
+    const revealStart = overlayFadeEnd + TIMING.siteHoldBeforeReveal;
+    const revealEnd = revealStart + TIMING.reveal;
+    return {
+      holdStart,
+      explodeStart,
+      explodeEnd,
+      recoilStart: holdStart,
+      shardsFadeStart: explodeStart + TIMING.explode * 0.55,
+      mergeStart,
+      mergeEnd,
+      contemplateEnd,
+      overlayFadeStart,
+      overlayFadeEnd,
+      revealStart,
+      revealEnd,
+    };
+  })();
 
   // Motion
   const EXPLODE = {
-    duration: 1.0,     // from explodeStart
+    duration: TIMING.explode, // from explodeStart
     zoomTo: 4.0,       // global zoom during explosion
     maxTravel: 1.25,   // as fraction of viewport max(vw,vh)
     rotMaxDeg: 22
@@ -78,6 +109,33 @@
     `;
     document.body.appendChild(overlay);
     return overlay;
+  }
+
+  function runSiteReveal(delaySec, durationSec) {
+    // A fixed glowing band that sweeps down over the page, AFTER the intro.
+    const existing = document.getElementById('site-reveal');
+    if (existing) existing.remove();
+
+    const el = document.createElement('div');
+    el.id = 'site-reveal';
+    el.setAttribute('aria-hidden', 'true');
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-30vh)';
+    document.body.appendChild(el);
+
+    const delayMs = Math.max(0, (delaySec || 0) * 1000);
+    const durMs = Math.max(300, (durationSec || 1.0) * 1000);
+    const t0 = performance.now() + delayMs;
+
+    function step(now) {
+      if (now < t0) return requestAnimationFrame(step);
+      const u = clamp((now - t0) / durMs, 0, 1);
+      el.style.opacity = u < 0.1 ? String(u / 0.1) : (u > 0.9 ? String((1 - u) / 0.1) : '1');
+      el.style.transform = `translateY(${lerp(-30, 120, u)}vh)`;
+      if (u < 1) requestAnimationFrame(step);
+      else el.remove();
+    }
+    requestAnimationFrame(step);
   }
 
   function setResponsiveSizing(overlay) {
@@ -258,20 +316,15 @@
         overlay.style.opacity = '0';
       }
 
-      // Laser-engraving reveal: a bright band sweeping down
-      if (t >= T.revealStart && t <= T.revealEnd) {
-        const u = clamp((t - T.revealStart) / (T.revealEnd - T.revealStart), 0, 1);
-        reveal.style.opacity = '1';
-        reveal.style.transform = `translateY(${lerp(-30, 120, u)}vh)`;
-      } else if (t > T.revealEnd) {
-        reveal.style.opacity = '0';
-      }
-
-      if (t > (T.revealEnd + 0.1)) {
+      // End: we remove the overlay right after the fade.
+      if (t > (T.overlayFadeEnd + 0.05)) {
         finished = true;
         overlay.remove();
         document.documentElement.classList.remove('intro-lock');
         document.body.classList.remove('intro-lock');
+
+        // After 1s of the site being visible, run the laser-engraving reveal.
+        runSiteReveal({ delaySec: TIMING.siteHoldBeforeReveal, durationSec: TIMING.revealDuration });
       } else {
         requestAnimationFrame(tick);
       }
