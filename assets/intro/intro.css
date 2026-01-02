@@ -1,221 +1,170 @@
-/* assets/intro/intro.css — v26
-   Option B: JS builds the overlay. IDs used in JS are styled here.
-   Black must never appear; background stays animated.
-*/
+/* assets/intro/intro.css — v1.0 (Option A: HTML overlay, intro bloquante) */
 
-:root{
-  --intro-logo-h: 360px; /* overwritten by JS */
+html.intro-active, html.intro-active body{
+  overflow: hidden !important;
+  height: 100%;
 }
 
-
-/* Patch: on utilise le fond global (canvas). Pas de doublon dans l'intro. */
-#intro-overlay .intro-bg{ display:none !important; }
-
-/* Hide site while intro runs */
-html.intro-pre body #site-root{
+html.intro-active #site-root{
   visibility: hidden;
+  opacity: 0;
   pointer-events: none;
 }
-body.intro-done #site-root{
+
+/* During reveal we show the site but still disable interactions until done */
+html.site-revealing #site-root{
   visibility: visible;
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* After reveal, everything normal */
+html.site-ready #site-root{
+  visibility: visible;
+  opacity: 1;
   pointer-events: auto;
 }
 
+/* Curtain reveal mask on the site */
+#site-root{
+  --reveal: 0;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent calc((var(--reveal) * 100%) - 48px),
+    rgba(0,0,0,0.15) calc((var(--reveal) * 100%) - 32px),
+    black calc((var(--reveal) * 100%)),
+    black 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+          mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent calc((var(--reveal) * 100%) - 48px),
+    rgba(0,0,0,0.15) calc((var(--reveal) * 100%) - 32px),
+    black calc((var(--reveal) * 100%)),
+    black 100%
+  );
+          mask-size: 100% 100%;
+          mask-repeat: no-repeat;
+}
+
+/* Overlay */
 #intro-overlay{
   position: fixed;
   inset: 0;
   z-index: 9999;
-  overflow: hidden;
+  display: grid;
+  place-items: center;
   background: transparent;
 }
 
-/* Background layers (gray base + gold layer + moving halos) */
-#intro-overlay .intro-bg{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-}
-#intro-overlay .intro-bg-layer{
-  position:absolute;
-  inset:-15%;
-  background-size: cover;
-  background-position:center;
-  opacity:1;
-}
-#intro-overlay .intro-bg-gray{
-  background: radial-gradient(1200px 800px at 50% 50%, rgba(255,255,255,0.06), rgba(0,0,0,0) 65%),
-              linear-gradient(180deg, #141414, #0f0f0f);
-}
-#intro-overlay .intro-bg-gold{
-  opacity: 0.85;
-  background: radial-gradient(900px 700px at 40% 45%, rgba(255,220,120,0.18), rgba(0,0,0,0) 70%),
-              radial-gradient(1100px 900px at 60% 55%, rgba(255,200,90,0.12), rgba(0,0,0,0) 72%);
-  mix-blend-mode: screen;
-}
-#intro-overlay .intro-bg-halo{
-  opacity: 0.95;
-  background:
-    radial-gradient(220px 220px at 25% 35%, rgba(255,215,120,0.22), rgba(0,0,0,0) 70%),
-    radial-gradient(340px 340px at 70% 55%, rgba(255,215,120,0.18), rgba(0,0,0,0) 72%),
-    radial-gradient(260px 260px at 45% 75%, rgba(255,215,120,0.14), rgba(0,0,0,0) 72%);
-  filter: blur(10px);
-  animation: haloDrift 5.8s ease-in-out infinite alternate;
-}
-@keyframes haloDrift{
-  0%{ transform: translate3d(-2%, -1%, 0) scale(1.0); }
-  100%{ transform: translate3d(2%, 1.5%, 0) scale(1.12); }
-}
-
-/* Stage */
-#intro-stage{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding: 6vh 4vw;
-}
-
-/* Layout row: left | center | right */
-#intro-row{
-  width:100%;
-  max-width: 1400px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap: clamp(10px, 2vw, 28px);
-}
-
-#intro-logo-left,
-#intro-logo-right{
-  height: var(--intro-logo-h);
-  width: auto;
-  display:block;
-  opacity: 1;
-  transform: translate3d(0,0,0);
-  will-change: transform, opacity;
-}
-
-#intro-center{
+.intro-stage{
+  width: min(92vw, 1200px);
+  height: min(70vh, 520px);
   position: relative;
-  height: var(--intro-logo-h);
-  width: calc(var(--intro-logo-h) * 16 / 9);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex: 0 0 auto;
 }
 
-#intro-logo-text{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit: contain;
-  opacity: 1;
-  will-change: transform, opacity;
+.intro-row{
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: clamp(10px, 3vw, 32px);
+  align-items: center;
+  justify-items: center;
+  height: 100%;
 }
 
-/* Shards stack */
+.intro-logo{
+  display: block;
+  max-height: 60vh;
+  width: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.intro-logo--motif{
+  height: min(60vh, 520px);
+  max-width: 28vw;
+}
+
+.intro-logo--texte{
+  position: relative;
+  height: min(60vh, 520px);
+  max-width: 60vw;
+}
+#intro-texte{
+  display:block;
+  height: 100%;
+  width: auto;
+  max-width: 60vw;
+}
+
 #intro-shards{
   position:absolute;
   inset:0;
-  opacity: 0;
-  display:none;
-}
-#intro-shards-box{
-  position:absolute;
-  inset:0;
-}
-#intro-shards-box .intro-shard{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit: contain;
-  transform: translate3d(0,0,0);
-  will-change: transform, opacity;
+  pointer-events:none;
 }
 
-/* Tremble */
-@keyframes shakeWeak{
-  0%{ transform: translate3d(0,0,0) rotate(0deg); }
-  25%{ transform: translate3d(0.6px,-0.4px,0) rotate(-0.12deg); }
-  50%{ transform: translate3d(-0.5px,0.6px,0) rotate(0.1deg); }
-  75%{ transform: translate3d(0.4px,0.2px,0) rotate(0.08deg); }
-  100%{ transform: translate3d(0,0,0) rotate(0deg); }
+#intro-shards img{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform: translate(-50%,-50%);
+  will-change: transform, opacity;
+  opacity: 0;
 }
-@keyframes shakeStrong{
-  0%{ transform: translate3d(0,0,0) rotate(0deg); }
-  20%{ transform: translate3d(1.8px,-1.2px,0) rotate(-0.35deg); }
-  40%{ transform: translate3d(-1.5px,1.8px,0) rotate(0.25deg); }
-  60%{ transform: translate3d(1.2px,1.1px,0) rotate(0.3deg); }
-  80%{ transform: translate3d(-1.2px,-1.0px,0) rotate(-0.25deg); }
-  100%{ transform: translate3d(0,0,0) rotate(0deg); }
+
+/* Tremblements */
+@keyframes trembleSoft{
+  0%,100%{ transform: translate(0,0) rotate(0deg); }
+  25%{ transform: translate(0.6px,-0.8px) rotate(-0.15deg); }
+  50%{ transform: translate(-0.8px,0.6px) rotate(0.12deg); }
+  75%{ transform: translate(0.5px,0.7px) rotate(0.08deg); }
 }
-.shake-weak{
-  animation: shakeWeak 0.9s linear infinite;
+@keyframes trembleStrong{
+  0%,100%{ transform: translate(0,0) rotate(0deg); }
+  10%{ transform: translate(1.6px,-1.2px) rotate(-0.4deg); }
+  20%{ transform: translate(-1.4px,1.1px) rotate(0.35deg); }
+  30%{ transform: translate(1.2px,1.4px) rotate(-0.3deg); }
+  40%{ transform: translate(-1.8px,-1.0px) rotate(0.45deg); }
+  50%{ transform: translate(1.4px,1.0px) rotate(-0.38deg); }
+  60%{ transform: translate(-1.2px,1.6px) rotate(0.3deg); }
+  70%{ transform: translate(1.7px,-1.1px) rotate(-0.42deg); }
+  80%{ transform: translate(-1.0px,-1.6px) rotate(0.28deg); }
+  90%{ transform: translate(1.0px,1.4px) rotate(-0.25deg); }
 }
-.shake-strong{
-  animation: shakeStrong 0.38s linear infinite;
-}
+
+.tremble-soft{ animation: trembleSoft 1.6s infinite; }
+.tremble-strong{ animation: trembleStrong 0.9s infinite; }
 
 /* Shockwave */
 #intro-shockwave{
   position:absolute;
   left:50%;
   top:50%;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  border: 2px solid rgba(255,225,140,0.0);
+  width: 12px;
+  height: 12px;
   transform: translate(-50%,-50%) scale(0.2);
-  opacity:0;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.8);
+  opacity: 0;
   pointer-events:none;
-}
-#intro-shockwave.ping{
-  animation: shockPing 0.45s ease-out forwards;
-}
-@keyframes shockPing{
-  0%{ opacity:0; transform: translate(-50%,-50%) scale(0.2); border-color: rgba(255,225,140,0.0); }
-  15%{ opacity:0.9; border-color: rgba(255,225,140,0.9); }
-  100%{ opacity:0; transform: translate(-50%,-50%) scale(18); border-color: rgba(255,225,140,0.0); }
+  filter: blur(0.3px);
 }
 
-/* Reveal curtain */
-#intro-reveal{
-  position:absolute;
-  left:0;
-  right:0;
-  top:0;
-  height: 100%;
-  transform: translate3d(0,-100%,0);
-  pointer-events:none;
-  z-index: 20;
-  background:
-    linear-gradient(180deg,
-      rgba(255,220,120,0.0) 0%,
-      rgba(255,220,120,0.08) 20%,
-      rgba(255,220,120,0.12) 50%,
-      rgba(255,220,120,0.08) 80%,
-      rgba(255,220,120,0.0) 100%);
-  mix-blend-mode: screen;
-  filter: blur(0px);
+/* Fade out overlay */
+#intro-overlay.is-fading{
+  animation: overlayFade 0.7s forwards;
 }
-#intro-reveal .laser-head{
-  position:absolute;
-  left:0;
-  right:0;
-  top:0;
-  height: 10px;
-  background: linear-gradient(90deg, rgba(0,0,0,0), rgba(255,235,170,0.95), rgba(0,0,0,0));
-  filter: blur(2px);
-  opacity: 0.9;
+@keyframes overlayFade{
+  to{ opacity:0; }
 }
 
-/* Mobile tweaks */
-@media (max-width: 520px){
-  #intro-row{ gap: 10px; }
-  #intro-overlay .intro-bg-layer{ inset:-22%; }
+/* Mobile adjustments */
+@media (max-width: 640px){
+  .intro-stage{ width: 92vw; height: 56vh; }
+  .intro-row{ grid-template-columns: 0.9fr 1.2fr 0.9fr; gap: 10px; }
+  .intro-logo--motif{ max-width: 22vw; height: min(54vh, 420px); }
+  .intro-logo--texte{ max-width: 62vw; }
 }

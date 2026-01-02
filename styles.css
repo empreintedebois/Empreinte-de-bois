@@ -21,6 +21,23 @@
   --transition-med: 260ms ease-out;
 }
 
+/* Custom display font (user-provided) */
+@font-face {
+  font-family: 'WildBreath';
+  src: url('assets/fonts/The Wild Breath of Zelda.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Apply on highlighted headings (safe defaults) */
+.hero h1,
+.section-title,
+h2 {
+  font-family: 'WildBreath', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  letter-spacing: 0.02em;
+}
+
 *,
 *::before,
 *::after {
@@ -807,6 +824,34 @@ main, .site-footer { position: relative; z-index: 1; }
 @media (max-width: 640px){
   #galleryMore .gallery-more-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ==========================================================
+   Ajustements demandés (header / hero / captions / modèles)
+   ========================================================== */
+
+/* Header : fond noir, texte doré */
+.site-header{
+  background: #000 !important;
+  border-bottom: 1px solid rgba(184, 138, 59, 0.35) !important;
+  backdrop-filter: none !important;
+}
+.site-header a,
+.site-logo__text{ color: var(--gold) !important; }
+.site-nav a{ color: rgba(184, 138, 59, 0.92) !important; }
+.site-nav a:hover{ color: #fff !important; }
+
+/* Hero : une seule colonne (pas de preview) */
+.hero__content{
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: flex-start !important;
+}
+
+/* Texte : important en blanc, secondaire en gris/doré */
+h1,h2,h3{ color: #fff; }
+.section__hdr p,
+.hero__subtitle{ color: rgba(226, 232, 240, 0.78); }
+.eyebrow{ color: rgba(184, 138, 59, 0.95); }
+
 /* Lightbox caption structurée (galerie) */
 #lightbox-caption{
   width: min(920px, 92vw);
