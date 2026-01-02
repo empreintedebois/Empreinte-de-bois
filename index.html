@@ -1,21 +1,123 @@
 <!DOCTYPE html>
-
 <html lang="fr" class="intro-pre">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>Empreinte-de-bois</title>
-<!-- Site CSS -->
-<link href="styles.css" rel="stylesheet"/>
-<!-- Intro CSS (isolé, n'affecte pas le site hors overlay) -->
-<link href="assets/intro/intro.css" rel="stylesheet"/>
-<script>document.documentElement.classList.add("intro-pre");</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Empreinte-de-bois</title>
+
+  <!-- Site CSS -->
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Intro CSS (isolé, n'affecte pas le site hors overlay) -->
+  <link rel="stylesheet" href="assets/intro/intro.css" />
+
+  <!-- Empêche le flash de contenu avant l'intro -->
+  <script>document.documentElement.classList.add("intro-pre");</script>
 </head>
 <body>
+
+<div id="site-root">
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="shell shell--row">
+      <a class="brand" href="#top" aria-label="Accueil">
+        <img class="brand-logo" src="assets/logo.webp" alt="Empreinte de bois" />
+        <span class="brand-name">Empreinte de bois</span>
+      </a>
+
+      <nav class="site-nav" aria-label="Navigation principale">
+        <a href="#portfolio">Galerie</a>
+        <a href="#models">Modèles</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <img class="hero-bg" src="assets/hero-bg.webp" alt="" />
+    <div class="hero-content shell">
+      <h1>Empreinte de bois</h1>
+      <p class="hero-sub">Conception, création & gravure. Série limitée, pièces uniques, sur mesure.</p>
+      <div id="selection-summary" class="selection-summary" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <main class="shell">
+
+    <!-- GALERIE / PORTFOLIO -->
+    <section id="portfolio" class="section">
+      <div class="section-head">
+        <h2 class="section-title">Galerie</h2>
+        <div class="gallery-filters" role="group" aria-label="Filtres galerie">
+          <button type="button" class="filter-btn is-active" data-filter="all">Tout</button>
+          <button type="button" class="filter-btn" data-filter="M01">M01</button>
+          <button type="button" class="filter-btn" data-filter="M02">M02</button>
+          <button type="button" class="filter-btn" data-filter="M03">M03</button>
+          <button type="button" class="filter-btn" data-filter="M04">M04</button>
+          <button type="button" class="filter-btn" data-filter="M05">M05</button>
+        </div>
+      </div>
+
+      <div class="gallery-grid" aria-live="polite"></div>
+
+      <div class="section-foot">
+        <button id="galleryMoreBtn" class="btn" type="button">Voir plus</button>
+      </div>
+    </section>
+
+    <!-- MODELES -->
+    <section id="models" class="section">
+      <div class="section-head">
+        <h2 class="section-title">Modèles</h2>
+      </div>
+      <div id="modelsGrid" class="models-grid"></div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section">
+      <div class="section-head">
+        <h2 class="section-title">Contact</h2>
+      </div>
+      <div class="contact-placeholder">
+        <p>Ajoute ici ton formulaire (ou il sera injecté par tes scripts si tu en as un).</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Lightbox (galerie) -->
+  <div id="lightbox" class="lightbox" hidden>
+    <button class="lightbox-close" type="button" aria-label="Fermer">×</button>
+    <figure class="lightbox-figure">
+      <img id="lightbox-img" alt="" />
+      <figcaption id="lightbox-caption"></figcaption>
+    </figure>
+  </div>
+
+  <!-- Modal "plus" galerie -->
+  <div id="galleryMore" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-label="Galerie - plus">
+      <button class="modal-close" type="button" data-close aria-label="Fermer">×</button>
+      <div class="gallery-more-grid"></div>
+    </div>
+  </div>
+
+  <!-- Modal modèles (attendu par page.js) -->
+  <div id="modelbox" class="modelbox" hidden>
+    <div id="modelbox-content">
+      <img id="modelbox-img" alt="" />
+    </div>
+  </div>
+
+</div><!-- /#site-root -->
+
 <!-- Site JS -->
-<script defer="" src="page.js"></script>
-<script defer="" src="gallery.js"></script>
+<script defer src="page.js"></script>
+<script defer src="gallery.js"></script>
+
 <!-- Intro JS -->
 <script defer src="assets/intro/intro.js"></script>
+
 </body>
 </html>
