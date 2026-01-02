@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="fr">
+<html lang="fr" class="intro-pre">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
@@ -9,40 +9,13 @@
 <link href="styles.css" rel="stylesheet"/>
 <!-- Intro CSS (isolé, n'affecte pas le site hors overlay) -->
 <link href="assets/intro/intro.css" rel="stylesheet"/>
+<script>document.documentElement.classList.add("intro-pre");</script>
 </head>
 <body>
-<div id="site-root">
-<!-- SITE (squelette minimal compatible avec page.js) -->
-<header class="page-shell">
-<div class="hero">
-<img alt="" class="hero-bg" src="assets/hero-bg.webp"/>
-<div class="hero-content">
-<img alt="Empreinte de bois" class="brand-logo" src="assets/logo.webp"/>
-</div>
-</div>
-</header>
-<main class="page-shell">
-<section id="models">
-<h2>Modèles</h2>
-<div id="modelsGrid"></div>
-</section>
-<section id="contact">
-<h2>Contact</h2>
-<!-- ton formulaire existe déjà probablement via page.js / HTML; ici placeholder safe -->
-<div class="contact-placeholder"></div>
-</section>
-</main>
-<!-- Modal modelbox attendu par page.js -->
-<div class="modelbox" hidden="" id="modelbox">
-<div id="modelbox-content">
-<img alt="" id="modelbox-img"/>
-</div>
-</div>
-</div>
 <!-- Site JS -->
 <script defer="" src="page.js"></script>
 <script defer="" src="gallery.js"></script>
 <!-- Intro JS -->
-<script defer="True" src="assets/intro/intro.js"></script>
+<script defer src="assets/intro/intro.js"></script>
 </body>
 </html>

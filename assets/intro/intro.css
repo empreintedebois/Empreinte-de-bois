@@ -1,239 +1,217 @@
-/* assets/intro/intro.css — Intro (Option B, JS overlay)
-   - Overlay created by assets/intro/intro.js
-   - Site is hidden while html.intro-active is present
-   - Layout is controlled by CSS vars set on #intro-stage:
-     --logoH, --motifW, --textW, --logoGap
+/* assets/intro/intro.css — v26
+   Option B: JS builds the overlay. IDs used in JS are styled here.
+   Black must never appear; background stays animated.
 */
 
-:root{ --intro-z: 99999; }
+:root{
+  --intro-logo-h: 360px; /* overwritten by JS */
+}
 
-/* Hide site during intro */
-html.intro-active #site-root{
-  opacity: 0;
+/* Hide site while intro runs */
+html.intro-pre body #site-root{
   visibility: hidden;
   pointer-events: none;
 }
-html.intro-active{ overflow: hidden; }
-
-html.intro-done #site-root{
-  opacity: 1;
+body.intro-done #site-root{
   visibility: visible;
   pointer-events: auto;
 }
 
-#site-root{ transition: opacity 600ms ease; }
-
-/* Overlay root */
-.intro-overlay{
+#intro-overlay{
   position: fixed;
   inset: 0;
-  z-index: var(--intro-z);
-  display: grid;
-  place-items: center;
+  z-index: 9999;
+  overflow: hidden;
   background: transparent;
-  opacity: 1;
 }
 
-/* Background */
-.intro-bg{
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.bg-layer{
-  position: absolute;
-  inset: -10vh -10vw;
-  background-position: center;
-  background-size: cover;
-  opacity: 0.72;
-  transform: scale(1.06);
-  filter: blur(2px);
-  will-change: transform, opacity;
-  animation: introBgDrift 6s ease-in-out infinite alternate;
-}
-.intro-bg::after{
-  content:"";
+/* Background layers (gray base + gold layer + moving halos) */
+#intro-overlay .intro-bg{
   position:absolute;
-  inset: -30vh -30vw;
-  background:
-    radial-gradient(circle at 50% 55%, rgba(255,255,255,0.12), transparent 55%),
-    radial-gradient(circle at 50% 55%, rgba(255,255,255,0.06), transparent 68%);
-  filter: blur(10px);
-  opacity: 0.9;
+  inset:0;
   pointer-events:none;
+  overflow:hidden;
 }
-@keyframes introBgDrift{
-  from{ transform: scale(1.06) translate3d(0,0,0); }
-  to{ transform: scale(1.10) translate3d(0,-1.5vh,0); }
+#intro-overlay .intro-bg-layer{
+  position:absolute;
+  inset:-15%;
+  background-size: cover;
+  background-position:center;
+  opacity:1;
+}
+#intro-overlay .intro-bg-gray{
+  background: radial-gradient(1200px 800px at 50% 50%, rgba(255,255,255,0.06), rgba(0,0,0,0) 65%),
+              linear-gradient(180deg, #141414, #0f0f0f);
+}
+#intro-overlay .intro-bg-gold{
+  opacity: 0.85;
+  background: radial-gradient(900px 700px at 40% 45%, rgba(255,220,120,0.18), rgba(0,0,0,0) 70%),
+              radial-gradient(1100px 900px at 60% 55%, rgba(255,200,90,0.12), rgba(0,0,0,0) 72%);
+  mix-blend-mode: screen;
+}
+#intro-overlay .intro-bg-halo{
+  opacity: 0.95;
+  background:
+    radial-gradient(220px 220px at 25% 35%, rgba(255,215,120,0.22), rgba(0,0,0,0) 70%),
+    radial-gradient(340px 340px at 70% 55%, rgba(255,215,120,0.18), rgba(0,0,0,0) 72%),
+    radial-gradient(260px 260px at 45% 75%, rgba(255,215,120,0.14), rgba(0,0,0,0) 72%);
+  filter: blur(10px);
+  animation: haloDrift 5.8s ease-in-out infinite alternate;
+}
+@keyframes haloDrift{
+  0%{ transform: translate3d(-2%, -1%, 0) scale(1.0); }
+  100%{ transform: translate3d(2%, 1.5%, 0) scale(1.12); }
 }
 
 /* Stage */
 #intro-stage{
-  position: relative;
-  width: 96vw;
-  height: var(--logoH, 320px);
-  max-width: 1400px;
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 6vh 4vw;
 }
 
-/* Logos row */
+/* Layout row: left | center | right */
 #intro-row{
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: var(--motifW, 120px) var(--textW, 480px) var(--motifW, 120px);
-  gap: var(--logoGap, 16px);
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
+  width:100%;
+  max-width: 1400px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: clamp(10px, 2vw, 28px);
 }
 
-.intro-logo{
-  height: 100%;
-  width: 100%;
-  object-fit: contain;
-  display: block;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-/* Center stack: text + shards */
-.intro-center{
-  position: relative;
-  height: 100%;
-  width: 100%;
-}
-#intro-logo-text{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+#intro-logo-left,
+#intro-logo-right{
+  height: var(--intro-logo-h);
+  width: auto;
+  display:block;
   opacity: 1;
-}
-
-/* Shards box overlays the same area as the text */
-#intro-shards{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  pointer-events: none;
-}
-
-#intro-shards img.shard{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  transform: translate3d(0,0,0);
   will-change: transform, opacity;
 }
 
-/* Recoil + merge transforms applied on row */
-#intro-row.recoil{
-  transform: translate3d(0, 0.6vh, 0) scale(0.985);
-  transition: transform 300ms ease;
-}
-#intro-row.merge{
-  transform: translate3d(0, 0, 0) scale(3.8);
-  transition: transform 900ms cubic-bezier(.2,.9,.2,1);
-}
-
-/* Tremble system (per your schedule)
-   - Text tremble is applied to .intro-center so it affects shards too.
-   - Motif tremble is applied to both motif images.
-*/
-@keyframes trembleWeak{
-  0%{ transform: translate3d(0,0,0); }
-  25%{ transform: translate3d(0.6px,-0.3px,0); }
-  50%{ transform: translate3d(-0.6px,0.3px,0); }
-  75%{ transform: translate3d(0.3px,0.6px,0); }
-  100%{ transform: translate3d(0,0,0); }
-}
-@keyframes trembleStrong{
-  0%{ transform: translate3d(0,0,0); }
-  20%{ transform: translate3d(2px,-1px,0); }
-  40%{ transform: translate3d(-2px,1px,0); }
-  60%{ transform: translate3d(1px,2px,0); }
-  80%{ transform: translate3d(-1px,-2px,0); }
-  100%{ transform: translate3d(0,0,0); }
+#intro-center{
+  position: relative;
+  height: var(--intro-logo-h);
+  width: calc(var(--intro-logo-h) * 16 / 9);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex: 0 0 auto;
 }
 
-.intro-overlay.t-text-weak  #intro-center{ animation: trembleWeak 220ms linear infinite; }
-.intro-overlay.t-text-strong #intro-center{ animation: trembleStrong 140ms linear infinite; }
+#intro-logo-text{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit: contain;
+  opacity: 1;
+  will-change: transform, opacity;
+}
 
-.intro-overlay.t-motif-weak  #intro-motif-left,
-.intro-overlay.t-motif-weak  #intro-motif-right{ animation: trembleWeak 240ms linear infinite; }
+/* Shards stack */
+#intro-shards{
+  position:absolute;
+  inset:0;
+  opacity: 0;
+  display:none;
+}
+#intro-shards-box{
+  position:absolute;
+  inset:0;
+}
+#intro-shards-box .intro-shard{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit: contain;
+  transform: translate3d(0,0,0);
+  will-change: transform, opacity;
+}
 
-.intro-overlay.t-motif-strong #intro-motif-left,
-.intro-overlay.t-motif-strong #intro-motif-right{ animation: trembleStrong 150ms linear infinite; }
+/* Tremble */
+@keyframes shakeWeak{
+  0%{ transform: translate3d(0,0,0) rotate(0deg); }
+  25%{ transform: translate3d(0.6px,-0.4px,0) rotate(-0.12deg); }
+  50%{ transform: translate3d(-0.5px,0.6px,0) rotate(0.1deg); }
+  75%{ transform: translate3d(0.4px,0.2px,0) rotate(0.08deg); }
+  100%{ transform: translate3d(0,0,0) rotate(0deg); }
+}
+@keyframes shakeStrong{
+  0%{ transform: translate3d(0,0,0) rotate(0deg); }
+  20%{ transform: translate3d(1.8px,-1.2px,0) rotate(-0.35deg); }
+  40%{ transform: translate3d(-1.5px,1.8px,0) rotate(0.25deg); }
+  60%{ transform: translate3d(1.2px,1.1px,0) rotate(0.3deg); }
+  80%{ transform: translate3d(-1.2px,-1.0px,0) rotate(-0.25deg); }
+  100%{ transform: translate3d(0,0,0) rotate(0deg); }
+}
+.shake-weak{
+  animation: shakeWeak 0.9s linear infinite;
+}
+.shake-strong{
+  animation: shakeStrong 0.38s linear infinite;
+}
 
 /* Shockwave */
 #intro-shockwave{
   position:absolute;
   left:50%;
   top:50%;
-  width:18px;
-  height:18px;
-  border: 2px solid rgba(255,255,255,0.35);
+  width: 10px;
+  height: 10px;
   border-radius: 999px;
-  transform: translate(-50%, -50%) scale(0.2);
-  opacity: 0;
+  border: 2px solid rgba(255,225,140,0.0);
+  transform: translate(-50%,-50%) scale(0.2);
+  opacity:0;
   pointer-events:none;
 }
 #intro-shockwave.ping{
-  animation: introPing 420ms ease-out forwards;
+  animation: shockPing 0.45s ease-out forwards;
 }
-@keyframes introPing{
-  0%{ opacity: .9; transform: translate(-50%,-50%) scale(0.2); }
-  100%{ opacity: 0; transform: translate(-50%,-50%) scale(7); }
+@keyframes shockPing{
+  0%{ opacity:0; transform: translate(-50%,-50%) scale(0.2); border-color: rgba(255,225,140,0.0); }
+  15%{ opacity:0.9; border-color: rgba(255,225,140,0.9); }
+  100%{ opacity:0; transform: translate(-50%,-50%) scale(18); border-color: rgba(255,225,140,0.0); }
 }
 
-/* Laser curtain reveal */
-.intro-reveal{
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 250ms ease;
-}
-.intro-reveal.on{ opacity: 1; }
-
-.intro-reveal::before{
-  content:"";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.92);
+/* Reveal curtain */
+#intro-reveal{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height: 100%;
   transform: translate3d(0,-100%,0);
-  will-change: transform;
-}
-.intro-reveal::after{
-  content:"";
-  position: absolute;
-  left: -10vw;
-  right: -10vw;
-  height: 18vh;
-  top: -18vh;
+  pointer-events:none;
+  z-index: 20;
   background:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.20), transparent 60%),
-    repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0 2px, rgba(255,255,255,0.00) 2px 10px);
-  filter: blur(2px);
+    linear-gradient(180deg,
+      rgba(255,220,120,0.0) 0%,
+      rgba(255,220,120,0.08) 20%,
+      rgba(255,220,120,0.12) 50%,
+      rgba(255,220,120,0.08) 80%,
+      rgba(255,220,120,0.0) 100%);
   mix-blend-mode: screen;
-  will-change: transform;
+  filter: blur(0px);
 }
-.intro-reveal.sweep::before{
-  transform: translate3d(0,100%,0);
-  transition: transform 1000ms cubic-bezier(.2,.9,.2,1);
-}
-.intro-reveal.sweep::after{
-  transform: translate3d(0,120vh,0);
-  transition: transform 1000ms cubic-bezier(.2,.9,.2,1);
+#intro-reveal .laser-head{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height: 10px;
+  background: linear-gradient(90deg, rgba(0,0,0,0), rgba(255,235,170,0.95), rgba(0,0,0,0));
+  filter: blur(2px);
+  opacity: 0.9;
 }
 
-/* Mobile tuning */
-@media (max-width: 560px){
-  #intro-stage{ width: 98vw; }
-  #intro-row.merge{ transform: translate3d(0,0,0) scale(3.6); }
+/* Mobile tweaks */
+@media (max-width: 520px){
+  #intro-row{ gap: 10px; }
+  #intro-overlay .intro-bg-layer{ inset:-22%; }
 }
