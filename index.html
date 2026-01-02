@@ -1,123 +1,381 @@
 <!DOCTYPE html>
+
 <html lang="fr" class="intro-pre">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Empreinte-de-bois</title>
-
-  <!-- Site CSS -->
-  <link rel="stylesheet" href="styles.css" />
-  <!-- Intro CSS (isolé, n'affecte pas le site hors overlay) -->
-  <link rel="stylesheet" href="assets/intro/intro.css" />
-
-  <!-- Empêche le flash de contenu avant l'intro -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Empreinte de Bois – Portfolio</title>
+<meta content="Portfolio 3D et gravure numérique : sélection de projets, démarche, matériaux et contact." name="description"/>
+<link href="styles.css" rel="stylesheet"/>
+  <link href="assets/intro/intro.css" rel="stylesheet"/>
   <script>document.documentElement.classList.add("intro-pre");</script>
 </head>
 <body>
-
 <div id="site-root">
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="shell shell--row">
-      <a class="brand" href="#top" aria-label="Accueil">
-        <img class="brand-logo" src="assets/logo.webp" alt="Empreinte de bois" />
-        <span class="brand-name">Empreinte de bois</span>
-      </a>
 
-      <nav class="site-nav" aria-label="Navigation principale">
-        <a href="#portfolio">Galerie</a>
-        <a href="#models">Modèles</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </div>
-  </header>
+<!-- Fond animé global (fixe, derrière tout) -->
+<canvas aria-hidden="true" id="background-canvas"></canvas>
+<!-- HEADER STICKY -->
+<header class="site-header" id="site-header">
+<div class="shell shell--row">
+<a class="site-logo" href="#top">
+<span class="site-logo__text">Empreinte de Bois</span>
+</a>
+<nav aria-label="Navigation principale" class="site-nav"><a href="#portfolio">Galerie</a><a href="#models">Modèles</a><a href="#contact">Contact</a></nav>
+</div>
+</header>
+<main id="top">
+<!-- HERO SECTION -->
+<section aria-labelledby="hero-title" class="hero">
+<div class="hero__bg"></div>
+<div class="shell hero__content">
+<div class="hero__text">
+<p class="eyebrow">Conception, création &amp; gravure laser.</p>
+<h1 id="hero-title">Donnons du relief à vos idées. </h1>
+<p class="hero__subtitle">
+   Création artisanale sur demande. 
+          </p>
+<div class="hero__actions">
+<a class="btn btn--primary" href="#portfolio">Voir la galerie</a>
+<a class="btn btn--ghost" href="#contact">Discuter d’un projet</a>
+</div>
+<p class="hero__hint">Scroll pour explorer la galerie ↓ </p>
+</div>
+<div class="hero__preview">
+<div class="hero-card">
+<img alt="Carré Bois Sapin — support en bois" loading="lazy" src="assets/logo.png"/>
+</div>
+</div>
+</div>
+</section>
+<!-- GALERIE SECTION -->
+<section aria-labelledby="portfolio-title" class="section" data-gallery="auto" id="portfolio">
+<div class="shell">
+<div class="section__hdr">
+<h2 id="portfolio-title">Galerie</h2>
+<p>Une sélection de projets récents : matières, essais de lumière, compositions et maquettes.</p>
+</div><div class="chips"><button class="chip is-active" data-filter="all" type="button">Tout</button><button class="chip" data-filter="gravure" type="button">Gravure</button><button class="chip" data-filter="accessoire" type="button">Accessoire</button><button class="chip" data-filter="maquette" type="button">Maquette</button></div>
+<div class="gallery-grid"><!-- Rempli automatiquement par gallery.js via data/gallery.json --></div><button class="gallery-more-banner" id="galleryMoreBtn" type="button">Voir plus</button>
+</div>
+</section>
+<!-- PROCESS SECTION -->
+<section aria-labelledby="process-title" class="section section--alt" id="process">
+<div class="shell">
+<div class="section__hdr">
+<h2 id="process-title">Démarche et service</h2>
+<p>Gravure multi-support, découpe, carte de visite métal, reprise de logo ou dessin. </p>
+</div>
+<div class="process-grid">
+<article class="process-card">
+<h3>1. Intention &amp; contraintes</h3>
+<p>Chaques projets est unique : support, format, étude, quantité. L’idée, c’est d'explorer des nouveautés ou s'inspirer d'autres projets.</p>
+</article>
+<article class="process-card">
+<h3>2. Études &amp; essais</h3>
+<p>Travail en 2D et 3D idées. Certains concepts ont déjà des bases solides, d'autres demandent d'être étudiés.</p>
+</article>
+<article class="process-card">
+<h3>3. Passage matière</h3>
+<p>Tests sur bois ou autres matériaux, ajustement, délais.</p>
+</article>
+<article class="process-card">
+<h3>4. Finitions &amp; variations</h3>
+<p>Déclinaisons de bases communes: formats, couleurs, essences, traitements ou séries. </p>
+</article>
+</div>
+</div>
+</section>
+<!-- MODÈLES & DÉCLINAISONS -->
+<section aria-labelledby="models-title" class="section" id="models">
+<div class="shell">
+<div class="section__hdr">
+<h2 id="models-title">Modèles &amp; options</h2>
+<p>Choisissez un support et explorez ses variantes de matière ou de couleurs. Les éléments choisis apparaissent dans le formulaire de contact. </p>
+</div>
+<div class="models-wrapper">
+<aside aria-label="Liste des modèles" class="models-list"></aside>
+<div aria-live="polite" class="model-preview">
+<div class="model-main">
+<img alt="" src=""/>
+</div>
+<div class="model-info">
+<h3></h3>
+<p></p>
+</div>
+<div aria-label="Variantes" class="model-variants"></div>
+<button class="add-selection btn btn--primary" type="button">Ajouter à ma sélection</button>
+</div>
+</div>
+</div>
+</section>
+<!-- À PROPOS -->
+<section aria-labelledby="about-title" class="section" id="about">
+<div class="shell about">
+<div class="about__text">
+<h2 id="about-title">À propos</h2>
+<p>Je conçois des images destinés à devenir des objets physiques : La galerie présente des pièces reproducibles.</p>
+<p>Mon travail mélange étude, connaissance du rendu matière et contraintes physiques. L’objectif : explorer les possibilités.</p>
+</div>
+<ul aria-label="Champs de travail" class="about__tags">
+</ul>
+</div>
+</section>
+<!-- CONTACT -->
+<section aria-labelledby="contact-title" class="section section--alt" id="contact">
+<div class="shell contact">
+<div class="contact__text">
+<h2 id="contact-title">Contact</h2>
+<p>Un projet, une idée ou juste une question sur la faisabilité d’une pièce ? Envoyez quelques lignes, éventuellement des visuels, et on voit ce qui est réaliste. Voici mon adresse mail: Empreinte.de.bois@gmail.com</p>
+</div>
+<form action="#" class="contact__form" method="post">
+<label>
+            Nom
+            <input autocomplete="name" name="name" required="" type="text"/>
+</label>
+<label>
+            Email
+            <input autocomplete="email" name="email" required="" type="email"/>
+</label>
+<label>
+            Message
+            <textarea name="message" required="" rows="5"></textarea>
+</label>
+<label>
+            Sélection
+            <textarea id="selection-summary" name="selection" readonly="" rows="3"></textarea>
+</label>
+<button class="btn btn--primary" type="submit">Envoyer</button>
+</form>
+</div>
+</section>
+</main>
+<!-- FOOTER -->
+<footer class="site-footer">
+<div class="shell site-footer__inner">
+<p>© Empreinte de Bois – Empreinte.de.bois@gmail.com</p>
+<div class="site-footer__links">
+<a href="#top">Retour en haut</a>
+</div>
+</div>
+</footer>
+<!-- Lightbox modal for gallery -->
+<div aria-hidden="true" class="lightbox" id="lightbox">
+<button aria-label="Fermer" class="lightbox__backdrop" data-close="1"></button>
+<figure class="lightbox__body">
+<img alt="" id="lightbox-img" src=""/>
+<figcaption id="lightbox-caption"></figcaption>
+<button aria-label="Fermer la vue détaillée" class="lightbox__close" data-close="1">×</button>
+</figure>
+</div><div aria-hidden="true" class="lightbox lightbox--more" id="galleryMore"><button aria-label="Fermer" class="lightbox__backdrop" data-close="1"></button><figure class="lightbox__body"><button aria-label="Fermer" class="lightbox__close" data-close="1">×</button><figcaption class="lightbox__caption">Galerie</figcaption><div class="gallery-more-grid"></div></figure></div>
 
-  <!-- HERO -->
-  <section class="hero" id="top">
-    <img class="hero-bg" src="assets/hero-bg.webp" alt="" />
-    <div class="hero-content shell">
-      <h1>Empreinte de bois</h1>
-      <p class="hero-sub">Conception, création & gravure. Série limitée, pièces uniques, sur mesure.</p>
-      <div id="selection-summary" class="selection-summary" aria-live="polite"></div>
-    </div>
-  </section>
-
-  <main class="shell">
-
-    <!-- GALERIE / PORTFOLIO -->
-    <section id="portfolio" class="section">
-      <div class="section-head">
-        <h2 class="section-title">Galerie</h2>
-        <div class="gallery-filters" role="group" aria-label="Filtres galerie">
-          <button type="button" class="filter-btn is-active" data-filter="all">Tout</button>
-          <button type="button" class="filter-btn" data-filter="M01">M01</button>
-          <button type="button" class="filter-btn" data-filter="M02">M02</button>
-          <button type="button" class="filter-btn" data-filter="M03">M03</button>
-          <button type="button" class="filter-btn" data-filter="M04">M04</button>
-          <button type="button" class="filter-btn" data-filter="M05">M05</button>
-        </div>
-      </div>
-
-      <div class="gallery-grid" aria-live="polite"></div>
-
-      <div class="section-foot">
-        <button id="galleryMoreBtn" class="btn" type="button">Voir plus</button>
-      </div>
-    </section>
-
-    <!-- MODELES -->
-    <section id="models" class="section">
-      <div class="section-head">
-        <h2 class="section-title">Modèles</h2>
-      </div>
-      <div id="modelsGrid" class="models-grid"></div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="section">
-      <div class="section-head">
-        <h2 class="section-title">Contact</h2>
-      </div>
-      <div class="contact-placeholder">
-        <p>Ajoute ici ton formulaire (ou il sera injecté par tes scripts si tu en as un).</p>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Lightbox (galerie) -->
-  <div id="lightbox" class="lightbox" hidden>
-    <button class="lightbox-close" type="button" aria-label="Fermer">×</button>
-    <figure class="lightbox-figure">
-      <img id="lightbox-img" alt="" />
-      <figcaption id="lightbox-caption"></figcaption>
-    </figure>
-  </div>
-
-  <!-- Modal "plus" galerie -->
-  <div id="galleryMore" class="modal" hidden>
-    <div class="modal-backdrop" data-close></div>
-    <div class="modal-panel" role="dialog" aria-modal="true" aria-label="Galerie - plus">
-      <button class="modal-close" type="button" data-close aria-label="Fermer">×</button>
-      <div class="gallery-more-grid"></div>
-    </div>
-  </div>
-
-  <!-- Modal modèles (attendu par page.js) -->
-  <div id="modelbox" class="modelbox" hidden>
-    <div id="modelbox-content">
-      <img id="modelbox-img" alt="" />
-    </div>
-  </div>
-
-</div><!-- /#site-root -->
-
-<!-- Site JS -->
-<script defer src="page.js"></script>
-<script defer src="gallery.js"></script>
-
-<!-- Intro JS -->
+</div>
 <script defer src="assets/intro/intro.js"></script>
+<script defer="" src="page.js"></script>
+<!-- SCRIPT FOND ANIMÉ (cover, non répété, fixe) -->
+<script>
+  // ===============================
+  // PARAMÈTRES (à modifier)
+  // ===============================
+  const IMG_GREY_V = "assets/fond/fond-gris-v.webp";
+  const IMG_GOLD_V = "assets/fond/fond-dore-v.webp";
 
-</body>
+  const IMG_GREY_H = "assets/fond/fond-gris-h.webp";
+  const IMG_GOLD_H = "assets/fond/fond-dore-h.webp";
+
+  const MAX_COVER_SCALE = 1.15;
+
+  // Halos en ratio (relatifs à l'écran)
+  const MIN_DIAMETER_RATIO = 0.06;
+  const MAX_DIAMETER_RATIO = 0.18;
+
+  // Timings (ms)
+  const FADE_IN  = 3000;
+  const FADE_OUT = 1000;
+  const SPAWN_DELAY = 800;
+
+  // Profil du halo (0.35 = bord plus net / 0.75 = très diffus)
+  const SOFT_EDGE = 0.55;
+
+  // Densité / perf
+  const MAX_PULSES = 20;
+  const MAX_PULSES_PER_SPAWN = 3;
+
+  // Perf (mobile)
+  const MAX_DPR = 1.5;
+
+  // Anti "micro-zoom" Android/Chrome
+  const VIEWPORT_HYSTERESIS_PX = 80;
+  // ===============================
+
+  const canvas = document.getElementById("background-canvas");
+  const ctx = canvas.getContext("2d");
+
+  const maskCanvas = document.createElement("canvas");
+  const maskCtx = maskCanvas.getContext("2d");
+
+  const goldCanvas = document.createElement("canvas");
+  const goldCtx = goldCanvas.getContext("2d");
+
+  let w = 0, h = 0, dpr = 1;
+  let pulses = [];
+  let lastSpawn = 0;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+
+    const newW = window.innerWidth;
+    const newH = window.innerHeight;
+
+    // Android/Chrome : la barre d’adresse fait varier innerHeight au scroll
+    // -> on ignore si c’est un petit delta, pour éviter le “zoom”
+    if (w && newW === w && Math.abs(newH - h) < VIEWPORT_HYSTERESIS_PX) return;
+
+    w = newW;
+    h = newH;
+
+    for (const c of [canvas, maskCanvas, goldCanvas]) {
+      c.width = Math.floor(w * dpr);
+      c.height = Math.floor(h * dpr);
+    }
+
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    maskCtx.setTransform(dpr,0,0,dpr,0,0);
+    goldCtx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function load(src) {
+    return new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error("Image introuvable: " + src));
+      i.src = src;
+    });
+  }
+
+  function pickBackgroundByOrientation() {
+    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+    return isPortrait
+      ? { grey: IMG_GREY_V, gold: IMG_GOLD_V }
+      : { grey: IMG_GREY_H, gold: IMG_GOLD_H };
+  }
+
+  function drawCover(ctx2d, img) {
+    const iw = img.width, ih = img.height;
+    const rawScale = Math.max(w / iw, h / ih);
+    const scale = Math.min(rawScale, MAX_COVER_SCALE);
+    const dw = iw * scale;
+    const dh = ih * scale;
+    const dx = (w - dw) / 2;
+    const dy = (h - dh) / 2;
+    ctx2d.drawImage(img, dx, dy, dw, dh);
+  }
+
+  function spawn(now) {
+    if (pulses.length >= MAX_PULSES) return;
+
+    // 1 → MAX_PULSES_PER_SPAWN halos (apparitions groupées)
+    const count = 1 + Math.floor(Math.random() * MAX_PULSES_PER_SPAWN);
+
+    const base = Math.min(w, h);
+    const minD = base * MIN_DIAMETER_RATIO;
+    const maxD = base * MAX_DIAMETER_RATIO;
+
+    for (let i = 0; i < count; i++) {
+      if (pulses.length >= MAX_PULSES) break;
+
+      const d = minD + Math.random() * (maxD - minD);
+
+      pulses.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: d / 2,
+        born: now + Math.random() * 250,                 // désynchronise un peu le cluster
+        die:  now + FADE_IN + FADE_OUT + 250
+      });
+    }
+  }
+
+  function opacity(p, now) {
+    const t = now - p.born;
+    if (t < 0) return 0;
+    if (t < FADE_IN) return t / FADE_IN;
+    if (t < FADE_IN + FADE_OUT) return 1 - (t - FADE_IN) / FADE_OUT;
+    return 0;
+  }
+
+  (async function () {
+    let grey, gold;
+
+    try {
+      const picked = pickBackgroundByOrientation();
+      [grey, gold] = await Promise.all([load(picked.grey), load(picked.gold)]);
+    } catch (e) {
+      console.error("[Fond animé]", e);
+      return;
+    }
+
+    resize();
+    window.addEventListener("resize", resize, { passive: true });
+
+    window.addEventListener("orientationchange", async () => {
+      try {
+        const picked = pickBackgroundByOrientation();
+        [grey, gold] = await Promise.all([load(picked.grey), load(picked.gold)]);
+        resize();
+      } catch (e) {
+        console.error("[Fond animé] reload orientation", e);
+      }
+    }, { passive: true });
+
+    function frame(now) {
+      if (now - lastSpawn > SPAWN_DELAY) {
+        spawn(now);
+        lastSpawn = now;
+      }
+
+      pulses = pulses.filter(p => now < p.die);
+
+      // base gris
+      ctx.clearRect(0,0,w,h);
+      drawCover(ctx, grey);
+
+      // couche dorée
+      goldCtx.clearRect(0,0,w,h);
+      drawCover(goldCtx, gold);
+
+      // masque radial
+      maskCtx.clearRect(0,0,w,h);
+      for (const p of pulses) {
+        const a = opacity(p, now);
+        if (!a) continue;
+
+        const g = maskCtx.createRadialGradient(
+          p.x, p.y, p.r * (1 - SOFT_EDGE),
+          p.x, p.y, p.r
+        );
+        g.addColorStop(0, `rgba(255,255,255,${a})`);
+        g.addColorStop(1, "rgba(255,255,255,0)");
+
+        maskCtx.fillStyle = g;
+        maskCtx.beginPath();
+        maskCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        maskCtx.fill();
+      }
+
+      goldCtx.globalCompositeOperation = "destination-in";
+      goldCtx.drawImage(maskCanvas, 0, 0, w, h);
+      goldCtx.globalCompositeOperation = "source-over";
+
+      ctx.drawImage(goldCanvas, 0, 0, w, h);
+
+      requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
+  })();
+  </script>
+<script defer="True" src="gallery.js"></script></body>
 </html>

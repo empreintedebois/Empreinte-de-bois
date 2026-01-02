@@ -33,74 +33,11 @@
   const isMobileA = () => window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
   const limitCount = () => (isMobileA() ? 6 : 9);
 
-  function escapeHtml(s) {
-    return (s || "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-  }
-
-  function parseStructuredCaption(raw) {
-    const txt = (raw || "").replace(/\r/g, "").trim();
-    const lines = txt.split("\n").map(l => l.trim()).filter(Boolean);
-    if (lines.length === 0) return { title: "", fields: {}, notes: "" };
-
-    const title = lines[0];
-    const fields = {};
-    const notes = [];
-
-    for (const line of lines.slice(1)) {
-      const m = line.match(/^([^:]{2,30})\s*:\s*(.+)$/);
-      if (m) {
-        const k = m[1].toLowerCase();
-        const v = m[2].trim();
-        if (k.startsWith("mati")) fields["Matières"] = v;
-        else if (k.startsWith("tech")) fields["Technique"] = v;
-        else if (k.startsWith("dim")) fields["Dimensions"] = v;
-        else if (k.startsWith("fin")) fields["Finitions"] = v;
-        else notes.push(line);
-      } else {
-        notes.push(line);
-      }
-    }
-
-    return { title, fields, notes: notes.join("\n") };
-  }
-
-  function renderCaption(figcaptionEl, rawCaption) {
-    if (!figcaptionEl) return;
-    figcaptionEl.innerHTML = "";
-    const parsed = parseStructuredCaption(rawCaption);
-
-    const title = document.createElement("div");
-    title.className = "lb-title";
-    title.textContent = parsed.title || "";
-    figcaptionEl.appendChild(title);
-
-    const sep = document.createElement("div");
-    sep.className = "lb-sep";
-    figcaptionEl.appendChild(sep);
-
-    const order = ["Matières", "Technique", "Dimensions", "Finitions"];
-    for (const k of order) {
-      if (!parsed.fields[k]) continue;
-      const row = document.createElement("div");
-      row.className = "lb-row";
-      row.innerHTML = `<span class="lb-k">${escapeHtml(k)}</span><span class="lb-v">${escapeHtml(parsed.fields[k])}</span>`;
-      figcaptionEl.appendChild(row);
-    }
-
-    if (parsed.notes) {
-      const notes = document.createElement("div");
-      notes.className = "lb-notes";
-      notes.textContent = parsed.notes;
-      figcaptionEl.appendChild(notes);
-    }
-  }
-
-  function openLightbox(fullSrc, captionRaw) {
+  function openLightbox(fullSrc, caption) {
     if (!lightbox || !lbImg || !lbCaption) return;
     lbImg.src = fullSrc;
-    const parsed = parseStructuredCaption(captionRaw);
-    lbImg.alt = parsed.title || "";
-    renderCaption(lbCaption, captionRaw || "");
+    lbImg.alt = caption || "";
+    lbCaption.textContent = caption || "";
     lightbox.classList.add("is-open");
     lightbox.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
@@ -111,7 +48,7 @@
     lightbox.classList.remove("is-open");
     lightbox.setAttribute("aria-hidden", "true");
     lbImg.removeAttribute("src");
-    lbCaption.innerHTML = "";
+    lbCaption.textContent = "";
     document.body.style.overflow = "";
   }
 
@@ -133,9 +70,7 @@
     const cat = it.category || "";
     const thumb = it.thumb || it.src || "";
     const full = it.full || it.src || thumb;
-    const captionRaw = (it.caption || "").trim();
-    const parsed = parseStructuredCaption(captionRaw);
-    const captionTitle = parsed.title || captionRaw;
+    const caption = (it.caption || "").trim();
 
     const article = document.createElement("article");
     article.className = "gallery-item";
@@ -145,7 +80,7 @@
     btn.className = "gallery-item__btn";
     btn.type = "button";
     btn.dataset.full = full;
-    btn.dataset.caption = captionRaw;
+    btn.dataset.caption = caption;
 
     const media = document.createElement("div");
     media.className = "gallery-item__media";
@@ -154,12 +89,12 @@
     img.loading = "lazy";
     img.decoding = "async";
     img.src = thumb;
-    img.alt = captionTitle || "";
+    img.alt = caption || "";
     media.appendChild(img);
 
     const cap = document.createElement("div");
     cap.className = "gallery-item__caption";
-    cap.textContent = captionTitle;
+    cap.textContent = caption;
     media.appendChild(cap);
 
     btn.appendChild(media);

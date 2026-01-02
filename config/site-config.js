@@ -2,7 +2,7 @@ window.SITE_CONFIG = {
   siteTitle: "Empreinte de Bois",
   subtitle: "Gravure & créations — galerie",
   headerImage: "assets/header01.webp",
-  heroBackground: "assets/hero-bg.webp",
+  heroBackground: "assets/hero-bg_w640.webp",
   galleryImages: [
     "assets/galerie/galerie01.webp",
     "assets/galerie/galerie02.webp",
