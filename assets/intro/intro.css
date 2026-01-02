@@ -7,6 +7,10 @@
   --intro-logo-h: 360px; /* overwritten by JS */
 }
 
+
+/* Patch: on utilise le fond global (canvas). Pas de doublon dans l'intro. */
+#intro-overlay .intro-bg{ display:none !important; }
+
 /* Hide site while intro runs */
 html.intro-pre body #site-root{
   visibility: hidden;

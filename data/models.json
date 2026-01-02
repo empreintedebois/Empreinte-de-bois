@@ -1,172 +1,177 @@
 {
   "models": [
     {
-      "id": "M01",
-      "title": "Rond Sapin",
+      "id": "ROND-100",
+      "title": "Sous-verre rond Ø100 mm",
       "thumb": "assets/bandeaux/M01/image.webp",
-      "full": "assets/bandeaux/M01/image.webp",
       "variants": [
         {
-          "id": "base",
-          "name": "Base",
+          "id": "M01",
+          "name": "Bois (Sapin)",
           "thumb": "assets/bandeaux/M01/image.webp",
           "full": "assets/bandeaux/M01/image.webp",
-          "fields": {},
+          "fields": {
+            "Technique": "Gravure laser",
+            "Dimensions": "Ø100 mm",
+            "Épaisseur": "15 mm - Diamètre: 100 mm",
+            "Lot": "4 pièces minimum"
+          },
           "finitions": [],
-          "notes": "Épaisseur: 15 mm — Diamètre: 100 mm\nLot: 4 pièces minimum\nLivré avec ses petits patins"
-        }
-      ]
-    },
-    {
-      "id": "M02",
-      "title": "Rond Contreplaqué",
-      "thumb": "assets/bandeaux/M02/image.webp",
-      "full": "assets/bandeaux/M02/image.webp",
-      "variants": [
+          "notes": "Livré avec ses petits patins"
+        },
         {
-          "id": "base",
-          "name": "Base",
+          "id": "M02",
+          "name": "Bois (Contreplaqué)",
           "thumb": "assets/bandeaux/M02/image.webp",
           "full": "assets/bandeaux/M02/image.webp",
-          "fields": {},
+          "fields": {
+            "Technique": "Gravure laser",
+            "Dimensions": "Ø100 mm",
+            "Épaisseur": "3 mm - Diamètre: 100 mm",
+            "Lot": "4 pièces minimum"
+          },
           "finitions": [],
-          "notes": "Épaisseur: 3 mm — Diamètre: 100 mm\nLot: 4 pièces minimum"
-        }
-      ]
-    },
-    {
-      "id": "M03",
-      "title": "Rond Similicuir Ø100 mm",
-      "thumb": "assets/bandeaux/M03/image.webp",
-      "full": "assets/bandeaux/M03/image.webp",
-      "variants": [
+          "notes": ""
+        },
         {
-          "id": "base",
-          "name": "Base",
+          "id": "M03",
+          "name": "Similicuir (blanc)",
           "thumb": "assets/bandeaux/M03/image.webp",
           "full": "assets/bandeaux/M03/image.webp",
-          "fields": {},
+          "fields": {
+            "Technique": "Gravure laser",
+            "Dimensions": "Ø100 mm",
+            "Couleurs": "blanc — Lot: 6 pièces"
+          },
           "finitions": [],
-          "notes": "Couleurs: blanc — Lot: 6 pièces\n1 Support inclus pas lot."
-        }
-      ]
-    },
-    {
-      "id": "M04",
-      "title": "Rond Similicuir Ø100 mm",
-      "thumb": "assets/bandeaux/M04/image.webp",
-      "full": "assets/bandeaux/M04/image.webp",
-      "variants": [
+          "notes": "1 Support inclus pas lot."
+        },
         {
-          "id": "base",
-          "name": "Base",
+          "id": "M04",
+          "name": "Similicuir (rouge)",
           "thumb": "assets/bandeaux/M04/image.webp",
           "full": "assets/bandeaux/M04/image.webp",
-          "fields": {},
+          "fields": {
+            "Technique": "Gravure laser",
+            "Dimensions": "Ø100 mm",
+            "Couleurs": "rouge — Lot: 6 pièces"
+          },
           "finitions": [],
-          "notes": "Couleurs: rouge — Lot: 6 pièces\n1 Support inclus par lot"
+          "notes": "1 Support inclus par lot"
         }
       ]
     },
     {
-      "id": "M05",
-      "title": "Carré Bois 100×100 mm",
+      "id": "CARRE-100",
+      "title": "Plaque carrée 100×100 mm",
       "thumb": "assets/bandeaux/M05/image.webp",
-      "full": "assets/bandeaux/M05/image.webp",
       "variants": [
         {
-          "id": "base",
-          "name": "Base",
+          "id": "M05",
+          "name": "Carré Bois 100×100 mm",
           "thumb": "assets/bandeaux/M05/image.webp",
           "full": "assets/bandeaux/M05/image.webp",
-          "fields": {},
+          "fields": {
+            "Technique": "Gravure laser",
+            "Dimensions": "100×100 mm",
+            "Épaisseur": "5 mm",
+            "Essences": "Sapin"
+          },
           "finitions": [],
-          "notes": "Épaisseur: 5 mm\nEssences: Sapin"
-        }
-      ]
-    },
-    {
-      "id": "M06",
-      "title": "Carré Bois 100×100 mm",
-      "thumb": "assets/bandeaux/M06/image.webp",
-      "full": "assets/bandeaux/M06/image.webp",
-      "variants": [
+          "notes": ""
+        },
         {
-          "id": "base",
-          "name": "Base",
+          "id": "M06",
+          "name": "Carré Bois 100×100 mm",
           "thumb": "assets/bandeaux/M06/image.webp",
           "full": "assets/bandeaux/M06/image.webp",
-          "fields": {},
+          "fields": {
+            "Technique": "Gravure laser",
+            "Dimensions": "100×100 mm",
+            "Épaisseur": "5 mm",
+            "Essences": "Noyer"
+          },
           "finitions": [],
-          "notes": "Épaisseur: 5 mm\nEssences:  Noyer"
+          "notes": ""
         }
       ]
     },
     {
-      "id": "M07",
-      "title": "Carré Bois décaissé 100×100 mm",
+      "id": "CARRE-DECAISSE-100",
+      "title": "Plaque carrée décaissée 100×100 mm",
       "thumb": "assets/bandeaux/M07/image.webp",
-      "full": "assets/bandeaux/M07/image.webp",
       "variants": [
         {
-          "id": "base",
-          "name": "Base",
+          "id": "M07",
+          "name": "Carré Bois décaissé 100×100 mm",
           "thumb": "assets/bandeaux/M07/image.webp",
           "full": "assets/bandeaux/M07/image.webp",
-          "fields": {},
+          "fields": {
+            "Technique": "Gravure laser",
+            "Dimensions": "100×100 mm",
+            "Épaisseur": "5 mm - Légère cavité",
+            "Essences": "Noyer ou Sapin"
+          },
           "finitions": [],
-          "notes": "Épaisseur: 5 mm — Légère cavité\nEssences: Noyer ou Sapin\nSUIVANT DISPONIBILITÉ"
+          "notes": "SUIVANT DISPONIBILITÉ"
         }
       ]
     },
     {
-      "id": "M08",
-      "title": "Carte de visite en métal !",
+      "id": "CARTE-METAL",
+      "title": "Carte de visite en métal",
       "thumb": "assets/bandeaux/M08/image.webp",
-      "full": "assets/bandeaux/M08/image.webp",
       "variants": [
         {
-          "id": "base",
-          "name": "Base",
+          "id": "M08",
+          "name": "Carte de visite en métal !",
           "thumb": "assets/bandeaux/M08/image.webp",
           "full": "assets/bandeaux/M08/image.webp",
-          "fields": {},
+          "fields": {
+            "Technique": "Gravure laser",
+            "Épaisseur": "0.2 mm - Souple"
+          },
           "finitions": [],
-          "notes": "Parfait pour des invitations, des éléments décoratifs.\nÉpaisseur: 0.2 mm - Souple\nMatière : Aluminium"
+          "notes": "Parfait pour des invitations, des éléments décoratifs.\nMatière : Aluminium"
         }
       ]
     },
     {
-      "id": "M09",
-      "title": "À vous de jouer !",
+      "id": "CUSTOM",
+      "title": "À vous de jouer",
       "thumb": "assets/bandeaux/M09/image.webp",
-      "full": "assets/bandeaux/M09/image.webp",
       "variants": [
         {
-          "id": "base",
-          "name": "Base",
+          "id": "M09",
+          "name": "À vous de jouer !",
           "thumb": "assets/bandeaux/M09/image.webp",
           "full": "assets/bandeaux/M09/image.webp",
-          "fields": {},
+          "fields": {
+            "Technique": "Gravure laser"
+          },
           "finitions": [],
           "notes": "Zonne de gravure maximum 400x400.\nAu plaisir d'en discuter.\nPlanche à découper, Manches, Verre, Plastique, Stensils, Guitare, Outils... ( Bientôt possible sur certains métaux)"
         }
       ]
     },
     {
-      "id": "M10",
+      "id": "PLANCHE-200x300",
       "title": "Planche 200×300 mm",
       "thumb": "assets/bandeaux/M10/image.webp",
-      "full": "assets/bandeaux/M10/image.webp",
       "variants": [
         {
-          "id": "base",
-          "name": "Base",
+          "id": "M10",
+          "name": "Planche 200×300 mm",
           "thumb": "assets/bandeaux/M10/image.webp",
           "full": "assets/bandeaux/M10/image.webp",
-          "fields": {},
+          "fields": {
+            "Technique": "Gravure laser",
+            "Dimensions": "200×300 mm",
+            "Épaisseur": "2 mm - Facile à découper",
+            "Essences": "contre-plaqué"
+          },
           "finitions": [],
-          "notes": "Épaisseur: 2 mm — Facile à découper\nEssences: contre-plaqué"
+          "notes": ""
         }
       ]
     }

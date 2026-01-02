@@ -1,178 +1,159 @@
 <!DOCTYPE html>
-
 <html lang="fr" class="intro-pre">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Empreinte de Bois – Portfolio</title>
-<meta content="Portfolio 3D et gravure numérique : sélection de projets, démarche, matériaux et contact." name="description"/>
-<link href="styles.css" rel="stylesheet"/>
-  <link href="assets/intro/intro.css" rel="stylesheet"/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Empreinte de Bois – Portfolio</title>
+  <meta name="description" content="Portfolio 3D et gravure numérique : sélection de projets, démarche, matériaux et contact."/>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="assets/intro/intro.css"/>
   <script>document.documentElement.classList.add("intro-pre");</script>
 </head>
 <body>
-<div id="site-root">
+  <!-- Fond animé global (fixe, derrière tout) -->
+  <canvas id="background-canvas" aria-hidden="true"></canvas>
 
-<!-- Fond animé global (fixe, derrière tout) -->
-<canvas aria-hidden="true" id="background-canvas"></canvas>
-<!-- HEADER STICKY -->
-<header class="site-header" id="site-header">
-<div class="shell shell--row">
-<a class="site-logo" href="#top">
-<span class="site-logo__text">Empreinte de Bois</span>
-</a>
-<nav aria-label="Navigation principale" class="site-nav"><a href="#portfolio">Galerie</a><a href="#models">Modèles</a><a href="#contact">Contact</a></nav>
-</div>
-</header>
-<main id="top">
-<!-- HERO SECTION -->
-<section aria-labelledby="hero-title" class="hero">
-<div class="hero__bg"></div>
-<div class="shell hero__content">
-<div class="hero__text">
-<p class="eyebrow">Conception, création &amp; gravure laser.</p>
-<h1 id="hero-title">Donnons du relief à vos idées. </h1>
-<p class="hero__subtitle">
-   Création artisanale sur demande. 
-          </p>
-<div class="hero__actions">
-<a class="btn btn--primary" href="#portfolio">Voir la galerie</a>
-<a class="btn btn--ghost" href="#contact">Discuter d’un projet</a>
-</div>
-<p class="hero__hint">Scroll pour explorer la galerie ↓ </p>
-</div>
-<div class="hero__preview">
-<div class="hero-card">
-<img alt="Carré Bois Sapin — support en bois" loading="lazy" src="assets/logo.png"/>
-</div>
-</div>
-</div>
-</section>
-<!-- GALERIE SECTION -->
-<section aria-labelledby="portfolio-title" class="section" data-gallery="auto" id="portfolio">
-<div class="shell">
-<div class="section__hdr">
-<h2 id="portfolio-title">Galerie</h2>
-<p>Une sélection de projets récents : matières, essais de lumière, compositions et maquettes.</p>
-</div><div class="chips"><button class="chip is-active" data-filter="all" type="button">Tout</button><button class="chip" data-filter="gravure" type="button">Gravure</button><button class="chip" data-filter="accessoire" type="button">Accessoire</button><button class="chip" data-filter="maquette" type="button">Maquette</button></div>
-<div class="gallery-grid"><!-- Rempli automatiquement par gallery.js via data/gallery.json --></div><button class="gallery-more-banner" id="galleryMoreBtn" type="button">Voir plus</button>
-</div>
-</section>
-<!-- PROCESS SECTION -->
-<section aria-labelledby="process-title" class="section section--alt" id="process">
-<div class="shell">
-<div class="section__hdr">
-<h2 id="process-title">Démarche et service</h2>
-<p>Gravure multi-support, découpe, carte de visite métal, reprise de logo ou dessin. </p>
-</div>
-<div class="process-grid">
-<article class="process-card">
-<h3>1. Intention &amp; contraintes</h3>
-<p>Chaques projets est unique : support, format, étude, quantité. L’idée, c’est d'explorer des nouveautés ou s'inspirer d'autres projets.</p>
-</article>
-<article class="process-card">
-<h3>2. Études &amp; essais</h3>
-<p>Travail en 2D et 3D idées. Certains concepts ont déjà des bases solides, d'autres demandent d'être étudiés.</p>
-</article>
-<article class="process-card">
-<h3>3. Passage matière</h3>
-<p>Tests sur bois ou autres matériaux, ajustement, délais.</p>
-</article>
-<article class="process-card">
-<h3>4. Finitions &amp; variations</h3>
-<p>Déclinaisons de bases communes: formats, couleurs, essences, traitements ou séries. </p>
-</article>
-</div>
-</div>
-</section>
-<!-- MODÈLES & DÉCLINAISONS -->
-<section aria-labelledby="models-title" class="section" id="models">
-<div class="shell">
-<div class="section__hdr">
-<h2 id="models-title">Modèles &amp; options</h2>
-<p>Choisissez un support et explorez ses variantes de matière ou de couleurs. Les éléments choisis apparaissent dans le formulaire de contact. </p>
-</div>
-<div class="models-wrapper">
-<aside aria-label="Liste des modèles" class="models-list"></aside>
-<div aria-live="polite" class="model-preview">
-<div class="model-main">
-<img alt="" src=""/>
-</div>
-<div class="model-info">
-<h3></h3>
-<p></p>
-</div>
-<div aria-label="Variantes" class="model-variants"></div>
-<button class="add-selection btn btn--primary" type="button">Ajouter à ma sélection</button>
-</div>
-</div>
-</div>
-</section>
-<!-- À PROPOS -->
-<section aria-labelledby="about-title" class="section" id="about">
-<div class="shell about">
-<div class="about__text">
-<h2 id="about-title">À propos</h2>
-<p>Je conçois des images destinés à devenir des objets physiques : La galerie présente des pièces reproducibles.</p>
-<p>Mon travail mélange étude, connaissance du rendu matière et contraintes physiques. L’objectif : explorer les possibilités.</p>
-</div>
-<ul aria-label="Champs de travail" class="about__tags">
-</ul>
-</div>
-</section>
-<!-- CONTACT -->
-<section aria-labelledby="contact-title" class="section section--alt" id="contact">
-<div class="shell contact">
-<div class="contact__text">
-<h2 id="contact-title">Contact</h2>
-<p>Un projet, une idée ou juste une question sur la faisabilité d’une pièce ? Envoyez quelques lignes, éventuellement des visuels, et on voit ce qui est réaliste. Voici mon adresse mail: Empreinte.de.bois@gmail.com</p>
-</div>
-<form action="#" class="contact__form" method="post">
-<label>
-            Nom
-            <input autocomplete="name" name="name" required="" type="text"/>
-</label>
-<label>
-            Email
-            <input autocomplete="email" name="email" required="" type="email"/>
-</label>
-<label>
-            Message
-            <textarea name="message" required="" rows="5"></textarea>
-</label>
-<label>
-            Sélection
-            <textarea id="selection-summary" name="selection" readonly="" rows="3"></textarea>
-</label>
-<button class="btn btn--primary" type="submit">Envoyer</button>
-</form>
-</div>
-</section>
-</main>
-<!-- FOOTER -->
-<footer class="site-footer">
-<div class="shell site-footer__inner">
-<p>© Empreinte de Bois – Empreinte.de.bois@gmail.com</p>
-<div class="site-footer__links">
-<a href="#top">Retour en haut</a>
-</div>
-</div>
-</footer>
-<!-- Lightbox modal for gallery -->
-<div aria-hidden="true" class="lightbox" id="lightbox">
-<button aria-label="Fermer" class="lightbox__backdrop" data-close="1"></button>
-<figure class="lightbox__body">
-<img alt="" id="lightbox-img" src=""/>
-<figcaption id="lightbox-caption"></figcaption>
-<button aria-label="Fermer la vue détaillée" class="lightbox__close" data-close="1">×</button>
-</figure>
-</div><div aria-hidden="true" class="lightbox lightbox--more" id="galleryMore"><button aria-label="Fermer" class="lightbox__backdrop" data-close="1"></button><figure class="lightbox__body"><button aria-label="Fermer" class="lightbox__close" data-close="1">×</button><figcaption class="lightbox__caption">Galerie</figcaption><div class="gallery-more-grid"></div></figure></div>
+  <div id="site-root">
+    <!-- HEADER STICKY -->
+    <header class="site-header" id="site-header">
+      <div class="shell shell--row">
+        <a class="site-logo" href="#top"><span class="site-logo__text">Empreinte de Bois</span></a>
+        <nav class="site-nav" aria-label="Navigation principale">
+          <a href="#portfolio">Galerie</a>
+          <a href="#models">Modèles</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
 
-</div>
-<script defer src="assets/intro/intro.js"></script>
-<script defer="" src="page.js"></script>
-<!-- SCRIPT FOND ANIMÉ (cover, non répété, fixe) -->
-<script>
+    <main id="top">
+      <!-- HERO SECTION -->
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__bg"></div>
+        <div class="shell hero__content">
+          <div class="hero__text">
+            <p class="eyebrow">Conception, création &amp; gravure laser.</p>
+            <h1 id="hero-title">Donnons du relief à vos idées.</h1>
+            <p class="hero__subtitle">Création artisanale sur demande.</p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="#portfolio">Voir la galerie</a>
+              <a class="btn btn--ghost" href="#contact">Discuter d’un projet</a>
+            </div>
+            <p class="hero__hint">Scroll pour explorer la galerie ↓</p>
+          </div>
+          <div class="hero__preview">
+            <div class="hero-card">
+              <img src="assets/bandeaux/M01/image.webp" alt="Aperçu" loading="lazy"/>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GALERIE SECTION -->
+      <section id="portfolio" class="section" aria-labelledby="portfolio-title" data-gallery="auto">
+        <div class="shell">
+          <div class="section__hdr">
+            <h2 id="portfolio-title">Galerie</h2>
+            <p>Une sélection de projets récents : matières, essais de lumière, compositions et maquettes.</p>
+          </div>
+
+          <div class="chips">
+            <button class="chip is-active" type="button" data-filter="all">Tout</button>
+            <button class="chip" type="button" data-filter="gravure">Gravure</button>
+            <button class="chip" type="button" data-filter="accessoire">Accessoire</button>
+            <button class="chip" type="button" data-filter="maquette">Maquette</button>
+          </div>
+
+          <div class="gallery-grid"><!-- rempli automatiquement par gallery.js --></div>
+          <button id="galleryMoreBtn" class="gallery-more-banner" type="button">Voir plus</button>
+        </div>
+      </section>
+
+      <!-- PROCESS SECTION -->
+      <section id="process" class="section section--alt" aria-labelledby="process-title">
+        <div class="shell">
+          <div class="section__hdr">
+            <h2 id="process-title">Démarche et service</h2>
+            <p>Gravure multi-support, découpe, carte de visite métal, reprise de logo ou dessin.</p>
+          </div>
+          <div class="process-grid">
+            <article class="process-card"><h3>1. Intention &amp; contraintes</h3><p>Support, format, quantité, délais, faisabilité : on pose le cadre.</p></article>
+            <article class="process-card"><h3>2. Études &amp; essais</h3><p>Travail 2D/3D, tests et itérations jusqu’au rendu voulu.</p></article>
+            <article class="process-card"><h3>3. Passage matière</h3><p>Essais sur bois ou autres matériaux, ajustements, validation.</p></article>
+            <article class="process-card"><h3>4. Finitions &amp; variations</h3><p>Déclinaisons : formats, essences, traitements, séries.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <!-- MODÈLES & OPTIONS -->
+      <section id="models" class="section" aria-labelledby="models-title">
+        <div class="shell">
+          <div class="section__hdr">
+            <h2 id="models-title">Modèles &amp; options</h2>
+            <p>Choisissez un support et explorez ses variantes de matière. Votre sélection remonte dans le formulaire de contact.</p>
+          </div>
+          <div id="modelsGrid" class="models-grid"></div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact" class="section section--alt" aria-labelledby="contact-title">
+        <div class="shell contact">
+          <div class="contact__text">
+            <h2 id="contact-title">Contact</h2>
+            <p>Un projet, une idée ou une question de faisabilité ? Décrivez votre besoin. Mail : Empreinte.de.bois@gmail.com</p>
+          </div>
+          <form class="contact__form" action="#" method="post">
+            <label>Nom <input type="text" name="name" autocomplete="name" required></label>
+            <label>Email <input type="email" name="email" autocomplete="email" required></label>
+            <label>Message <textarea name="message" rows="5" required></textarea></label>
+            <label>Sélection <textarea id="selection-summary" name="selection" rows="3" readonly></textarea></label>
+            <button class="btn btn--primary" type="submit">Envoyer</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell site-footer__inner">
+        <p>© Empreinte de Bois – Empreinte.de.bois@gmail.com</p>
+        <div class="site-footer__links"><a href="#top">Retour en haut</a></div>
+      </div>
+    </footer>
+
+    <!-- Lightbox galerie -->
+    <div id="lightbox" class="lightbox" aria-hidden="true">
+      <button class="lightbox__backdrop" data-close="1" aria-label="Fermer"></button>
+      <figure class="lightbox__body">
+        <img id="lightbox-img" src="" alt=""/>
+        <figcaption id="lightbox-caption"></figcaption>
+        <button class="lightbox__close" data-close="1" aria-label="Fermer la vue détaillée">×</button>
+      </figure>
+    </div>
+
+    <!-- Modal “Voir plus” -->
+    <div id="galleryMore" class="lightbox lightbox--more" aria-hidden="true">
+      <button class="lightbox__backdrop" data-close="1" aria-label="Fermer"></button>
+      <figure class="lightbox__body">
+        <button class="lightbox__close" data-close="1" aria-label="Fermer">×</button>
+        <figcaption class="lightbox__caption">Galerie</figcaption>
+        <div class="gallery-more-grid"></div>
+      </figure>
+    </div>
+
+    <!-- Lightbox modèles -->
+    <div id="modelbox" class="lightbox lightbox--model" aria-hidden="true">
+      <button class="lightbox__backdrop" data-close="1" aria-label="Fermer"></button>
+      <figure class="lightbox__body">
+        <img id="modelbox-img" src="" alt=""/>
+        <div id="modelbox-content" class="modelbox__content"></div>
+        <button class="lightbox__close" data-close="1" aria-label="Fermer">×</button>
+      </figure>
+    </div>
+  </div>
+
+  <script>
+
   // ===============================
   // PARAMÈTRES (à modifier)
   // ===============================
@@ -376,6 +357,11 @@
 
     requestAnimationFrame(frame);
   })();
+  
   </script>
-<script defer="True" src="gallery.js"></script></body>
+
+  <script defer src="page.js"></script>
+  <script defer src="gallery.js"></script>
+  <script defer src="assets/intro/intro.js"></script>
+</body>
 </html>

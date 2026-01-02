@@ -1,260 +1,276 @@
+/* ============================================================
+   page.js — interactions page (modèles + sélection)
+   ------------------------------------------------------------
+   - Charge data/models.json (généré automatiquement par workflow)
+   - Affiche les modèles sous forme de miniatures (sans texte)
+   - Lightbox modèle : déclinaisons (matières), finitions, quantité, série
+   - Un seul matériau sélectionné à la fois : la sélection remplace la précédente
+   ============================================================ */
+
 document.addEventListener("DOMContentLoaded", () => {
-  const __AUTO_GALLERY__ = document.querySelector('section#portfolio[data-gallery="auto"]');
-
-  // --- Galerie (legacy) : désactivée si la galerie auto est active ---
-  if (!__AUTO_GALLERY__) {
-
-  // Gestion des filtres de la galerie
-  const filterButtons = Array.from(document.querySelectorAll(".chip"));
-  const galleryItems = Array.from(document.querySelectorAll(".gallery-item"));
-
-  filterButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const filter = btn.dataset.filter;
-      // toggle active class on chips
-      filterButtons.forEach((b) => {
-        b.classList.toggle("is-active", b === btn);
-        b.setAttribute("aria-selected", b === btn);
-      });
-      // show/hide gallery items
-      galleryItems.forEach((item) => {
-        const cat = item.dataset.cat || "";
-        if (filter === "all" || cat.includes(filter)) {
-          item.style.display = "";
-        } else {
-          item.style.display = "none";
-        }
-      });
-    });
-  });
-
-  // Lightbox pour la galerie
-  const lightbox = document.getElementById("lightbox");
-  const lbImg = document.getElementById("lightbox-img");
-  const lbCaption = document.getElementById("lightbox-caption");
-
-  document.addEventListener("click", (evt) => {
-    // si clic sur un bouton de galerie
-    const btn = evt.target.closest(".gallery-item__btn");
-    if (btn) {
-      const fullSrc = btn.getAttribute("data-full");
-      const title = btn.querySelector(".gallery-item__meta h3").textContent.trim();
-      const desc = btn.querySelector(".gallery-item__meta p").textContent.trim();
-      lbImg.src = fullSrc;
-      lbImg.alt = title;
-      lbCaption.textContent = `${title} — ${desc}`;
-      lightbox.classList.add("is-open");
-      lightbox.setAttribute("aria-hidden", "false");
-      return;
-    }
-    // fermeture de la lightbox
-    if (
-      evt.target.dataset.close === "1" ||
-      evt.target.classList.contains("lightbox__close")
-    ) {
-      lightbox.classList.remove("is-open");
-      lightbox.setAttribute("aria-hidden", "true");
-      lbImg.src = "";
-    }
-  });
-  // fermer avec échappement
-  document.addEventListener("keydown", (evt) => {
-    if (evt.key === "Escape" && lightbox.classList.contains("is-open")) {
-      lightbox.classList.remove("is-open");
-      lightbox.setAttribute("aria-hidden", "true");
-      lbImg.src = "";
-    }
-  });
-  }
-
-// Données pour les modèles M01 à M10
-  const designs = [
-    {
-      id: "M01",
-      name: "Rond Sapin",
-      desc: "Rond Sapin\nÉpaisseur: 15 mm — Diamètre: 100 mm\nLot: 4 pièces minimum",
-      image: "assets/bandeaux/M01/image.png",
-      thumb: "assets/bandeaux/M01/image.png",
-      variants: [],
-    },
-    {
-      id: "M02",
-      name: "Rond Contreplaqué",
-      desc: "Rond Contreplaqué\nÉpaisseur: 20 mm — Diamètre: 100 mm\nLot: 4 pièces minimum",
-      image: "assets/bandeaux/M02/image.png",
-      thumb: "assets/bandeaux/M02/image.png",
-      variants: [
-        "assets/bandeaux/M02/file_0000000019b8620aaf763fc03240ef9d_w640.webp",
-      ],
-    },
-    {
-      id: "M03",
-      name: "Rond Similicuir blanc",
-      desc: "Rond Similicuir blanc\nCouleur: blanc\nLot: 6 pièces minimum",
-      image: "assets/bandeaux/M03/image.png",
-      thumb: "assets/bandeaux/M03/image.png",
-      variants: [
-        "assets/bandeaux/M03/file_0000000019b8620aaf763fc03240ef9d_w640.webp",
-      ],
-    },
-    {
-      id: "M04",
-      name: "Rond Similicuir rouge",
-      desc: "Rond Similicuir rouge\nCouleur: rouge\nLot: 6 pièces minimum",
-      image: "assets/bandeaux/M04/image.png",
-      thumb: "assets/bandeaux/M04/image.png",
-      variants: [
-        "assets/bandeaux/M04/file_0000000019b8620aaf763fc03240ef9d_w640.webp",
-      ],
-    },
-    {
-      id: "M05",
-      name: "Carré Bois Sapin",
-      desc: "Carré Bois 100×100 mm\nÉpaisseur: 5 mm\nEssence: Sapin",
-      image: "assets/bandeaux/M05/image.png",
-      thumb: "assets/bandeaux/M05/image.png",
-      variants: [
-        "assets/bandeaux/M05/file_0000000019b8620aaf763fc03240ef9d_w640.webp",
-      ],
-    },
-    {
-      id: "M06",
-      name: "Carré Bois Noyer",
-      desc: "Carré Bois 100×100 mm\nÉpaisseur: 5 mm\nEssence: Noyer",
-      image: "assets/bandeaux/M06/image.png",
-      thumb: "assets/bandeaux/M06/image.png",
-      variants: [
-        "assets/bandeaux/M06/file_0000000019b8620aaf763fc03240ef9d_w640.webp",
-      ],
-    },
-    {
-      id: "M07",
-      name: "Carré Bois décaissé",
-      desc: "Carré Bois décaissé 100×100 mm\nÉpaisseur: 5 mm\nEssence: Noyer",
-      image: "assets/bandeaux/M07/image.png",
-      thumb: "assets/bandeaux/M07/image.png",
-      variants: [
-        "assets/bandeaux/M07/file_0000000019b8620aaf763fc03240ef9d_w640.webp",
-      ],
-    },
-    {
-      id: "M08",
-      name: "Carte métal",
-      desc: "Carte de visite en métal !\nFormat: 85×55 mm",
-      image: "assets/bandeaux/M08/image.png",
-      thumb: "assets/bandeaux/M08/image.png",
-      variants: [],
-    },
-    {
-      id: "M09",
-      name: "À vous de jouer !",
-      desc: "À vous de jouer !\nPièce customisable à volonté",
-      image: "assets/bandeaux/M09/image.png",
-      thumb: "assets/bandeaux/M09/image.png",
-      variants: [],
-    },
-    {
-      id: "M10",
-      name: "Planche 200×300 mm",
-      desc: "Planche 200×300 mm\nÉpaisseur: 5 mm\nEssence: Contreplaqué",
-      image: "assets/bandeaux/M10/image.png",
-      thumb: "assets/bandeaux/M10/image.png",
-      variants: [
-        "assets/bandeaux/M10/file_0000000019b8620aaf763fc03240ef9d_w640.webp",
-      ],
-    },
-  ];
-
-  // Création de la liste dans le DOM
-  const listContainer = document.querySelector(".models-list");
-  const previewContainer = document.querySelector(".model-preview");
-  const modelImg = previewContainer.querySelector(".model-main img");
-  const modelTitle = previewContainer.querySelector(".model-info h3");
-  const modelDesc = previewContainer.querySelector(".model-info p");
-  const variantsContainer = previewContainer.querySelector(".model-variants");
-  const addBtn = previewContainer.querySelector(".add-selection");
+  const modelsGrid = document.getElementById("modelsGrid");
+  const modelbox = document.getElementById("modelbox");
+  const modelboxImg = document.getElementById("modelbox-img");
+  const modelboxContent = document.getElementById("modelbox-content");
   const selectionSummary = document.getElementById("selection-summary");
 
-  let selectedModel = null;
-  let selectedVariantIndex = 0;
-
-  function updatePreview(model) {
-    selectedModel = model;
-    selectedVariantIndex = 0;
-    modelImg.src = model.image;
-    modelImg.alt = model.name;
-    modelTitle.textContent = model.name;
-    modelDesc.textContent = model.desc;
-    variantsContainer.innerHTML = "";
-    // Base image always considered variant index 0
-    const baseThumb = document.createElement("div");
-    baseThumb.className = "variant active";
-    const baseImg = document.createElement("img");
-    baseImg.src = model.thumb;
-    baseImg.alt = `${model.name} (variante 0)`;
-    baseThumb.appendChild(baseImg);
-    baseThumb.addEventListener("click", () => {
-      selectedVariantIndex = 0;
-      modelImg.src = model.image;
-      // toggle active
-      variantsContainer
-        .querySelectorAll(".variant")
-        .forEach((el) => el.classList.remove("active"));
-      baseThumb.classList.add("active");
-    });
-    variantsContainer.appendChild(baseThumb);
-    // Additional variants
-    model.variants.forEach((vSrc, idx) => {
-      const variantDiv = document.createElement("div");
-      variantDiv.className = "variant";
-      const vImg = document.createElement("img");
-      vImg.src = vSrc;
-      vImg.alt = `${model.name} (variante ${idx + 1})`;
-      variantDiv.appendChild(vImg);
-      variantDiv.addEventListener("click", () => {
-        selectedVariantIndex = idx + 1;
-        modelImg.src = vSrc;
-        variantsContainer
-          .querySelectorAll(".variant")
-          .forEach((el) => el.classList.remove("active"));
-        variantDiv.classList.add("active");
-      });
-      variantsContainer.appendChild(variantDiv);
-    });
+  if (!modelsGrid || !modelbox || !modelboxImg || !modelboxContent || !selectionSummary) {
+    return;
   }
 
-  // Populate list
-  designs.forEach((model) => {
-    const li = document.createElement("div");
-    li.className = "models-item";
-    li.innerHTML = `<h4>${model.name}</h4><p>${model.desc.split("\n")[0]}</p>`;
-    li.addEventListener("click", () => {
-      // highlight current selection
-      listContainer
-        .querySelectorAll(".models-item")
-        .forEach((el) => el.classList.remove("active"));
-      li.classList.add("active");
-      updatePreview(model);
-    });
-    listContainer.appendChild(li);
-  });
-  // Select first by default
-  if (designs.length > 0) {
-    listContainer.firstChild.classList.add("active");
-    updatePreview(designs[0]);
+  /** @type {{models: any[]}} */
+  let manifest = { models: [] };
+  let currentModel = null;
+  let currentVariantIndex = 0;
+  let selectedFinition = null;
+  let quantityValue = "";
+  let isSerie = false;
+
+  function escapeHtml(s) {
+    return (s || "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
   }
 
-  // Handle adding to selection summary
-  addBtn.addEventListener("click", () => {
-    if (!selectedModel) return;
-    const baseName = selectedModel.name;
-    const variantSuffix = selectedVariantIndex > 0 ? ` (Variante ${selectedVariantIndex})` : "";
-    const entry = `${baseName}${variantSuffix}`;
-    // Avoid duplicates
-    const current = selectionSummary.value.split("\n").filter((l) => l.trim());
-    if (!current.includes(entry)) {
-      current.push(entry);
+  function openModal() {
+    modelbox.classList.add("is-open");
+    modelbox.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    modelbox.classList.remove("is-open");
+    modelbox.setAttribute("aria-hidden", "true");
+    // Décharger l'image grande pour libérer mémoire
+    modelboxImg.removeAttribute("src");
+    modelboxImg.removeAttribute("alt");
+    modelboxContent.innerHTML = "";
+    document.body.style.overflow = "";
+  }
+
+  function resetOptions() {
+    selectedFinition = null;
+    quantityValue = "";
+    isSerie = false;
+  }
+
+  function getVariant(model, index) {
+    const vars = Array.isArray(model?.variants) ? model.variants : [];
+    return vars[Math.max(0, Math.min(index, vars.length - 1))] || null;
+  }
+
+  function renderModelbox() {
+    if (!currentModel) return;
+    const v = getVariant(currentModel, currentVariantIndex);
+    if (!v) return;
+
+    // Image
+    const imgSrc = v.full || currentModel.full || v.thumb || currentModel.thumb || "";
+    modelboxImg.src = imgSrc;
+    modelboxImg.alt = v.name ? `${currentModel.title} — ${v.name}` : (currentModel.title || "");
+
+    // Content
+    modelboxContent.innerHTML = "";
+
+    // Header
+    const title = document.createElement("div");
+    title.className = "lb-title";
+    title.textContent = currentModel.title || currentModel.id || "Modèle";
+    modelboxContent.appendChild(title);
+    const sep = document.createElement("div");
+    sep.className = "lb-sep";
+    modelboxContent.appendChild(sep);
+
+    // Bloc infos
+    const fields = v.fields || {};
+    const rows = [];
+    // Matière affichée = nom de variante si dispo
+    if (v.name) rows.push(["Matières", v.name]);
+    if (fields.Technique || fields["Technique"]) rows.push(["Technique", fields.Technique || fields["Technique"]]);
+    if (fields.Dimensions || fields["Dimensions"]) rows.push(["Dimensions", fields.Dimensions || fields["Dimensions"]]);
+
+    // Finitions (liste possible)
+    const finList = Array.isArray(v.finitions) ? v.finitions : [];
+    if (finList.length) rows.push(["Finitions", finList.join(", ")]);
+
+    for (const [k, val] of rows) {
+      const row = document.createElement("div");
+      row.className = "lb-row";
+      row.innerHTML = `<span class="lb-k">${escapeHtml(k)}</span><span class="lb-v">${escapeHtml(val)}</span>`;
+      modelboxContent.appendChild(row);
     }
-    selectionSummary.value = current.join("\n");
+
+    if (v.notes) {
+      const notes = document.createElement("div");
+      notes.className = "lb-notes";
+      notes.textContent = v.notes;
+      modelboxContent.appendChild(notes);
+    }
+
+    // Choix des déclinaisons
+    const decla = document.createElement("div");
+    decla.className = "modelbox__section";
+    decla.innerHTML = `<div class="modelbox__sectionTitle">Choix des déclinaisons</div>`;
+    const strip = document.createElement("div");
+    strip.className = "variant-strip";
+    (currentModel.variants || []).forEach((vv, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = `variant-chip ${idx === currentVariantIndex ? "is-active" : ""}`;
+      const im = document.createElement("img");
+      im.loading = "lazy";
+      im.decoding = "async";
+      im.src = vv.thumb || vv.full || "";
+      im.alt = vv.name || `Variante ${idx + 1}`;
+      b.appendChild(im);
+      b.addEventListener("click", () => {
+        // Changement de matière => reset options
+        currentVariantIndex = idx;
+        resetOptions();
+        renderModelbox();
+      });
+      strip.appendChild(b);
+    });
+    decla.appendChild(strip);
+    modelboxContent.appendChild(decla);
+
+    // Finitions optionnelles
+    const fin = document.createElement("div");
+    fin.className = "modelbox__section";
+    fin.innerHTML = `<div class="modelbox__sectionTitle">Finitions (optionnel)</div>`;
+    const pills = document.createElement("div");
+    pills.className = "pills";
+    if (finList.length) {
+      finList.forEach((f) => {
+        const p = document.createElement("button");
+        p.type = "button";
+        p.className = `pill ${selectedFinition === f ? "is-active" : ""}`;
+        p.textContent = f;
+        p.addEventListener("click", () => {
+          selectedFinition = (selectedFinition === f) ? null : f;
+          renderModelbox();
+        });
+        pills.appendChild(p);
+      });
+    } else {
+      const empty = document.createElement("div");
+      empty.className = "lb-notes";
+      empty.textContent = "Aucune finition définie pour cette matière.";
+      fin.appendChild(empty);
+    }
+    fin.appendChild(pills);
+    modelboxContent.appendChild(fin);
+
+    // Quantité + série
+    const qty = document.createElement("div");
+    qty.className = "modelbox__section";
+    qty.innerHTML = `<div class="modelbox__sectionTitle">Quantité (optionnel)</div>`;
+
+    const row = document.createElement("div");
+    row.className = "qty-row";
+    const lab = document.createElement("span");
+    lab.className = "qty-label";
+    lab.textContent = "Quantité";
+
+    const input = document.createElement("input");
+    input.className = "qty-input";
+    input.type = "number";
+    input.min = "1";
+    input.step = "1";
+    input.placeholder = "—";
+    input.value = quantityValue;
+    input.addEventListener("input", () => {
+      quantityValue = input.value;
+    });
+
+    const serieWrap = document.createElement("div");
+    serieWrap.className = "serie-wrap";
+    const ck = document.createElement("input");
+    ck.type = "checkbox";
+    ck.checked = !!isSerie;
+    ck.addEventListener("change", () => { isSerie = ck.checked; });
+    const ckLab = document.createElement("label");
+    ckLab.textContent = "Série";
+    serieWrap.appendChild(ck);
+    serieWrap.appendChild(ckLab);
+
+    row.appendChild(lab);
+    row.appendChild(input);
+    row.appendChild(serieWrap);
+    qty.appendChild(row);
+    modelboxContent.appendChild(qty);
+
+    // Bouton final
+    const choose = document.createElement("button");
+    choose.type = "button";
+    choose.className = "btn btn--primary modelbox__choose";
+    choose.textContent = "Je choisis ce model";
+    choose.addEventListener("click", () => {
+      // Un seul matériau dans le formulaire : on remplace
+      const parts = [];
+      parts.push(`${currentModel.title || currentModel.id}`);
+      if (v.name) parts.push(`Matière : ${v.name}`);
+      if (fields.Technique || fields["Technique"]) parts.push(`Technique : ${fields.Technique || fields["Technique"]}`);
+      if (fields.Dimensions || fields["Dimensions"]) parts.push(`Dimensions : ${fields.Dimensions || fields["Dimensions"]}`);
+      if (selectedFinition) parts.push(`Finition : ${selectedFinition}`);
+      if (quantityValue) parts.push(`Quantité : ${quantityValue}`);
+      if (isSerie) parts.push(`Série : oui`);
+      selectionSummary.value = parts.join("\n");
+
+      closeModal();
+      // Amène l'utilisateur vers le contact
+      const contact = document.getElementById("contact");
+      if (contact) contact.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    modelboxContent.appendChild(choose);
+  }
+
+  function openModel(model) {
+    currentModel = model;
+    currentVariantIndex = 0;
+    resetOptions();
+    renderModelbox();
+    openModal();
+  }
+
+  function renderGrid() {
+    modelsGrid.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    (manifest.models || []).forEach((m) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "model-tile";
+      btn.setAttribute("aria-label", m.title || m.id);
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.src = m.thumb || "";
+      img.alt = m.title || m.id;
+      btn.appendChild(img);
+      btn.addEventListener("click", () => openModel(m));
+      frag.appendChild(btn);
+    });
+    modelsGrid.appendChild(frag);
+  }
+
+  async function loadModels() {
+    try {
+      const res = await fetch("data/models.json", { cache: "no-store" });
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      manifest = data && Array.isArray(data.models) ? data : { models: [] };
+      renderGrid();
+    } catch (e) {
+      // fallback: no models
+      modelsGrid.innerHTML = "<p style=\"opacity:.8\">Aucun modèle disponible pour le moment.</p>";
+    }
+  }
+
+  // Close handlers
+  modelbox.addEventListener("click", (evt) => {
+    if (evt.target.closest("[data-close]")) closeModal();
   });
+  document.addEventListener("keydown", (evt) => {
+    if (evt.key === "Escape" && modelbox.classList.contains("is-open")) closeModal();
+  });
+
+  loadModels();
 });
