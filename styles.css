@@ -989,3 +989,18 @@ h1,h2,h3{ color: #fff; }
   width: 100%;
   margin-top: 1rem;
 }
+
+
+/* Background canvas (global, behind intro + site) */
+#background-canvas{
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+#site-root{
+  position: relative;
+  z-index: 1;
+}

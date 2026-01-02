@@ -7,27 +7,26 @@
 <title>Empreinte de Bois – Portfolio</title>
 <meta content="Portfolio 3D et gravure numérique : sélection de projets, démarche, matériaux et contact." name="description"/>
 <link href="styles.css" rel="stylesheet"/>
-<link rel="stylesheet" href="assets/intro/intro.css"/>
+<link href="assets/intro/intro.css" rel="stylesheet"/>
 </head>
 <body>
-<div id="intro-overlay" aria-hidden="false">
-  <div class="intro-stage">
-    <div class="intro-row">
-      <img id="intro-motif-left" class="intro-logo intro-logo--motif" src="assets/intro/logo-motif-left.webp" alt=""/>
-      <div id="intro-texte-wrap" class="intro-logo intro-logo--texte">
-        <img id="intro-texte" src="assets/intro/logo-texte.webp" alt="Empreinte de bois"/>
-        <div id="intro-shards" aria-hidden="true"></div>
-      </div>
-      <img id="intro-motif-right" class="intro-logo intro-logo--motif" src="assets/intro/logo-motif-right.webp" alt=""/>
-    </div>
-    <div id="intro-shockwave" aria-hidden="true"></div>
-    <canvas id="intro-curtain" aria-hidden="true"></canvas>
-  </div>
+<canvas aria-hidden="true" id="background-canvas"></canvas><div aria-hidden="false" id="intro-overlay">
+<div class="intro-stage">
+<div class="intro-row">
+<img alt="" class="intro-logo intro-logo--motif" id="intro-motif-left" src="assets/intro/logo-motif-left.webp"/>
+<div class="intro-logo intro-logo--texte" id="intro-texte-wrap">
+<img alt="Empreinte de bois" id="intro-texte" src="assets/intro/logo-texte.webp"/>
+<div aria-hidden="true" id="intro-shards"></div>
 </div>
-
+<img alt="" class="intro-logo intro-logo--motif" id="intro-motif-right" src="assets/intro/logo-motif-right.webp"/>
+</div>
+<div aria-hidden="true" id="intro-shockwave"></div>
+<canvas aria-hidden="true" id="intro-curtain"></canvas>
+</div>
+</div>
 <div id="site-root">
 <!-- Fond animé global (fixe, derrière tout) -->
-<canvas aria-hidden="true" id="background-canvas"></canvas>
+
 <!-- HEADER STICKY -->
 <header class="site-header" id="site-header">
 <div class="shell shell--row">
@@ -100,13 +99,13 @@
 </section>
 <!-- MODÈLES & DÉCLINAISONS -->
 <section aria-labelledby="models-title" class="section" id="models">
-  <div class="shell">
-    <div class="section__hdr">
-      <h2 id="models-title">Modèles &amp; options</h2>
-      <p>Choisissez un support et explorez ses variantes de matière ou finition. Votre sélection remonte dans le formulaire de contact.</p>
-    </div>
-    <div id="modelsGrid"></div>
-  </div>
+<div class="shell">
+<div class="section__hdr">
+<h2 id="models-title">Modèles &amp; options</h2>
+<p>Choisissez un support et explorez ses variantes de matière ou finition. Votre sélection remonte dans le formulaire de contact.</p>
+</div>
+<div id="modelsGrid"></div>
+</div>
 </section>
 <!-- À PROPOS -->
 <section aria-labelledby="about-title" class="section" id="about">
@@ -122,26 +121,26 @@
 </section>
 <!-- CONTACT -->
 <section aria-labelledby="contact-title" class="section section--alt" id="contact">
-  <div class="shell contact">
-    <div class="contact__text">
-      <h2 id="contact-title">Contact</h2>
-      <p>Un projet, une idée ou juste une question sur la faisabilité ? Écris-moi, je te réponds rapidement.</p>
-      <p>Mail : <strong>Empreinte.de.bois@gmail.com</strong></p>
-    </div>
-    <form class="contact__form" action="#" method="post">
-      <label>Nom
-        <input autocomplete="name" name="name" required type="text"/>
-      </label>
-      <label>Email
-        <input autocomplete="email" name="email" required type="email"/>
-      </label>
-      <label>Message
-        <textarea name="message" required rows="5"></textarea>
-      </label>
-      <input id="selection-summary" name="selection" type="hidden" value=""/>
-      <button class="btn btn--primary" type="submit">Envoyer</button>
-    </form>
-  </div>
+<div class="shell contact">
+<div class="contact__text">
+<h2 id="contact-title">Contact</h2>
+<p>Un projet, une idée ou juste une question sur la faisabilité ? Écris-moi, je te réponds rapidement.</p>
+<p>Mail : <strong>Empreinte.de.bois@gmail.com</strong></p>
+</div>
+<form action="#" class="contact__form" method="post">
+<label>Nom
+        <input autocomplete="name" name="name" required="" type="text"/>
+</label>
+<label>Email
+        <input autocomplete="email" name="email" required="" type="email"/>
+</label>
+<label>Message
+        <textarea name="message" required="" rows="5"></textarea>
+</label>
+<input id="selection-summary" name="selection" type="hidden" value=""/>
+<button class="btn btn--primary" type="submit">Envoyer</button>
+</form>
+</div>
 </section>
 </main>
 <!-- FOOTER -->
@@ -371,12 +370,12 @@
   })();
   </script>
 <script defer="True" src="gallery.js"></script></div>
-<div class="modelbox" id="modelbox" hidden>
-  <div id="modelbox-content">
-    <button class="modelbox-close" type="button" aria-label="Fermer">×</button>
-    <img id="modelbox-img" alt=""/>
-    <div class="modelbox-meta"></div>
-  </div>
+<div class="modelbox" hidden="" id="modelbox">
+<div id="modelbox-content">
+<button aria-label="Fermer" class="modelbox-close" type="button">×</button>
+<img alt="" id="modelbox-img"/>
+<div class="modelbox-meta"></div>
+</div>
 </div>
 </body>
 </html>

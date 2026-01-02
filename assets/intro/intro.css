@@ -16,38 +16,42 @@ html.site-revealing #site-root{
   visibility: visible;
   opacity: 1;
   pointer-events: none;
+--reveal: 0;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,1) calc((var(--reveal) * 100%) + 48px),
+    transparent calc((var(--reveal) * 100%) - 48px),
+    rgba(0,0,0,0) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,1) calc((var(--reveal) * 100%) + 48px),
+    transparent calc((var(--reveal) * 100%) - 48px),
+    rgba(0,0,0,0) 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
+
+
+/* During reveal we show the site but still disable interactions until done */
 
 /* After reveal, everything normal */
 html.site-ready #site-root{
   visibility: visible;
   opacity: 1;
   pointer-events: auto;
+
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
-/* Curtain reveal mask on the site */
-#site-root{
-  --reveal: 0;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    transparent calc((var(--reveal) * 100%) - 48px),
-    rgba(0,0,0,0.15) calc((var(--reveal) * 100%) - 32px),
-    black calc((var(--reveal) * 100%)),
-    black 100%
-  );
-  -webkit-mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-          mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    transparent calc((var(--reveal) * 100%) - 48px),
-    rgba(0,0,0,0.15) calc((var(--reveal) * 100%) - 32px),
-    black calc((var(--reveal) * 100%)),
-    black 100%
-  );
-          mask-size: 100% 100%;
-          mask-repeat: no-repeat;
+/* Curtain reveal mask on the site (only during reveal) */
+
+/* After reveal, remove ma  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 /* Overlay */
