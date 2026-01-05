@@ -1,5 +1,5 @@
 {
-  "count": 74,
+  "count": 55,
   "files": [
     "shard_001.webp",
     "shard_002.webp",
@@ -55,25 +55,6 @@
     "shard_052.webp",
     "shard_053.webp",
     "shard_054.webp",
-    "shard_055.webp",
-    "shard_056.webp",
-    "shard_057.webp",
-    "shard_058.webp",
-    "shard_059.webp",
-    "shard_060.webp",
-    "shard_061.webp",
-    "shard_062.webp",
-    "shard_063.webp",
-    "shard_064.webp",
-    "shard_065.webp",
-    "shard_066.webp",
-    "shard_067.webp",
-    "shard_068.webp",
-    "shard_069.webp",
-    "shard_070.webp",
-    "shard_071.webp",
-    "shard_072.webp",
-    "shard_073.webp",
-    "shard_074.webp"
+    "shard_055.webp"
   ]
 }

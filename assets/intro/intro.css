@@ -183,3 +183,66 @@ html.site-ready #site-root{
   .intro-logo--motif{ max-width: 22vw; height: min(54vh, 420px); }
   .intro-logo--texte{ max-width: 62vw; }
 }
+
+/* --- v2 fixes: overlay dim+halo, mobile viewport, transform origins --- */
+#intro-overlay{
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100vh;
+  z-index: 99999;
+}
+#intro-overlay::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  /* Dim noir + halo subtil (centre plus transparent) */
+  background: radial-gradient(circle at 50% 45%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.78) 55%, rgba(0,0,0,0.88) 100%);
+  opacity: var(--intro-dim, 1);
+  transition: opacity 700ms ease;
+  pointer-events:none;
+}
+#intro-overlay.is-dim-fade{
+  --intro-dim: 0;
+}
+.intro-stage{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.intro-row{
+  /* Use flex to keep proportions stable on mobile */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 3vw, 32px);
+}
+#intro-motif-left{ transform-origin: 100% 50%; }
+#intro-motif-right{ transform-origin: 0% 50%; }
+#intro-texte{ transform-origin: 50% 50%; }
+/* Ensure shards sit above the texte image */
+#intro-texte-wrap{ position: relative; }
+#intro-shards{ position:absolute; inset:0; z-index: 3; pointer-events:none; }
+#intro-texte{ position:relative; z-index: 2; }
+/* Start hint */
+#intro-start-hint{
+  position:absolute;
+  left:50%;
+  bottom: clamp(18px, 4vh, 42px);
+  transform: translateX(-50%);
+  font: 600 12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+#intro-overlay.is-waiting #intro-start-hint{ opacity: 1; }
