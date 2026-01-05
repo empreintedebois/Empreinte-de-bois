@@ -19,8 +19,9 @@
 
   const stage = overlay.querySelector(".intro-stage");
   const row = overlay.querySelector(".intro-row");
-  const motifL = $("#intro-motif-left");
-  const motifR = $("#intro-motif-right");
+  const motifL = $("#intro-motif-left-wrap") || $("#intro-motif-left");
+  const motifR = $("#intro-motif-right-wrap") || $("#intro-motif-right");
+  const texteWrap = $("#intro-texte-wrap");
   const texteImg = $("#intro-texte");
   const shardsWrap = $("#intro-shards");
   const shock = $("#intro-shockwave");
@@ -28,6 +29,16 @@
   const SHARDS_META_URL = "assets/intro/shards_meta.json";
 
   // ---------- helpers ----------
+  function commitAnimations(el){
+    try{
+      const anims = el.getAnimations ? el.getAnimations() : [];
+      anims.forEach(a => {
+        if (a.commitStyles) a.commitStyles();
+        a.cancel();
+      });
+    }catch(_e){}
+  }
+
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -189,7 +200,7 @@
     // Wait a short window so most shards appear before G1
     await Promise.race([
       Promise.allSettled(imgs.map(perImg)),
-      wait(650)
+      wait(2500)
     ]);
 
     // Give paint 2 frames
@@ -222,47 +233,68 @@
     });
   }
 
+  
   // ---------- merge + zoom ----------
   async function mergeMotifsAndZoom(){
     if (!motifL || !motifR || !stage) { await wait(900); return; }
 
-    // Remove any previous transforms (keep current opacity)
-    motifL.style.transform = "";
-    motifR.style.transform = "";
-    stage.style.transform = "";
+    // Ensure texte is not fighting for space
+    if (texteWrap) {
+      texteWrap.style.display = "none";
+    }
 
-    // Measure current gap
+    // Freeze previous animations to avoid jumps
+    commitAnimations(motifL);
+    commitAnimations(motifR);
+    commitAnimations(stage);
+
+    // Read current rects (after recoil animations)
     const rectL = motifL.getBoundingClientRect();
     const rectR = motifR.getBoundingClientRect();
-    const gap = rectR.left - rectL.right; // positive => space between
-    const dx = (gap / 2);
+
+    // If the right motif wrapped to another line, force layout update via scale recalculation
+    if (Math.abs(rectL.top - rectR.top) > (Math.min(rectL.height, rectR.height) * 0.25)) {
+      updateIntroLayout();
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+
+    const rL = motifL.getBoundingClientRect();
+    const rR = motifR.getBoundingClientRect();
+
+    // Target meeting point = midpoint between inner edges
+    const meetX = (rL.right + rR.left) / 2;
+    const dxL = meetX - rL.right;
+    const dxR = meetX - rR.left;
 
     const dur = 900;
     const ease = "cubic-bezier(.2,.8,.2,1)";
 
-    // Move motifs so their inner edges meet (border-to-border)
-    const leftAnim = motifL.animate([
-      { transform: "translateX(0px)" },
-      { transform: `translateX(${dx}px)` }
-    ], { duration: dur, easing: ease, fill: "forwards" });
+    const leftAnim = motifL.animate(
+      [{ transform: getComputedStyle(motifL).transform === "none" ? "translateX(0px)" : getComputedStyle(motifL).transform },
+       { transform: `translateX(${dxL}px)` }],
+      { duration: dur, easing: ease, fill: "forwards" }
+    );
 
-    const rightAnim = motifR.animate([
-      { transform: "translateX(0px)" },
-      { transform: `translateX(${-dx}px)` }
-    ], { duration: dur, easing: ease, fill: "forwards" });
+    const rightAnim = motifR.animate(
+      [{ transform: getComputedStyle(motifR).transform === "none" ? "translateX(0px)" : getComputedStyle(motifR).transform },
+       { transform: `translateX(${dxR}px)` }],
+      { duration: dur, easing: ease, fill: "forwards" }
+    );
 
-    // Compute zoom so motif height ~95% of viewport
-    const rectAfter = rectL; // height is close enough before translate
+    // Zoom stage so motifs height ~95% of viewport (use current motif height)
     const vh = window.innerHeight || 800;
-    const targetScale = clamp((vh * 0.95) / Math.max(1, rectAfter.height), 1.0, 4.0);
+    const motifH = Math.max(1, Math.max(rL.height, rR.height));
+    const targetScale = clamp((vh * 0.95) / motifH, 1.0, 4.0);
 
-    const zoomAnim = stage.animate([
-      { transform: "scale(1)" },
-      { transform: `scale(${targetScale})` }
-    ], { duration: dur, easing: ease, fill: "forwards" });
+    const zoomAnim = stage.animate(
+      [{ transform: getComputedStyle(stage).transform === "none" ? "scale(1)" : getComputedStyle(stage).transform },
+       { transform: `scale(${targetScale})` }],
+      { duration: dur, easing: ease, fill: "forwards" }
+    );
 
     await Promise.allSettled([leftAnim.finished, rightAnim.finished, zoomAnim.finished]);
   }
+
 
   function shockwave(){
     if (!shock) return;
@@ -368,7 +400,7 @@
 
     // P4: shockwave
     shockwave();
-    await wait(650);
+    await wait(2500);
 
     // P5: contemplation 2s
     await wait(2000);
