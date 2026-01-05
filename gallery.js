@@ -22,6 +22,8 @@
   const lightbox = document.getElementById("lightbox");
   const lbImg = document.getElementById("lightbox-img");
   const lbCaption = document.getElementById("lightbox-caption");
+  const lbSelect = document.getElementById("lightbox-select");
+  const selectionSummary = document.getElementById("selection-summary");
 
   // Modal "Voir plus" (ajoutée dans index)
   const moreModal = document.getElementById("galleryMore");
@@ -101,6 +103,18 @@
     const parsed = parseStructuredCaption(captionRaw);
     lbImg.alt = parsed.title || "";
     renderCaption(lbCaption, captionRaw || "");
+
+    // Sélection depuis la lightbox (remonte vers le formulaire Contact)
+    if (lbSelect && selectionSummary){
+      const label = parsed.title ? `Galerie : ${parsed.title}` : "Galerie : (sans titre)";
+      lbSelect.onclick = () => {
+        selectionSummary.value = label;
+        // scroll vers contact pour donner du sens au bouton
+        const contact = document.getElementById("contact");
+        if (contact) contact.scrollIntoView({ behavior: "smooth", block: "start" });
+      };
+    }
+
     lightbox.classList.add("is-open");
     lightbox.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";

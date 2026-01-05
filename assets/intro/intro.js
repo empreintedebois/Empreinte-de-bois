@@ -15,6 +15,24 @@
 
   html.classList.add("intro-active");
 
+  // Layout: unifie la hauteur des 3 logos pour éviter les débordements mobile/desktop
+  const stage = overlay.querySelector(".intro-stage");
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+  function updateIntroLayout(){
+    if (!stage) return;
+    const vh = window.innerHeight || 800;
+    const vw = window.innerWidth || 1200;
+    // base: 22vh, borné, et borné aussi par la largeur pour éviter un logo trop grand en paysage
+    let h = clamp(vh * 0.22, 120, 260);
+    h = Math.min(h, vw * 0.45);
+    stage.style.setProperty("--introH", `${Math.round(h)}px`);
+  }
+  updateIntroLayout();
+  window.addEventListener("resize", () => {
+    // Ne pas recalculer en plein milieu des animations lourdes
+    if (!html.classList.contains("site-ready")) updateIntroLayout();
+  });
+
   const motifL = $("#intro-motif-left");
   const motifR = $("#intro-motif-right");
   const texteImg = $("#intro-texte");
@@ -66,18 +84,20 @@
       const res = await fetch(SHARDS_META_URL, { cache: "no-store" });
       meta = await res.json();
     }catch(e){
-      // No shards: unblock site
       console.warn("[intro] shards_meta.json unreadable", e);
       return [];
     }
     const files0 = (meta && meta.files) ? meta.files : [];
-  const files = files0.map(f => (f.includes('/') ? f : ('assets/intro/shards/' + f)));
+    const files = files0.map(f => (f.includes('/') ? f : ('assets/intro/shards/' + f)));
     const loaded = [];
-    // Preload all images
+
+    // Preload all images (network)
     await Promise.all(files.map((src) => new Promise((resolve) => {
       const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => resolve();
+      img.decoding = "async";
+      img.loading = "eager";
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
       img.src = src;
     })));
 
@@ -92,6 +112,16 @@
       shardsWrap.appendChild(im);
       loaded.push(im);
     });
+
+    // Wait for decode/paint to ensure every shard is drawable before the timeline continues
+    const waitDecode = (im) => {
+      if (!im) return Promise.resolve();
+      if (im.decode) return im.decode().catch(() => new Promise((r) => (im.onload = () => r())));
+      return new Promise((r) => (im.onload = () => r()));
+    };
+    await Promise.all(loaded.map(waitDecode));
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
     return loaded;
   }
 
@@ -120,23 +150,43 @@
   }
 
   async function mergeMotifsAndZoom(){
-    // Move motifs toward center while scaling up
+    // Move motifs toward each other so they touch (no overlap), then zoom
+    if (!motifL || !motifR) {
+      await wait(900);
+      return;
+    }
+
     const dur = 900;
     const ease = "cubic-bezier(.2,.8,.2,1)";
-    const leftAnim = motifL ? motifL.animate([
-      { transform: getComputedStyle(motifL).transform === "none" ? "translateX(0px) scale(1)" : "translateX(0px) scale(1)" },
-      { transform: "translateX(18vw) scale(3.8)" }
-    ], { duration: dur, easing: ease, fill: "forwards" }) : null;
 
-    const rightAnim = motifR ? motifR.animate([
-      { transform: getComputedStyle(motifR).transform === "none" ? "translateX(0px) scale(1)" : "translateX(0px) scale(1)" },
-      { transform: "translateX(-18vw) scale(3.8)" }
-    ], { duration: dur, easing: ease, fill: "forwards" }) : null;
+    // Gap between motifs at the moment we start merging
+    const rectL = motifL.getBoundingClientRect();
+    const rectR = motifR.getBoundingClientRect();
+    const gap = rectR.left - rectL.right;
+
+    // If negative gap (already overlapping), keep a small separation instead of pushing more
+    const safeGap = Math.max(gap, 16);
+    const dx = safeGap / 2;
+
+    const leftAnim = motifL.animate([
+      { transform: "translateX(0px) scale(1)" },
+      { transform: `translateX(${dx}px) scale(3.8)` }
+    ], { duration: dur, easing: ease, fill: "forwards" });
+
+    const rightAnim = motifR.animate([
+      { transform: "translateX(0px) scale(1)" },
+      { transform: `translateX(${-dx}px) scale(3.8)` }
+    ], { duration: dur, easing: ease, fill: "forwards" });
 
     // Hide texte (already faded earlier)
     if (texteImg){
       texteImg.animate([{ opacity: 0 }, { opacity: 0 }], { duration: dur, fill:"forwards" });
     }
+
+    await wait(dur);
+    leftAnim.cancel();
+    rightAnim.cancel();
+  }
 
     await wait(dur);
     if (leftAnim) leftAnim.cancel();
@@ -191,6 +241,12 @@
 
     // T0: preload shards
     const shards = await loadShards();
+    // Barrière: s'assurer que tous les shards sont bien présents avant la transition
+    if (shards && shards.length){
+      await new Promise((r)=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+      // force opacity baseline (évite le cas "quelques shards seulement")
+      shards.forEach(im => { im.style.opacity = "0"; });
+    }
 
     // G1: fade texte -> shards (only when shards ready)
     if (texteImg) texteImg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, easing:"ease", fill:"forwards" });

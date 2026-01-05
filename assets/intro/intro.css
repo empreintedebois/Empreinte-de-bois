@@ -65,17 +65,21 @@ html.site-ready #site-root{
 }
 
 .intro-stage{
-  width: min(92vw, 1200px);
-  height: min(70vh, 520px);
+  width: 100%;
+  height: 100%;
   position: relative;
+  /* Variable de taille unifiée pour les 3 logos (mise à jour par JS) */
+  --introH: clamp(120px, 22vh, 260px);
 }
 
 .intro-row{
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: auto auto auto;
   gap: clamp(10px, 3vw, 32px);
   align-items: center;
+  justify-content: center;
   justify-items: center;
+  width: 100%;
   height: 100%;
 }
 
@@ -88,32 +92,39 @@ html.site-ready #site-root{
 }
 
 .intro-logo--motif{
-  height: min(60vh, 520px);
-  max-width: 28vw;
+  height: var(--introH);
+  width: auto;
+  max-width: min(30vw, 320px);
 }
 
 .intro-logo--texte{
   position: relative;
-  height: min(60vh, 520px);
-  max-width: 60vw;
+  height: var(--introH);
+  width: auto;
+  max-width: min(60vw, 980px);
 }
 #intro-texte{
   display:block;
   height: 100%;
   width: auto;
-  max-width: 60vw;
+  max-width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 #intro-shards{
   position:absolute;
   inset:0;
   pointer-events:none;
+  z-index: 2;
 }
 
 #intro-shards img{
   position:absolute;
   left:50%;
   top:50%;
+  height: var(--introH);
+  width: auto;
   transform: translate(-50%,-50%);
   will-change: transform, opacity;
   opacity: 0;

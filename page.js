@@ -20,6 +20,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /** @type {{models: any[]}} */
   let manifest = { models: [] };
+
+  // Cache des descriptions .txt (évite de refetch en boucle)
+  const textCache = new Map();
+  async function fetchText(url){
+    if (!url) return "";
+    if (textCache.has(url)) return textCache.get(url);
+    try{
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(String(res.status));
+      const t = (await res.text()).trim();
+      textCache.set(url, t);
+      return t;
+    }catch(_e){
+      textCache.set(url, "");
+      return "";
+    }
+  }
+  function dirOf(p){
+    if (!p) return "";
+    const parts = String(p).split("/");
+    parts.pop();
+    return parts.join("/");
+  }
+  async function getVariantDescription(model, variant){
+    const base = dirOf(variant?.full || variant?.thumb || model?.full || model?.thumb || "");
+    const id = variant?.id ? String(variant.id) : "";
+    // 1) texte spécifique à la déclinaison (si présent)
+    if (base && id){
+      const t1 = await fetchText(`${base}/${id}.txt`);
+      if (t1) return t1;
+    }
+    // 2) texte générique du modèle (description.txt)
+    if (base){
+      const t2 = await fetchText(`${base}/description.txt`);
+      if (t2) return t2;
+    }
+    // 3) fallback: champ notes du JSON
+    return (variant?.notes || "").trim();
+  }
+
   let currentModel = null;
   let currentVariantIndex = 0;
   let selectedFinition = null;
@@ -97,13 +137,15 @@ document.addEventListener("DOMContentLoaded", () => {
       row.innerHTML = `<span class="lb-k">${escapeHtml(k)}</span><span class="lb-v">${escapeHtml(val)}</span>`;
       modelboxContent.appendChild(row);
     }
+    // Description (txt) — modèle + déclinaison
+    const notes = document.createElement("div");
+    notes.className = "lb-notes";
+    notes.textContent = "";
+    modelboxContent.appendChild(notes);
+    getVariantDescription(currentModel, v).then((t) => {
+      if (t) notes.textContent = t;
+    });
 
-    if (v.notes) {
-      const notes = document.createElement("div");
-      notes.className = "lb-notes";
-      notes.textContent = v.notes;
-      modelboxContent.appendChild(notes);
-    }
 
     // Choix des déclinaisons
     const decla = document.createElement("div");
@@ -114,6 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
     (currentModel.variants || []).forEach((vv, idx) => {
       const b = document.createElement("button");
       b.type = "button";
+      if (idx === currentVariantIndex) b.classList.add("is-active");
       b.className = `variant-chip ${idx === currentVariantIndex ? "is-active" : ""}`;
       const im = document.createElement("img");
       im.loading = "lazy";
