@@ -1,56 +1,63 @@
-/* assets/intro/intro.css — v1.0 (Option A: HTML overlay, intro bloquante) */
+/* =========================
+   INTRO OVERLAY (fixed, mobile-safe)
+   + Site reveal mask (soft edge)
+   + Laser canvas effect overlay
+   ========================= */
 
-html.intro-active, html.intro-active body{
-  overflow: hidden !important;
-  height: 100%;
+:root{
+  --introScale: 1;
+  --logoH: 180px;
+
+  --dimOpacity: 0.80;
+  --haloStrength: 0.35;
+
+  /* reveal from top to bottom */
+  --revealY: 0%;
+  --revealSoft: 8%;
 }
 
+/* Hide site during intro */
 html.intro-active #site-root{
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
-/* During reveal we show the site but still disable interactions until done */
+/* During reveal: site is visible but masked */
 html.site-revealing #site-root{
-  visibility: visible;
-  opacity: 1;
-  pointer-events: none;
---reveal: 0;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+
+  /* soft edge mask (standard + webkit) */
   -webkit-mask-image: linear-gradient(
     to bottom,
-    rgba(0,0,0,1) calc((var(--reveal) * 100%) + 48px),
-    transparent calc((var(--reveal) * 100%) - 48px),
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) calc(var(--revealY) - var(--revealSoft)),
+    rgba(0,0,0,0) calc(var(--revealY) + var(--revealSoft)),
     rgba(0,0,0,0) 100%
   );
   mask-image: linear-gradient(
     to bottom,
-    rgba(0,0,0,1) calc((var(--reveal) * 100%) + 48px),
-    transparent calc((var(--reveal) * 100%) - 48px),
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) calc(var(--revealY) - var(--revealSoft)),
+    rgba(0,0,0,0) calc(var(--revealY) + var(--revealSoft)),
     rgba(0,0,0,0) 100%
   );
+
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
 }
 
-
-/* During reveal we show the site but still disable interactions until done */
-
-/* After reveal, everything normal */
+/* After reveal done */
 html.site-ready #site-root{
-  visibility: visible;
-  opacity: 1;
-  pointer-events: auto;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 
   -webkit-mask-image: none;
-  mask-image: none;
-}
-
-/* Curtain reveal mask on the site (only during reveal) */
-
-/* After reveal, remove ma  -webkit-mask-image: none;
   mask-image: none;
 }
 
@@ -58,212 +65,159 @@ html.site-ready #site-root{
 #intro-overlay{
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 999999;
   display: grid;
   place-items: center;
-  background: transparent;
+  pointer-events: all;
+  overflow: hidden;
+  opacity: 1;
 }
 
-.intro-stage{
+/* Dim + halo */
+#intro-dim{
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(0,0,0, calc(var(--dimOpacity) - var(--haloStrength))) 0%,
+      rgba(0,0,0, var(--dimOpacity)) 60%,
+      rgba(0,0,0, calc(var(--dimOpacity) + 0.10)) 100%
+    );
+  transition: opacity 700ms ease;
+  opacity: 1;
+}
+
+#intro-overlay.dim-fade #intro-dim{
+  opacity: 0;
+}
+
+/* Laser canvas overlay (visual only) */
+#laser-canvas{
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  position: relative;
-  /* Variable de taille unifiée pour les 3 logos (mise à jour par JS) */
-  --introH: clamp(120px, 22vh, 260px);
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0;
+  transition: opacity 200ms ease;
 }
 
-.intro-row{
+#intro-overlay.laser-on #laser-canvas{
+  opacity: 1;
+}
+
+/* Stage 16:9 scaled globally */
+#intro-stage{
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  transform: translateZ(0) scale(var(--introScale));
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* Row with 3 logos */
+#intro-row{
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(10px, 2vw, 38px);
-  flex-wrap: nowrap;
-  width: 100%;
-  height: 100%;
+  gap: 72px;
+  pointer-events: none;
 }
 
 .intro-logo{
+  position: relative;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  will-change: transform, opacity;
+  opacity: 1;
+}
+
+.intro-logo img{
+  height: var(--logoH);
+  width: auto;            /* keep ratio */
+  max-width: 100%;
+  object-fit: contain;
   display: block;
-  max-height: 60vh;
-  width: auto;
   user-select: none;
   -webkit-user-drag: none;
 }
 
-.intro-logo--motif{
-  height: var(--introH);
-  width: auto;
-  max-width: min(30vw, 320px);
-}
+#intro-texte{ z-index: 10; }
+#intro-motif-left, #intro-motif-right{ z-index: 20; }
 
-.intro-logo--texte{
-  position: relative;
-  height: var(--introH);
-  width: auto;
-  max-width: min(60vw, 980px);
-}
-#intro-texte{
-  display:block;
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  position: relative;
-  z-index: 1;
-}
-
+/* Shards stacked full-frame inside stage */
 #intro-shards{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  z-index: 2;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
 }
 
-#intro-shards img{
-  position:absolute;
-  left:50%;
-  top:50%;
-  height: var(--introH);
-  width: auto;
-  transform: translate(-50%,-50%);
-  will-change: transform, opacity;
+.intro-shard{
+  position: absolute;
+  inset: 0;          /* stack at (0,0) */
+  width: 100%;
+  height: 100%;
   opacity: 0;
+  transform: none;
+  will-change: transform, opacity;
+  pointer-events: none;
 }
 
-/* Tremblements */
-@keyframes trembleSoft{
-  0%,100%{ transform: translate(0,0) rotate(0deg); }
-  25%{ transform: translate(0.6px,-0.8px) rotate(-0.15deg); }
-  50%{ transform: translate(-0.8px,0.6px) rotate(0.12deg); }
-  75%{ transform: translate(0.5px,0.7px) rotate(0.08deg); }
-}
-@keyframes trembleStrong{
-  0%,100%{ transform: translate(0,0) rotate(0deg); }
-  10%{ transform: translate(1.6px,-1.2px) rotate(-0.4deg); }
-  20%{ transform: translate(-1.4px,1.1px) rotate(0.35deg); }
-  30%{ transform: translate(1.2px,1.4px) rotate(-0.3deg); }
-  40%{ transform: translate(-1.8px,-1.0px) rotate(0.45deg); }
-  50%{ transform: translate(1.4px,1.0px) rotate(-0.38deg); }
-  60%{ transform: translate(-1.2px,1.6px) rotate(0.3deg); }
-  70%{ transform: translate(1.7px,-1.1px) rotate(-0.42deg); }
-  80%{ transform: translate(-1.0px,-1.6px) rotate(0.28deg); }
-  90%{ transform: translate(1.0px,1.4px) rotate(-0.25deg); }
+/* Hint */
+#intro-start-hint{
+  position: absolute;
+  left: 50%;
+  bottom: 6dvh;
+  transform: translateX(-50%);
+  font: 600 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.85);
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 300ms ease;
 }
 
-.tremble-soft{ animation: trembleSoft 1.6s infinite; }
-.tremble-strong{ animation: trembleStrong 0.9s infinite; }
+#intro-overlay.started #intro-start-hint{ opacity: 0; }
 
 /* Shockwave */
 #intro-shockwave{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width: 12px;
-  height: 12px;
-  transform: translate(-50%,-50%) scale(0.2);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 32px;
+  height: 32px;
   border-radius: 999px;
-  border: 2px solid rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.18);
+  transform: translate(-50%,-50%) scale(0);
   opacity: 0;
-  pointer-events:none;
-  filter: blur(0.3px);
+  pointer-events: none;
+  z-index: 50;
 }
 
-/* Fade out overlay */
-#intro-overlay.is-fading{
-  animation: overlayFade 0.7s forwards;
+@keyframes trembleWeak{
+  0%,100%{ transform: translate(0,0) rotate(0deg); }
+  25%{ transform: translate(0.6px,-0.4px) rotate(0.08deg); }
+  50%{ transform: translate(-0.5px,0.5px) rotate(-0.08deg); }
+  75%{ transform: translate(0.4px,0.6px) rotate(0.06deg); }
 }
-@keyframes overlayFade{
-  to{ opacity:0; }
-}
+.tremble-weak{ animation: trembleWeak 140ms infinite linear; }
 
-/* Mobile adjustments */
-@media (max-width: 640px){
-  .intro-stage{ width: 92vw; height: 56vh; }
-  .intro-row{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(10px, 2vw, 38px);
-  flex-wrap: nowrap;
-  width: 100%;
-  height: 100%;
-}
-  .intro-logo--motif{ max-width: 22vw; height: min(54vh, 420px); }
-  .intro-logo--texte{ max-width: 62vw; }
-}
-
-/* --- v2 fixes: overlay dim+halo, mobile viewport, transform origins --- */
-#intro-overlay{
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100dvh;
-  min-height: 100vh;
-  z-index: 99999;
-}
-#intro-overlay::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  /* Dim noir + halo subtil (centre plus transparent) */
-  background: radial-gradient(circle at 50% 45%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.78) 55%, rgba(0,0,0,0.88) 100%);
-  opacity: var(--intro-dim, 1);
-  transition: opacity 700ms ease;
-  pointer-events:none;
-}
-#intro-overlay.is-dim-fade{
-  --intro-dim: 0;
-}
-.intro-stage{
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-}
-.intro-row{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(10px, 2vw, 38px);
-  flex-wrap: nowrap;
-  width: 100%;
-  height: 100%;
-}
-#intro-motif-left{ transform-origin: 100% 50%; }
-#intro-motif-right{ transform-origin: 0% 50%; }
-#intro-texte{ transform-origin: 50% 50%; }
-/* Ensure shards sit above the texte image */
-#intro-texte-wrap{ position: relative; }
-#intro-shards{ position:absolute; inset:0; z-index: 3; pointer-events:none; }
-#intro-texte{ position:relative; z-index: 2; }
-/* Start hint */
-#intro-start-hint{
-  position:absolute;
-  left:50%;
-  bottom: clamp(18px, 4vh, 42px);
-  transform: translateX(-50%);
-  font: 600 12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.75);
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(0,0,0,0.25);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  opacity: 0;
-  transition: opacity 250ms ease;
-}
-#intro-overlay.is-waiting #intro-start-hint{ opacity: 1; }
-
-
-/* --- v2.1 motif wrappers to avoid transform conflicts --- */
-.intro-motifwrap{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height: var(--introH);
-  width: auto;
-  flex: 0 0 auto;
-  will-change: transform, opacity;
+@media (max-width: 520px){
+  #intro-start-hint{ font-size: 12px; }
+  :root{ --revealSoft: 10%; }
 }

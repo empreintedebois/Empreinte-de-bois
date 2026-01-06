@@ -11,19 +11,17 @@
 </head>
 <body>
 <canvas aria-hidden="true" id="background-canvas"></canvas><div aria-hidden="false" id="intro-overlay">
-<div class="intro-stage">
-<div class="intro-row">
-<img alt="" class="intro-logo intro-logo--motif" id="intro-motif-left" src="assets/intro/logo-motif-left.webp"/>
-<div class="intro-logo intro-logo--texte" id="intro-texte-wrap">
-<img alt="Empreinte de bois" id="intro-texte" src="assets/intro/logo-texte.webp"/>
+<div id="intro-dim"></div>
+<div id="intro-stage">
+<div id="intro-row">
+<div class="intro-logo" id="intro-motif-left"><img alt="" src="assets/intro/logo-motif-left.webp"/></div>
+<div class="intro-logo" id="intro-texte"><img alt="Empreinte de bois" src="assets/intro/logo-texte.webp"/></div>
+<div class="intro-logo" id="intro-motif-right"><img alt="" src="assets/intro/logo-motif-right.webp"/></div>
+</div>
 <div aria-hidden="true" id="intro-shards"></div>
-</div>
-<img alt="" class="intro-logo intro-logo--motif" id="intro-motif-right" src="assets/intro/logo-motif-right.webp"/>
-</div>
 <div aria-hidden="true" id="intro-shockwave"></div>
-<canvas aria-hidden="true" id="intro-curtain"></canvas>
-<div id="intro-start-hint">Tap pour démarrer</div>
 </div>
+<div aria-hidden="true" id="intro-start-hint"></div>
 </div>
 <div id="site-root">
 <!-- Fond animé global (fixe, derrière tout) -->
