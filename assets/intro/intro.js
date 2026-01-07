@@ -1,445 +1,532 @@
-/* =========================
-   INTRO TIMELINE (stacked shards, auto)
-   Timeline order requested:
-     G1 -> P3bis -> P2 -> P4 -> T1 -> P3(P5)
-   Notes:
-   - Shards are full-frame cutouts: stacking at (0,0) reconstructs logo-texte.
-   - Shard count is dynamic from shards_meta.json.
-   - No image ratio distortion: we scale only the 16:9 stage.
-   - Laser reveal: canvas visual + CSS soft mask reveal.
-   Auto start:
-   - Wait for window "load" (site assets) then +1000ms, then run intro.
-   ========================= */
-
+/* Intro overlay + shards animation (responsive, load-gated)
+   Empreinte-de-bois — v31
+*/
 (() => {
-  const qs = (s) => document.querySelector(s);
+  "use strict";
 
-  const overlay   = qs("#intro-overlay");
-  const dim       = qs("#intro-dim");
-  const stage     = qs("#intro-stage");
-  const row       = qs("#intro-row");
-  const motifL    = qs("#intro-motif-left");
-  const texte     = qs("#intro-texte");
-  const motifR    = qs("#intro-motif-right");
-  const shardsBox = qs("#intro-shards");
-  const shock     = qs("#intro-shockwave");
-  const hint      = qs("#intro-start-hint");
-
-  // Create laser canvas if not present
-  let laserCanvas = qs("#laser-canvas");
-  if (overlay && !laserCanvas) {
-    laserCanvas = document.createElement("canvas");
-    laserCanvas.id = "laser-canvas";
-    overlay.appendChild(laserCanvas);
-  }
-
-  if (!overlay || !stage || !row || !motifL || !texte || !motifR || !shardsBox) return;
-
-  /* -------------------------
-     Scroll lock
-  ------------------------- */
-  let savedY = 0;
-  const preventTouch = (e) => e.preventDefault();
-
-  const lockScroll = () => {
-    savedY = window.scrollY || 0;
-    document.documentElement.classList.add("intro-active");
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${savedY}px`;
-    document.body.style.left = "0";
-    document.body.style.right = "0";
-    document.body.style.width = "100%";
-    window.addEventListener("touchmove", preventTouch, { passive: false });
+  const INTRO = {
+    // timings (ms)
+    G0_HOLD_MIN: 2000,          // hold before shards swap, while preloading
+    FADE_IN_ALL: 500,           // clean fade-in once everything ready (logos visible)
+    G1_SWAP_FADE: 420,          // fade text -> shards
+    P3BIS_PULL_BACK: 450,       // motifs pull-back (outward)
+    P3BIS_MERGE: 450,           // motifs merge (touch)
+    P3BIS_ZOOM: 700,            // motifs zoom to 80% viewport
+    P2_EXPLODE: 1500,
+    P4_SHOCK: 420,
+    T1_FADE_SHARDS: 520,
+    P3_RECOIL: 650,
+    P5_CONTEMPLATE: 2000,
+    OUTRO_FADE: 500,
+    REVEAL_DELAY_AFTER_INTRO: 1000, // auto curtain reveal after intro + 1s
   };
 
-  const unlockScroll = () => {
-    window.removeEventListener("touchmove", preventTouch);
-    document.body.style.position = "";
-    const top = document.body.style.top;
-    document.body.style.top = "";
-    document.body.style.left = "";
-    document.body.style.right = "";
-    document.body.style.width = "";
-    const y = top ? Math.abs(parseInt(top, 10)) : savedY;
-    window.scrollTo(0, y);
+  const SELECTORS = {
+    overlay: "#intro-overlay",
+    stage: "#intro-stage",
+    row: "#intro-row",
+    texte: "#intro-texte",
+    motifL: "#intro-motif-left",
+    motifLImg: "#intro-motif-left-img",
+    motifR: "#intro-motif-right",
+    motifRImg: "#intro-motif-right-img",
+    shards: "#intro-shards",
+    loader: "#intro-loader",
+    underlay: "#intro-underlay",
   };
 
-  /* -------------------------
-     Stage scaling (no ratio distortion)
-  ------------------------- */
-  const BASE_W = 1920;
-  const BASE_H = 1080;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  function updateScale() {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const scale = Math.min(vw / BASE_W, vh / BASE_H) * 0.92;
+  // ----- Build overlay (if not present) -----
+  function ensureOverlay() {
+    let overlay = document.querySelector(SELECTORS.overlay);
+    if (overlay) return overlay;
 
-    document.documentElement.style.setProperty("--introScale", String(scale));
-    document.documentElement.style.setProperty("--logoH", `${Math.round(180 * scale / 0.92)}px`);
+    overlay = document.createElement("div");
+    overlay.id = "intro-overlay";
+    overlay.setAttribute("aria-hidden", "false");
+
+    overlay.innerHTML = `
+      <div id="intro-underlay"></div>
+      <div id="intro-stage">
+        <div id="intro-row">
+          <div id="intro-motif-left" class="intro-motif-wrap"><img id="intro-motif-left-img" class="intro-img" src="assets/intro/logo-motif-g.webp" alt=""></div>
+          <div id="intro-texte-wrap">
+            <img id="intro-texte" class="intro-img" src="assets/intro/logo-texte.webp" alt="Empreinte de bois">
+            <div id="intro-shards"></div>
+          </div>
+          <div id="intro-motif-right" class="intro-motif-wrap"><img id="intro-motif-right-img" class="intro-img" src="assets/intro/logo-motif-d.webp" alt=""></div>
+        </div>
+
+        <button id="intro-start" type="button" aria-label="Démarrer">
+          <span>Tap to start</span>
+        </button>
+
+        <div id="intro-loader" aria-hidden="true">
+          <span class="dot d1"></span>
+          <span class="dot d2"></span>
+          <span class="dot d3"></span>
+          <span class="dot d4"></span>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    return overlay;
   }
 
-  updateScale();
-  window.addEventListener("resize", updateScale, { passive: true });
-
-  /* -------------------------
-     Helpers
-  ------------------------- */
-  const wait = (ms) => new Promise(r => setTimeout(r, ms));
-  const raf2 = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-  function setOpacity(el, v) {
-    if (!el) return;
-    el.style.opacity = String(v);
+  // ----- Scroll lock -----
+  function lockScroll(lock) {
+    document.documentElement.classList.toggle("intro-lock", !!lock);
+    document.body.classList.toggle("intro-lock", !!lock);
   }
 
-  /* -------------------------
-     Shards loading (stacked full-frame)
-  ------------------------- */
-  async function fetchMeta() {
-    const res = await fetch("assets/intro/shards_meta.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("missing shards_meta.json");
-    const json = await res.json();
-    const files = (json.files || []).filter(Boolean);
-    return files;
-  }
+  // ----- Layout (responsive, no stretching) -----
+  function updateIntroLayout() {
+    const stage = document.querySelector(SELECTORS.stage);
+    const row   = document.querySelector(SELECTORS.row);
+    const imgT  = document.querySelector(SELECTORS.texte);
+    const vw = Math.max(320, window.innerWidth || document.documentElement.clientWidth || 0);
+    const vh = Math.max(320, window.innerHeight || document.documentElement.clientHeight || 0);
 
-  function waitDecode(img) {
-    if (img.decode) {
-      return img.decode().catch(() => new Promise((r) => {
-        img.onload = () => r();
-        img.onerror = () => r();
-      }));
+    // target text width: ~80% viewport width (both mobile & desktop), capped so it doesn't become ridiculous
+    const maxTextW = vw >= 900 ? 1000 : 0.80 * vw;
+    const targetTextW = clamp(0.80 * vw, 240, maxTextW);
+
+    const ratio = (imgT && imgT.naturalWidth > 0) ? (imgT.naturalWidth / imgT.naturalHeight) : (16/9);
+    let targetH = targetTextW / ratio;
+
+    // keep a sane height relative to viewport
+    targetH = clamp(targetH, 90, 0.33 * vh);
+
+    // define CSS vars for all logos (same height)
+    document.documentElement.style.setProperty("--introH", `${targetH}px`);
+    document.documentElement.style.setProperty("--introTextW", `${targetTextW}px`);
+
+    // stage scaling: keep everything centered; allow empty margins around
+    // we do NOT want a tiny logo on desktop: ensure stage has room and row is centered
+    if (stage) {
+      stage.style.width = "100%";
+      stage.style.height = "100%";
     }
-    return new Promise((r) => {
-      img.onload = () => r();
-      img.onerror = () => r();
-    });
+    if (row) {
+      row.style.transform = "translate3d(0,0,0) scale(1)";
+    }
   }
 
-  async function buildShards() {
-    const files = await fetchMeta();
-    shardsBox.innerHTML = "";
-
-    const imgs = files.map((file) => {
-      const img = new Image();
-      img.src = `assets/intro/shards/${file}`;
-      img.className = "intro-shard";
-      img.alt = "";
-      img.style.opacity = "0";
-      img.style.transform = "none";
-      shardsBox.appendChild(img);
-      return img;
-    });
-
-    // Strict: wait all decoded so "stack -> composed logo" is guaranteed
-    await Promise.all(imgs.map(waitDecode));
-
-    // Force paint
-    await raf2();
-
-    return imgs;
-  }
-
-  async function fadeIn(imgs, ms = 220) {
-    const t0 = performance.now();
+  // ----- Image / shards preload -----
+  function waitImage(img) {
     return new Promise((resolve) => {
-      const tick = (t) => {
-        const k = Math.min(1, (t - t0) / ms);
-        for (const img of imgs) img.style.opacity = String(k);
-        if (k < 1) requestAnimationFrame(tick);
-        else resolve();
-      };
-      requestAnimationFrame(tick);
+      if (!img) return resolve(false);
+      if (img.complete && img.naturalWidth > 0) return resolve(true);
+      const done = () => resolve(img.naturalWidth > 0);
+      img.addEventListener("load", done, { once: true });
+      img.addEventListener("error", () => resolve(false), { once: true });
     });
   }
 
-  async function fadeOut(imgs, ms = 420) {
-    const t0 = performance.now();
-    return new Promise((resolve) => {
-      const tick = (t) => {
-        const k = Math.min(1, (t - t0) / ms);
-        const o = 1 - k;
-        for (const img of imgs) img.style.opacity = String(o);
-        if (k < 1) requestAnimationFrame(tick);
-        else resolve();
-      };
-      requestAnimationFrame(tick);
-    });
+  async function preloadCoreImages() {
+    const ok1 = await waitImage(document.querySelector(SELECTORS.texte));
+    const ok2 = await waitImage(document.querySelector(SELECTORS.motifLImg));
+    const ok3 = await waitImage(document.querySelector(SELECTORS.motifRImg));
+    return ok1 && ok2 && ok3;
   }
 
-  /* -------------------------
-     Motif merge edge-to-edge
-  ------------------------- */
-  async function mergeMotifs(duration = 850) {
-    // ensure stable layout
-    motifL.classList.remove("tremble-weak");
-    motifR.classList.remove("tremble-weak");
+  async function loadShardsStrict({ timeoutMs = 8000 } = {}) {
+    const wrap = document.querySelector("#intro-texte-wrap");
+    const shardsRoot = document.querySelector(SELECTORS.shards);
+    if (!wrap || !shardsRoot) return { ok: false, count: 0 };
 
-    motifL.style.transform = "";
-    motifR.style.transform = "";
-    await raf2();
+    shardsRoot.innerHTML = "";
 
-    const rL = motifL.getBoundingClientRect();
-    const rR = motifR.getBoundingClientRect();
-    const cx = window.innerWidth * 0.5;
-
-    // inner edges to center
-    const dxL = cx - rL.right;
-    const dxR = cx - rR.left;
-
-    const t0 = performance.now();
-    return new Promise((resolve) => {
-      const tick = (t) => {
-        const k = Math.min(1, (t - t0) / duration);
-        const e = 1 - Math.pow(1 - k, 3);
-
-        // zoom to "take the screen" feeling (height driven by stage scaling)
-        const s = 1 + 2.8 * e;
-
-        motifL.style.transform = `translateX(${dxL * e}px) scale(${s})`;
-        motifR.style.transform = `translateX(${dxR * e}px) scale(${s})`;
-
-        if (k < 1) requestAnimationFrame(tick);
-        else resolve();
-      };
-      requestAnimationFrame(tick);
-    });
-  }
-
-  /* -------------------------
-     Shards explosion
-  ------------------------- */
-  function explode(imgs, duration = 1500) {
-    const maxD = Math.max(innerWidth, innerHeight) * 1.25;
-    const t0 = performance.now();
-
-    const dirs = imgs.map((_, i) => {
-      const a = (i * 137.5) * Math.PI / 180;
-      const d = maxD * (0.65 + (i % 7) * 0.05);
-      const rot = (i % 2 ? 1 : -1) * (10 + (i % 11));
-      return { x: Math.cos(a) * d, y: Math.sin(a) * d, rot };
-    });
-
-    return new Promise((resolve) => {
-      const tick = (t) => {
-        const k = Math.min(1, (t - t0) / duration);
-        const e = 1 - Math.pow(1 - k, 3);
-
-        for (let i = 0; i < imgs.length; i++) {
-          const d = dirs[i];
-          const s = 1 + 3 * e; // zoom x4
-          imgs[i].style.transform = `translate(${d.x * e}px, ${d.y * e}px) rotate(${d.rot * e}deg) scale(${s})`;
-        }
-
-        if (k < 1) requestAnimationFrame(tick);
-        else resolve();
-      };
-      requestAnimationFrame(tick);
-    });
-  }
-
-  /* -------------------------
-     Shockwave
-  ------------------------- */
-  async function shockwave(duration = 650) {
-    if (!shock) return;
-
-    shock.style.opacity = "1";
-    const t0 = performance.now();
-
-    return new Promise((resolve) => {
-      const tick = (t) => {
-        const k = Math.min(1, (t - t0) / duration);
-        shock.style.transform = `translate(-50%, -50%) scale(${1 + 8 * k})`;
-        shock.style.opacity = String(1 - k);
-
-        if (k < 1) requestAnimationFrame(tick);
-        else {
-          shock.style.opacity = "0";
-          shock.style.transform = "translate(-50%, -50%) scale(0)";
-          resolve();
-        }
-      };
-      requestAnimationFrame(tick);
-    });
-  }
-
-  /* -------------------------
-     Laser canvas reveal (visual + CSS mask)
-  ------------------------- */
-  function setupLaserCanvas() {
-    if (!laserCanvas) return null;
-    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-    const w = Math.floor(window.innerWidth * dpr);
-    const h = Math.floor(window.innerHeight * dpr);
-    laserCanvas.width = w;
-    laserCanvas.height = h;
-    laserCanvas.style.width = "100%";
-    laserCanvas.style.height = "100%";
-    const ctx = laserCanvas.getContext("2d");
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    return ctx;
-  }
-
-  async function laserReveal(duration = 1000) {
-    // Make site visible but masked
-    document.documentElement.classList.remove("intro-active");
-    document.documentElement.classList.add("site-revealing");
-    document.documentElement.style.setProperty("--revealY", "0%");
-
-    // Turn on laser overlay visuals
-    overlay.classList.add("laser-on");
-    const ctx = setupLaserCanvas();
-
-    const t0 = performance.now();
-    return new Promise((resolve) => {
-      const tick = (t) => {
-        const k = Math.min(1, (t - t0) / duration);
-        const e = 1 - Math.pow(1 - k, 3);
-
-        const yPct = e * 100;
-        document.documentElement.style.setProperty("--revealY", `${yPct}%`);
-
-        if (ctx) {
-          const w = window.innerWidth;
-          const h = window.innerHeight;
-          ctx.clearRect(0, 0, w, h);
-
-          // soft glow line
-          const y = (yPct / 100) * h;
-
-          ctx.globalCompositeOperation = "source-over";
-
-          // outer glow
-          ctx.beginPath();
-          ctx.rect(0, y - 20, w, 40);
-          ctx.fillStyle = "rgba(255, 240, 180, 0.06)";
-          ctx.fill();
-
-          // main line
-          ctx.beginPath();
-          ctx.rect(0, y - 1.5, w, 3);
-          ctx.fillStyle = "rgba(255, 240, 180, 0.18)";
-          ctx.fill();
-
-          // core line
-          ctx.beginPath();
-          ctx.rect(0, y - 0.5, w, 1);
-          ctx.fillStyle = "rgba(255, 255, 255, 0.22)";
-          ctx.fill();
-        }
-
-        if (k < 1) requestAnimationFrame(tick);
-        else resolve();
-      };
-      requestAnimationFrame(tick);
-    });
-  }
-
-  /* -------------------------
-     Timeline (AUTO)
-  ------------------------- */
-  let started = false;
-
-  async function runIntro() {
-    if (started) return;
-    started = true;
-
-    overlay.classList.add("started");
-
-    // lock scroll
-    lockScroll();
-
-    // G0: show 3 logos (no shards), mild tremble
-    motifL.classList.add("tremble-weak");
-    motifR.classList.add("tremble-weak");
-    texte.classList.add("tremble-weak");
-
-    // Hide shards box until ready
-    shardsBox.setAttribute("aria-hidden", "true");
-
-    // Short settle (we're not enforcing 2s here because user changed timeline order)
-    await wait(450);
-
-    // T0: load shards now
-    let shards = [];
+    let meta;
     try {
-      shards = await buildShards();
+      const r = await fetch("assets/intro/shards_meta.json", { cache: "no-store" });
+      meta = await r.json();
     } catch (e) {
-      shards = [];
+      return { ok: false, count: 0 };
     }
 
-    // G1: show shards stacked (reconstructs logo). Then hide texte.
-    if (shards.length > 0) {
-      shardsBox.setAttribute("aria-hidden", "false");
-      await fadeIn(shards, 220);
-      await wait(180);          // ensures you SEE all shards present
-      setOpacity(texte, 0);     // fade texte out after shards are clearly there
+    const items = Array.isArray(meta?.items) ? meta.items : [];
+    if (!items.length) return { ok: false, count: 0 };
+
+    // create shards at identical origin (center), same height as logos; no reposition needed for initial stack
+    const created = [];
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
+      const img = new Image();
+      img.decoding = "async";
+      img.loading = "eager";
+      img.src = `assets/intro/${it.src}`;
+      img.className = "intro-shard";
+      img.style.left = "50%";
+      img.style.top = "50%";
+      img.style.transform = "translate(-50%, -50%)";
+      img.style.opacity = "0";
+      img.style.willChange = "transform, opacity";
+      shardsRoot.appendChild(img);
+      created.push(img);
     }
 
-    // P3bis: merge motifs + zoom first (requested)
-    await mergeMotifs(850);
+    // strict wait: all shards loaded (or timeout), then show only loaded ones
+    const started = performance.now();
+    const promises = created.map(waitImage);
+    let results = [];
+    const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve("timeout"), timeoutMs));
 
-    // P2: explode shards after merge
-    if (shards.length > 0) {
-      await explode(shards, 1500);
+    const res = await Promise.race([
+      Promise.all(promises).then(r => ({ type: "all", r })),
+      timeoutPromise
+    ]);
+
+    if (res === "timeout") {
+      // collect current state
+      results = created.map(img => (img.complete && img.naturalWidth > 0));
     } else {
-      await wait(700);
+      results = res.r;
     }
 
-    // P4: shockwave
-    await shockwave(650);
-
-    // T1: fade shards
-    if (shards.length > 0) {
-      await fadeOut(shards, 420);
+    // remove broken shards (so count matches visuals, and no "explode invisible")
+    const okImgs = [];
+    for (let i = 0; i < created.length; i++) {
+      if (results[i]) {
+        okImgs.push(created[i]);
+      } else {
+        created[i].remove();
+      }
     }
 
-    // P3(P5): short hold / contemplation (grouped)
-    await wait(1200);
-
-    // Fade out motifs (leave dim for smoother transition)
-    motifL.style.transition = "opacity 650ms ease";
-    motifR.style.transition = "opacity 650ms ease";
-    motifL.style.opacity = "0";
-    motifR.style.opacity = "0";
-
-    // fade dim (overlay black 80%) now
-    overlay.classList.add("dim-fade");
-    await wait(700);
-
-    // After intro end: wait 1s then reveal site (auto rule)
-    await wait(1000);
-
-    // Laser reveal (canvas effect + soft mask)
-    await laserReveal(1000);
-
-    // Finalize: remove overlay and enable site
-    document.documentElement.classList.remove("site-revealing");
-    document.documentElement.classList.add("site-ready");
-
-    overlay.style.transition = "opacity 250ms ease";
-    overlay.style.opacity = "0";
-    await wait(260);
-
-    overlay.remove();
-    unlockScroll();
+    return { ok: okImgs.length > 0, count: okImgs.length, elapsed: performance.now() - started };
   }
 
-  // AUTO start: wait for full load then +1s
-  function autoStart() {
-    // hide hint because auto
-    if (hint) hint.style.opacity = "0";
-    runIntro().catch(() => {});
+  // ----- Visual helpers -----
+  function setVisible(el, v) {
+    if (!el) return;
+    el.style.opacity = v ? "1" : "0";
+    el.style.pointerEvents = v ? "auto" : "none";
   }
 
-  document.documentElement.classList.add("intro-active");
-  overlay.style.opacity = "1";
+  async function fade(el, to, ms) {
+    if (!el) return;
+    el.style.transition = `opacity ${ms}ms ease`;
+    // force reflow
+    el.getBoundingClientRect();
+    el.style.opacity = String(to);
+    await sleep(ms + 30);
+  }
 
-  if (document.readyState === "complete") {
-    setTimeout(autoStart, 1000);
+  async function fadeMany(els, to, ms) {
+    els.forEach(el => {
+      if (!el) return;
+      el.style.transition = `opacity ${ms}ms ease`;
+      el.getBoundingClientRect();
+      el.style.opacity = String(to);
+    });
+    await sleep(ms + 30);
+  }
+
+  // ----- Shards phases -----
+  function showAllShards() {
+    const nodes = [...document.querySelectorAll("#intro-shards img.intro-shard")];
+    nodes.forEach(img => img.style.opacity = "1");
+    return nodes;
+  }
+
+  async function swapTextToShards() {
+    const text = document.querySelector(SELECTORS.texte);
+    const shards = showAllShards();
+    // fade text out, shards in (they already exist stacked)
+    if (text) text.style.transition = `opacity ${INTRO.G1_SWAP_FADE}ms ease`;
+    shards.forEach(img => img.style.transition = `opacity ${INTRO.G1_SWAP_FADE}ms ease`);
+    // make shards visible now, then fade text
+    shards.forEach(img => img.style.opacity = "1");
+    if (text) text.style.opacity = "0";
+    await sleep(INTRO.G1_SWAP_FADE + 30);
+    return shards;
+  }
+
+  async function explodeShards(durationMs = INTRO.P2_EXPLODE) {
+    const shards = [...document.querySelectorAll("#intro-shards img.intro-shard")];
+    const stage = document.querySelector(SELECTORS.stage);
+    if (!shards.length || !stage) return;
+
+    const rect = stage.getBoundingClientRect();
+    const maxR = Math.min(rect.width, rect.height) * 0.65;
+
+    shards.forEach((img, i) => {
+      const a = (i / shards.length) * Math.PI * 2 + (Math.random() - 0.5) * 0.25;
+      const r = maxR * (0.55 + Math.random() * 0.45);
+      const tx = Math.cos(a) * r;
+      const ty = Math.sin(a) * r;
+      const rot = (Math.random() * 2 - 1) * 40;
+      img.style.transition = `transform ${durationMs}ms cubic-bezier(.2,.8,.2,1), opacity ${durationMs}ms ease`;
+      img.style.transform = `translate(-50%, -50%) translate(${tx}px, ${ty}px) rotate(${rot}deg)`;
+    });
+
+    await sleep(durationMs + 30);
+  }
+
+  async function fadeOutShards(ms = INTRO.T1_FADE_SHARDS) {
+    const shards = [...document.querySelectorAll("#intro-shards img.intro-shard")];
+    await fadeMany(shards, 0, ms);
+  }
+
+  // ----- Tremblement (shake) -----
+  function setShakeLevel(el, level) {
+    if (!el) return;
+    el.dataset.shake = level; // "none" | "weak" | "strong"
+  }
+
+  // ----- Motifs merge + zoom -----
+  async function pullBackMotifs() {
+    const l = document.querySelector(SELECTORS.motifL);
+    const r = document.querySelector(SELECTORS.motifR);
+    const li = document.querySelector(SELECTORS.motifLImg);
+    const ri = document.querySelector(SELECTORS.motifRImg);
+    const vw = Math.max(320, window.innerWidth || 0);
+    const offset = vw * 0.20; // 20% of viewport width
+    document.documentElement.style.setProperty("--motifPull", `${offset}px`);
+
+    [l, r].forEach(el => {
+      if (!el) return;
+      el.style.transition = `transform ${INTRO.P3BIS_PULL_BACK}ms ease`;
+    });
+    if (l) l.style.transform = `translateX(calc(-1 * var(--motifPull)))`;
+    if (r) r.style.transform = `translateX(var(--motifPull))`;
+
+    await sleep(INTRO.P3BIS_PULL_BACK + 30);
+  }
+
+  async function mergeMotifsTouching() {
+    const l = document.querySelector(SELECTORS.motifL);
+    const r = document.querySelector(SELECTORS.motifR);
+    const li = document.querySelector(SELECTORS.motifLImg);
+    const ri = document.querySelector(SELECTORS.motifRImg);
+    const textWrap = document.querySelector("#intro-texte-wrap");
+
+    // hide the text wrap (keeps shards layer, but we'll handle shards separately)
+    if (textWrap) {
+      textWrap.style.transition = `opacity ${INTRO.P3BIS_MERGE}ms ease`;
+      textWrap.style.opacity = "0";
+    }
+
+    // bring motifs to center (touching)
+    // we do it by removing pull-back and setting a small negative gap via translate
+    // then we compute final nudge to avoid visible seam.
+    [l, r].forEach(el => {
+      if (!el) return;
+      el.style.transition = `transform ${INTRO.P3BIS_MERGE}ms ease`;
+    });
+
+    if (l) l.style.transform = `translateX(0)`;
+    if (r) r.style.transform = `translateX(0)`;
+    await sleep(INTRO.P3BIS_MERGE + 60);
+
+    // compute touch: move each motif inward by half the current gap between them
+    if (l && r) {
+      const rl = l.getBoundingClientRect();
+      const rr = r.getBoundingClientRect();
+      const gap = rr.left - rl.right; // positive if separated
+      const nudge = gap > 0 ? gap / 2 : 0;
+      const seam = 1; // 1px overlap to avoid hairline
+      l.style.transition = `transform 220ms ease`;
+      r.style.transition = `transform 220ms ease`;
+      l.style.transform = `translateX(${(nudge + seam)}px)`;
+      r.style.transform = `translateX(${-(nudge + seam)}px)`;
+      await sleep(260);
+    }
+  }
+
+  async function zoomMergedMotifsTo80() {
+    const row = document.querySelector(SELECTORS.row);
+    const l = document.querySelector(SELECTORS.motifL);
+    const r = document.querySelector(SELECTORS.motifR);
+    const li = document.querySelector(SELECTORS.motifLImg);
+    const ri = document.querySelector(SELECTORS.motifRImg);
+    if (!row || !l || !r) return;
+
+    const vw = Math.max(320, window.innerWidth || 0);
+    const vh = Math.max(320, window.innerHeight || 0);
+    const desiredW = vw * 0.80;
+    const desiredH = vh * 0.80;
+
+    // bounding box of both motifs combined
+    const rl = l.getBoundingClientRect();
+    const rr = r.getBoundingClientRect();
+    const mergedW = (rr.right - rl.left);
+    const mergedH = Math.max(rl.height, rr.height);
+
+    let scale = desiredW / mergedW;
+    scale = Math.min(scale, desiredH / mergedH);
+    scale = clamp(scale, 1.0, 3.0);
+
+    row.style.transformOrigin = "50% 50%";
+    row.style.transition = `transform ${INTRO.P3BIS_ZOOM}ms cubic-bezier(.2,.9,.2,1)`;
+    // keep it centered while scaling
+    row.style.transform = `translate3d(0,0,0) scale(${scale})`;
+    await sleep(INTRO.P3BIS_ZOOM + 40);
+  }
+
+  // ----- Site reveal (curtain) -----
+  async function runCurtainReveal() {
+    // Optional: if a canvas/curtain system exists on the page, trigger it.
+    // We'll look for a function exported on window: window.startLaserCurtain()
+    if (typeof window.startLaserCurtain === "function") {
+      try { window.startLaserCurtain(); } catch(e) {}
+      return;
+    }
+    // Fallback: simple CSS mask reveal on #site-root (if present)
+    const root = document.querySelector("#site-root");
+    if (!root) return;
+
+    root.classList.add("reveal-curtain");
+    await sleep(1100);
+    root.classList.remove("reveal-curtain");
+  }
+
+  // ----- Main intro sequence -----
+  async function runIntroSequence() {
+    const overlay = document.querySelector(SELECTORS.overlay);
+    const underlay = document.querySelector(SELECTORS.underlay);
+    const loader = document.querySelector(SELECTORS.loader);
+    const startBtn = document.querySelector("#intro-start");
+
+    const imgT = document.querySelector(SELECTORS.texte);
+    const wrapL = document.querySelector(SELECTORS.motifL);
+    const imgL = document.querySelector(SELECTORS.motifLImg);
+    const wrapR = document.querySelector(SELECTORS.motifR);
+    const imgR = document.querySelector(SELECTORS.motifRImg);
+    const textWrap = document.querySelector("#intro-texte-wrap");
+
+    // show overlay, lock scroll
+    lockScroll(true);
+    overlay.classList.add("is-active");
+
+    // ensure clean base state
+    if (underlay) underlay.style.opacity = "0.80";
+    if (textWrap) textWrap.style.opacity = "1";
+    if (imgT) imgT.style.opacity = "1";
+    if (wrapL) { wrapL.style.transform = "translateX(0)"; }
+    if (imgL) { imgL.style.opacity = "1"; }
+    if (wrapR) { wrapR.style.transform = "translateX(0)"; }
+    if (imgR) { imgR.style.opacity = "1"; }
+
+    // shake levels per latest spec:
+    // text: weak during G0, strong during T0..P2, none after
+    setShakeLevel(imgT, "weak");
+    setShakeLevel(imgL, "weak");
+    setShakeLevel(imgR, "weak");
+
+    // loader ON while preloading (core + shards)
+    if (loader) loader.classList.add("on");
+
+    // Wait for core images, update layout once available
+    await preloadCoreImages();
+    updateIntroLayout();
+
+    // Nice fade-in once ready
+    await fadeMany([imgT, imgL, imgR], 1, INTRO.FADE_IN_ALL);
+
+    // Start preloading shards in parallel during G0 hold
+    const tStart = performance.now();
+    const shardsPromise = loadShardsStrict({ timeoutMs: 8000 });
+
+    // hold at least G0_HOLD_MIN
+    const remaining = INTRO.G0_HOLD_MIN - (performance.now() - tStart);
+    if (remaining > 0) await sleep(remaining);
+
+    // Ensure shards loaded (or timeout) before continuing
+    const shardRes = await shardsPromise;
+
+    // loader OFF once shards are ready (or as ready as possible)
+    if (loader) loader.classList.remove("on");
+
+    // If no shards loaded, we still continue, but skip shard-specific effects
+    const hasShards = shardRes.ok && shardRes.count > 0;
+
+    // T0 -> strong shake on text up to P2
+    setShakeLevel(imgT, "strong");
+
+    // G1 swap text -> shards (only if shards exist)
+    if (hasShards) {
+      await swapTextToShards();
+    }
+
+    // P3bis: motifs pull-back then merge + zoom
+    await pullBackMotifs();
+    await mergeMotifsTouching();
+    await zoomMergedMotifsTo80();
+
+    // P2: explode shards (only if shards exist)
+    if (hasShards) {
+      await explodeShards(INTRO.P2_EXPLODE);
+    }
+
+    // P4 shock: small global pulse
+    overlay.classList.add("shock");
+    await sleep(INTRO.P4_SHOCK);
+    overlay.classList.remove("shock");
+
+    // T1 fade shards away (if any), then stop shaking
+    if (hasShards) await fadeOutShards(INTRO.T1_FADE_SHARDS);
+    setShakeLevel(imgT, "none");
+    setShakeLevel(imgL, "none");
+    setShakeLevel(imgR, "none");
+
+    // P3 recoil: subtle pull back of whole row
+    const row = document.querySelector(SELECTORS.row);
+    if (row) {
+      row.style.transition = `transform ${INTRO.P3_RECOIL}ms ease`;
+      row.style.transform = "translate3d(0, 12px, 0) scale(0.98)";
+      await sleep(INTRO.P3_RECOIL + 40);
+      row.style.transition = `transform ${INTRO.P3_RECOIL}ms ease`;
+      row.style.transform = "translate3d(0,0,0) scale(1)";
+      await sleep(INTRO.P3_RECOIL + 40);
+    }
+
+    // P5 contemplation
+    await sleep(INTRO.P5_CONTEMPLATE);
+
+    // fade out underlay + overlay
+    if (underlay) await fade(underlay, 0, INTRO.OUTRO_FADE);
+    await fade(overlay, 0, INTRO.OUTRO_FADE);
+
+    // end
+    overlay.classList.remove("is-active");
+    overlay.style.display = "none";
+    lockScroll(false);
+
+    // auto curtain reveal after intro + 1s
+    await sleep(INTRO.REVEAL_DELAY_AFTER_INTRO);
+    await runCurtainReveal();
+  }
+
+  function init() {
+    const overlay = ensureOverlay();
+    const startBtn = overlay.querySelector("#intro-start");
+
+    // hide overlay until first paint
+    overlay.style.opacity = "1";
+    overlay.style.display = "block";
+
+    updateIntroLayout();
+    window.addEventListener("resize", () => {
+      updateIntroLayout();
+    }, { passive: true });
+
+    // by default: block interaction/scroll, but require a click/tap to launch
+    lockScroll(true);
+    startBtn.addEventListener("click", async () => {
+      startBtn.disabled = true;
+      startBtn.classList.add("hide");
+      await runIntroSequence();
+    }, { once: true });
+  }
+
+  // Start after DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
   } else {
-    window.addEventListener("load", () => setTimeout(autoStart, 1000), { once: true });
+    init();
   }
 })();
