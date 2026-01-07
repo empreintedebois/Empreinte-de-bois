@@ -6,12 +6,33 @@
   --logoH: 180px;                  /* sera recalé par JS = hauteur commune */
   --loaderOpacity: .9;
 }
-
-/* Verrouillage scroll durant l’intro */
-html.intro-lock, body.intro-lock{
+/* ===== SCROLL LOCK (béton, mobile inclus) ===== */
+html.intro-active,
+body.intro-active{
   height: 100%;
   overflow: hidden !important;
+  position: fixed;          /* empêche le scroll iOS/Android */
+  width: 100%;
+  overscroll-behavior: none; /* empêche bounce */
   touch-action: none;
+}
+
+/* site invisible sous l’intro */
+html.intro-active #site-root{
+  visibility: hidden;
+}
+
+/* overlay full screen */
+#intro-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  width: 100vw;
+  height: 100svh;            /* IMPORTANT mobile */
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,.80);
 }
 /* Le site ne doit jamais apparaître sous l’intro */
 html.intro-active #site-root{
