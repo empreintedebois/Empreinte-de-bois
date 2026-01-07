@@ -1,126 +1,136 @@
-/* assets/intro/intro.css
-   Intro overlay (responsive, auto-start, load-gated shards)
-   Uses existing markup in index.html:
-   #intro-overlay > .intro-stage > .intro-row
-   #intro-motif-left, #intro-texte-wrap (#intro-texte + #intro-shards), #intro-motif-right
-   #intro-curtain canvas
-*/
 
 :root{
-  --intro-groupW: min(80vw, 1100px);               /* group of 3 logos = 80% viewport width (clamped) */
-  --intro-logoH: clamp(120px, 18vh, 240px);       /* common height for the 3 logos */
-  --intro-gap: clamp(10px, 2.5vw, 28px);
-  --intro-overlay: rgba(0,0,0,.80);
+  --overlayBg: rgba(0,0,0,.80);
+  --centerW: 60vw;                 /* largeur du bloc central (logo-texte + shards) */
+  --groupGap: clamp(12px, 2.4vw, 28px);
+  --logoH: 180px;                  /* sera recalé par JS = hauteur commune */
+  --loaderOpacity: .9;
 }
 
-/* lock page scroll during intro */
+/* Verrouillage scroll durant l’intro */
 html.intro-lock, body.intro-lock{
   height: 100%;
   overflow: hidden !important;
   touch-action: none;
 }
 
-/* hide site content under intro while keeping global background visible */
-body:not(.intro-done) #site-root{
-  visibility: hidden;
-}
-
-/* overlay */
+/* Overlay plein écran hermétique */
 #intro-overlay{
   position: fixed;
   inset: 0;
   z-index: 9999;
   display: grid;
   place-items: center;
-  background: var(--intro-overlay);
+  background: var(--overlayBg);
   opacity: 1;
-  transition: opacity .5s ease;
+  transition: opacity 600ms ease;
 }
-
 #intro-overlay.is-hidden{
   opacity: 0;
   pointer-events: none;
 }
 
-.intro-stage{
-  width: var(--intro-groupW);
-  position: relative;
+/* Stage = conteneur de l’ensemble */
+#intro-stage{
+  width: min(92vw, 1280px);
   display: grid;
-  place-items: center;
+  justify-items: center;
+  position: relative;
 }
 
-.intro-row{
+/* Groupe : [left]  [center (texte+shards)]  [right] */
+#intro-row{
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--intro-gap);
-  position: relative;
-}
-
-/* Motifs */
-.intro-logo--motif{
-  height: var(--intro-logoH);
-  width: auto;
-  max-width: 32%;
-  object-fit: contain;
-  flex: 0 0 auto;
-  opacity: 1;
-  will-change: transform, opacity;
-  transform: translateX(0) translateY(0) scale(1);
-}
-
-/* Texte wrap keeps same height as motifs; contains the text img + shard stack */
-#intro-texte-wrap{
-  position: relative;
-  height: var(--intro-logoH);
-  width: auto;
-  max-width: 46%;
-  flex: 0 0 auto;
   display: grid;
-  place-items: center;
-  will-change: transform, opacity;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  justify-items: center;
+  column-gap: var(--groupGap);
+  position: relative;
 }
 
-#intro-texte{
-  height: 100%;
+/* Motifs latéraux : même hauteur que le logo-texte */
+.intro-motif{
+  height: var(--logoH);
   width: auto;
   object-fit: contain;
   display: block;
-  opacity: 1;
-  will-change: opacity, transform;
-  transform: translateZ(0);
+  transform-origin: center center;
+  will-change: transform, opacity;
 }
 
-/* Shards stack: same origin as text (no reposition needed) */
+/* Bloc central = conteneur dimensionné au ratio du logo-texte (fixé par JS) */
+#intro-center{
+  width: var(--centerW);
+  position: relative;
+}
+
+/* L’image du logo-texte (sous les shards) */
+#intro-logo-text{
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  opacity: 1;
+  will-change: opacity, transform;
+}
+
+/* Pile des shards exactement par-dessus le logo-texte */
 #intro-shards{
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
   pointer-events: none;
-  opacity: 0; /* shown after fade text -> shards */
 }
-
-#intro-shards .intro-shard{
+#intro-shards .shard{
   position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
-  width: auto;
-  object-fit: contain;
-  opacity: 1;
+  object-fit: contain;  /* même cadrage que le logo-texte */
+  opacity: 0;           /* elles apparaissent pendant la transition */
   transform: translate(0,0) rotate(0deg) scale(1);
   will-change: transform, opacity;
 }
 
-/* shockwave helper (optional) */
-#intro-shockwave{
-  position: absolute;
-  inset: -20%;
-  pointer-events: none;
-  opacity: 0;
+/* Loader 4 points (vague) en bas */
+#intro-loader{
+  position: fixed;
+  left: 0; right: 0; bottom: 18px;
+  display: flex; justify-content: center; gap: 10px;
+  z-index: 10000; pointer-events: none; opacity: var(--loaderOpacity);
+}
+#intro-loader .dot{
+  width: 8px; height: 8px; border-radius: 999px;
+  background: rgba(255,255,255,.55);
+  animation: introWave 1.2s infinite ease-in-out;
+}
+#intro-loader .dot:nth-child(2){ animation-delay: .12s; }
+#intro-loader .dot:nth-child(3){ animation-delay: .24s; }
+#intro-loader .dot:nth-child(4){ animation-delay: .36s; }
+@keyframes introWave{
+  0%,100%{ transform: translateY(0); opacity:.45; }
+  50%   { transform: translateY(-8px); opacity:1; }
 }
 
-/* curtain canvas */
+/* Tremblements contrôlés (léger / fort) */
+@keyframes tremble-soft{
+  0%{ transform: translate(0,0) rotate(0deg); }
+  25%{ transform: translate(-0.6px, 0.4px) rotate(-.1deg); }
+  50%{ transform: translate(0.8px, -0.5px) rotate(.12deg); }
+  75%{ transform: translate(-0.5px, -0.3px) rotate(-.08deg); }
+  100%{ transform: translate(0,0) rotate(0deg); }
+}
+@keyframes tremble-strong{
+  0%{ transform: translate(0,0) rotate(0deg); }
+  25%{ transform: translate(-1.8px, 1.2px) rotate(-.35deg); }
+  50%{ transform: translate(2.0px, -1.4px) rotate(.40deg); }
+  75%{ transform: translate(-1.4px, -1.0px) rotate(-.30deg); }
+  100%{ transform: translate(0,0) rotate(0deg); }
+}
+.is-tremble-soft{ animation: tremble-soft .6s infinite; }
+.is-tremble-strong{ animation: tremble-strong .45s infinite; }
+
+/* Rideau (si tu déclenches un reveal ensuite) */
 #intro-curtain{
   position: fixed;
   inset: 0;
@@ -128,73 +138,9 @@ body:not(.intro-done) #site-root{
   pointer-events: none;
   opacity: 0;
 }
+#intro-curtain.is-on{ opacity: 1; }
 
-#intro-curtain.is-on{
-  opacity: 1;
-}
-
-/* start hint hidden (auto mode) */
-#intro-start-hint{
-  display: none !important;
-}
-
-/* loader dots bar (created by JS: #intro-loader) */
-#intro-loader{
-  position: fixed;
-  left: 0; right: 0;
-  bottom: 18px;
-  z-index: 10000;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  pointer-events: none;
-  opacity: .95;
-}
-
-#intro-loader .dot{
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.55);
-  animation: introWave 1.0s infinite ease-in-out;
-}
-
-#intro-loader .dot:nth-child(2){ animation-delay: .12s; }
-#intro-loader .dot:nth-child(3){ animation-delay: .24s; }
-#intro-loader .dot:nth-child(4){ animation-delay: .36s; }
-
-@keyframes introWave{
-  0%, 100% { transform: translateY(0);   opacity: .45; }
-  50%      { transform: translateY(-8px); opacity: 1; }
-}
-
-/* tremble animations */
-@keyframes tremble-soft{
-  0%{ transform: translate(0,0) rotate(0deg); }
-  20%{ transform: translate(-0.7px, 0.4px) rotate(-0.10deg); }
-  40%{ transform: translate(0.8px, -0.6px) rotate(0.12deg); }
-  60%{ transform: translate(-0.6px, -0.3px) rotate(-0.08deg); }
-  80%{ transform: translate(0.5px, 0.6px) rotate(0.10deg); }
-  100%{ transform: translate(0,0) rotate(0deg); }
-}
-
-@keyframes tremble-strong{
-  0%{ transform: translate(0,0) rotate(0deg); }
-  15%{ transform: translate(-1.8px, 1.2px) rotate(-0.35deg); }
-  30%{ transform: translate(2.0px, -1.4px) rotate(0.40deg); }
-  45%{ transform: translate(-1.4px, -1.0px) rotate(-0.30deg); }
-  60%{ transform: translate(1.6px, 1.0px) rotate(0.35deg); }
-  75%{ transform: translate(-1.0px, 1.2px) rotate(-0.25deg); }
-  100%{ transform: translate(0,0) rotate(0deg); }
-}
-
-/* Use wrappers in JS if needed; here apply to elements directly (works because movement uses translateX on inline style, while tremble is via animation -> conflict)
-   JS will apply tremble to dedicated "shake" class on inner elements when it uses wrappers.
-*/
-.is-tremble-soft{ animation: tremble-soft .6s infinite; }
-.is-tremble-strong{ animation: tremble-strong .45s infinite; }
-
-/* Mobile tweak: slightly smaller height to fit */
+/* Mobile : on borne la hauteur commune si minuscule */
 @media (max-width: 420px){
-  :root{ --intro-logoH: clamp(96px, 16vh, 170px); }
+  :root{ --logoH: 140px; }
 }
