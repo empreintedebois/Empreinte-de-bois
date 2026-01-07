@@ -1,222 +1,200 @@
-/* Intro overlay styles — v31 */
+/* assets/intro/intro.css
+   Intro overlay (responsive, auto-start, load-gated shards)
+   Uses existing markup in index.html:
+   #intro-overlay > .intro-stage > .intro-row
+   #intro-motif-left, #intro-texte-wrap (#intro-texte + #intro-shards), #intro-motif-right
+   #intro-curtain canvas
+*/
+
 :root{
-  --introH: 140px;
-  --introTextW: 70vw;
-  --motifPull: 0px;
+  --intro-groupW: min(80vw, 1100px);               /* group of 3 logos = 80% viewport width (clamped) */
+  --intro-logoH: clamp(120px, 18vh, 240px);       /* common height for the 3 logos */
+  --intro-gap: clamp(10px, 2.5vw, 28px);
+  --intro-overlay: rgba(0,0,0,.80);
 }
 
+/* lock page scroll during intro */
 html.intro-lock, body.intro-lock{
+  height: 100%;
   overflow: hidden !important;
-  height: 100% !important;
-  overscroll-behavior: none;
   touch-action: none;
 }
 
+/* hide site content under intro while keeping global background visible */
+body:not(.intro-done) #site-root{
+  visibility: hidden;
+}
+
+/* overlay */
 #intro-overlay{
   position: fixed;
   inset: 0;
   z-index: 9999;
-  display: block;
-  opacity: 1;
-  background: transparent;
-}
-
-#intro-overlay.is-active{
-  pointer-events: auto;
-}
-
-#intro-underlay{
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.80); /* black 80% underlay to smooth transition */
-  opacity: 0.80;
-  transition: opacity 500ms ease;
-}
-
-#intro-stage{
-  position: absolute;
-  inset: 0;
   display: grid;
   place-items: center;
-  overflow: hidden;
+  background: var(--intro-overlay);
+  opacity: 1;
+  transition: opacity .5s ease;
 }
 
-#intro-row{
-.intro-motif-wrap{ display:block; }
+#intro-overlay.is-hidden{
+  opacity: 0;
+  pointer-events: none;
+}
 
+.intro-stage{
+  width: var(--intro-groupW);
   position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.intro-row{
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  transform: translate3d(0,0,0) scale(1);
-  will-change: transform;
+  gap: var(--intro-gap);
+  position: relative;
 }
 
-.intro-img{
-  height: var(--introH);
+/* Motifs */
+.intro-logo--motif{
+  height: var(--intro-logoH);
   width: auto;
-  max-width: 90vw;
-  max-height: 40vh;
+  max-width: 32%;
   object-fit: contain;
-  display: block;
+  flex: 0 0 auto;
   opacity: 1;
-  image-rendering: auto;
+  will-change: transform, opacity;
+  transform: translateX(0) translateY(0) scale(1);
 }
 
+/* Texte wrap keeps same height as motifs; contains the text img + shard stack */
 #intro-texte-wrap{
   position: relative;
-  height: var(--introH);
+  height: var(--intro-logoH);
+  width: auto;
+  max-width: 46%;
+  flex: 0 0 auto;
   display: grid;
   place-items: center;
+  will-change: transform, opacity;
 }
 
 #intro-texte{
-  height: var(--introH);
+  height: 100%;
   width: auto;
-  max-width: var(--introTextW);
   object-fit: contain;
+  display: block;
+  opacity: 1;
+  will-change: opacity, transform;
+  transform: translateZ(0);
 }
 
+/* Shards stack: same origin as text (no reposition needed) */
 #intro-shards{
   position: absolute;
   inset: 0;
+  display: grid;
+  place-items: center;
   pointer-events: none;
+  opacity: 0; /* shown after fade text -> shards */
 }
 
 #intro-shards .intro-shard{
   position: absolute;
-  height: var(--introH);
+  height: 100%;
   width: auto;
   object-fit: contain;
-  opacity: 0;
-}
-
-#intro-start{
-  position: absolute;
-  inset: 0;
-  border: 0;
-  background: transparent;
-  color: rgba(255,255,255,0.75);
-  font: 600 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-#intro-start span{
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(0,0,0,0.35);
-  border: 1px solid rgba(255,255,255,0.18);
-  backdrop-filter: blur(2px);
-}
-
-#intro-start.hide{
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 250ms ease;
-}
-
-/* loader dots bar (bottom) */
-#intro-loader{
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 200ms ease;
-}
-
-#intro-loader.on{
   opacity: 1;
+  transform: translate(0,0) rotate(0deg) scale(1);
+  will-change: transform, opacity;
+}
+
+/* shockwave helper (optional) */
+#intro-shockwave{
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* curtain canvas */
+#intro-curtain{
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+}
+
+#intro-curtain.is-on{
+  opacity: 1;
+}
+
+/* start hint hidden (auto mode) */
+#intro-start-hint{
+  display: none !important;
+}
+
+/* loader dots bar (created by JS: #intro-loader) */
+#intro-loader{
+  position: fixed;
+  left: 0; right: 0;
+  bottom: 18px;
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  pointer-events: none;
+  opacity: .95;
 }
 
 #intro-loader .dot{
   width: 8px;
   height: 8px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.45);
-  transform: translateY(0) scale(1);
-  animation: introWave 900ms ease-in-out infinite;
+  border-radius: 999px;
+  background: rgba(255,255,255,.55);
+  animation: introWave 1.0s infinite ease-in-out;
 }
 
-#intro-loader .d1{ animation-delay: 0ms; }
-#intro-loader .d2{ animation-delay: 120ms; }
-#intro-loader .d3{ animation-delay: 240ms; }
-#intro-loader .d4{ animation-delay: 360ms; }
+#intro-loader .dot:nth-child(2){ animation-delay: .12s; }
+#intro-loader .dot:nth-child(3){ animation-delay: .24s; }
+#intro-loader .dot:nth-child(4){ animation-delay: .36s; }
 
 @keyframes introWave{
-  0%   { transform: translateY(0) scale(1);   opacity: 0.35; }
-  30%  { transform: translateY(-6px) scale(1.25); opacity: 0.95; }
-  60%  { transform: translateY(0) scale(1);   opacity: 0.45; }
-  100% { transform: translateY(0) scale(1);   opacity: 0.35; }
+  0%, 100% { transform: translateY(0);   opacity: .45; }
+  50%      { transform: translateY(-8px); opacity: 1; }
 }
 
-/* Shake levels */
-#intro-texte[data-shake="weak"]{
-  animation: introShakeWeak 380ms linear infinite;
-}
-#intro-texte[data-shake="strong"]{
-  animation: introShakeStrong 220ms linear infinite;
-}
-#intro-texte[data-shake="none"]{
-  animation: none;
-}
-
-#intro-motif-left-img[data-shake="weak"],
-#intro-motif-right-img[data-shake="weak"]{
-  animation: introShakeWeak 420ms linear infinite;
-}
-#intro-motif-left-img[data-shake="strong"],
-#intro-motif-right-img[data-shake="strong"]{
-  animation: introShakeStrong 260ms linear infinite;
-}
-#intro-motif-left-img[data-shake="none"],
-#intro-motif-right-img[data-shake="none"]{
-  animation: none;
+/* tremble animations */
+@keyframes tremble-soft{
+  0%{ transform: translate(0,0) rotate(0deg); }
+  20%{ transform: translate(-0.7px, 0.4px) rotate(-0.10deg); }
+  40%{ transform: translate(0.8px, -0.6px) rotate(0.12deg); }
+  60%{ transform: translate(-0.6px, -0.3px) rotate(-0.08deg); }
+  80%{ transform: translate(0.5px, 0.6px) rotate(0.10deg); }
+  100%{ transform: translate(0,0) rotate(0deg); }
 }
 
-@keyframes introShakeWeak{
-  0%{ transform: translateX(0) }
-  25%{ transform: translateX(0.8px) }
-  50%{ transform: translateX(-0.8px) }
-  75%{ transform: translateX(0.6px) }
-  100%{ transform: translateX(0) }
+@keyframes tremble-strong{
+  0%{ transform: translate(0,0) rotate(0deg); }
+  15%{ transform: translate(-1.8px, 1.2px) rotate(-0.35deg); }
+  30%{ transform: translate(2.0px, -1.4px) rotate(0.40deg); }
+  45%{ transform: translate(-1.4px, -1.0px) rotate(-0.30deg); }
+  60%{ transform: translate(1.6px, 1.0px) rotate(0.35deg); }
+  75%{ transform: translate(-1.0px, 1.2px) rotate(-0.25deg); }
+  100%{ transform: translate(0,0) rotate(0deg); }
 }
 
-@keyframes introShakeStrong{
-  0%{ transform: translateX(0) }
-  25%{ transform: translateX(1.6px) }
-  50%{ transform: translateX(-1.6px) }
-  75%{ transform: translateX(1.0px) }
-  100%{ transform: translateX(0) }
-}
+/* Use wrappers in JS if needed; here apply to elements directly (works because movement uses translateX on inline style, while tremble is via animation -> conflict)
+   JS will apply tremble to dedicated "shake" class on inner elements when it uses wrappers.
+*/
+.is-tremble-soft{ animation: tremble-soft .6s infinite; }
+.is-tremble-strong{ animation: tremble-strong .45s infinite; }
 
-/* Shock pulse */
-#intro-overlay.shock #intro-row{
-.intro-motif-wrap{ display:block; }
-
-  animation: introShock 420ms ease;
-}
-@keyframes introShock{
-  0%{ transform: translate3d(0,0,0) scale(1); }
-  40%{ transform: translate3d(0,0,0) scale(1.03); }
-  100%{ transform: translate3d(0,0,0) scale(1); }
-}
-
-/* Site curtain fallback (if JS uses it) */
-#site-root.reveal-curtain{
-  position: relative;
-  clip-path: inset(100% 0 0 0);
-  animation: curtainDown 1000ms ease forwards;
-}
-@keyframes curtainDown{
-  to{ clip-path: inset(0 0 0 0); }
+/* Mobile tweak: slightly smaller height to fit */
+@media (max-width: 420px){
+  :root{ --intro-logoH: clamp(96px, 16vh, 170px); }
 }
