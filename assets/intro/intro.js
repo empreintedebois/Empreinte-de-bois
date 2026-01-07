@@ -1,6 +1,11 @@
 
 (() => {
   "use strict";
+const siteRoot = document.getElementById("site-root");
+document.documentElement.classList.add("intro-active");
+if (siteRoot) siteRoot.setAttribute("aria-hidden", "true");
+  document.body.classList.add("intro-active");
+// ...
 
   // === Config chemins ===
   const PATH = {
@@ -159,6 +164,10 @@
   }
 
   // Séquence complète (2s par étape)
+  
+  document.documentElement.classList.remove("intro-active");
+if (siteRoot) siteRoot.removeAttribute("aria-hidden");
+  document.body.classList.remove("intro-active");
   
   // Rideau laser : révèle uniquement #site-layer (le fond reste visible)
   async function runCurtain(duration=1000){
