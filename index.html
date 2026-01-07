@@ -10,24 +10,24 @@
 <link href="assets/intro/intro.css" rel="stylesheet"/>
 </head>
 <body>
-<canvas aria-hidden="true" id="background-canvas"></canvas><div aria-hidden="false" id="intro-overlay">
-<div class="intro-stage">
-<div class="intro-row">
-<img alt="" class="intro-logo intro-logo--motif" id="intro-motif-left" src="assets/intro/logo-motif-left.webp"/>
-<div class="intro-logo intro-logo--texte" id="intro-texte-wrap">
-<img alt="Empreinte de bois" id="intro-texte" src="assets/intro/logo-texte.webp"/>
-<div aria-hidden="true" id="intro-shards"></div>
+<canvas aria-hidden="true" id="background-canvas"></canvas><div id="intro-overlay" aria-hidden="false">
+  <div id="intro-stage">
+    <div id="intro-row">
+      <img src="assets/intro/logo-motif-left.webp" alt="" id="intro-logo-left" class="intro-motif" />
+      <div id="intro-center">
+        <img src="assets/intro/logo-texte.webp" alt="Empreinte de bois" id="intro-logo-text" />
+        <div id="intro-shards" aria-hidden="true"></div>
+      </div>
+      <img src="assets/intro/logo-motif-right.webp" alt="" id="intro-logo-right" class="intro-motif" />
+    </div>
+  </div>
+
+  <div id="intro-loader" aria-hidden="true">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+  </div>
 </div>
-<img alt="" class="intro-logo intro-logo--motif" id="intro-motif-right" src="assets/intro/logo-motif-right.webp"/>
-</div>
-<div aria-hidden="true" id="intro-shockwave"></div>
-<canvas aria-hidden="true" id="intro-curtain"></canvas>
-<div id="intro-start-hint">Tap pour démarrer</div>
-</div>
-</div>
-<div id="site-root">
-<!-- Fond animé global (fixe, derrière tout) -->
-<!-- HEADER STICKY -->
+
+<div id="site-layer">
 <header class="site-header" id="site-header">
 <div class="shell shell--row">
 <a class="site-logo" href="#top">
@@ -377,6 +377,8 @@
 <img alt="" id="modelbox-img"/>
 <div class="modelbox-meta"></div>
 </div>
+</div>
+
 </div>
 </body>
 </html>

@@ -22,16 +22,26 @@
     motifsMerge: D,         // réunion motifs
     zoomTogether: D,        // zoom final motifs réunis
     fadeOut: D,             // fade out overlay/logos
-    curtain: D              // rideau/reveal si besoin
+    curtain: 1000          // rideau laser (ms)
   };
 
   // === DOM helpers ===
   const qs = (s, r=document)=>r.querySelector(s);
   const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
 
+  // Lire translateX courant (en px) depuis transform
+  function getTranslateX(el){
+    const t = getComputedStyle(el).transform;
+    if(!t || t==="none") return 0;
+    try{
+      const m = new DOMMatrixReadOnly(t);
+      return m.m41 || 0;
+    }catch{ return 0; }
+  }
+
   // Verrouillage scroll
-  function lockScroll(){ document.documentElement.classList.add("intro-lock"); document.body.classList.add("intro-lock"); }
-  function unlockScroll(){ document.documentElement.classList.remove("intro-lock"); document.body.classList.remove("intro-lock"); }
+  function lockScroll(){ document.documentElement.classList.add("intro-lock"); document.body.classList.add("intro-lock"); document.body.classList.add("intro-active"); }
+  function unlockScroll(){ document.documentElement.classList.remove("intro-lock"); document.body.classList.remove("intro-lock"); document.body.classList.remove("intro-active"); }
 
   // Preload image
   function preload(src){
@@ -149,7 +159,33 @@
   }
 
   // Séquence complète (2s par étape)
-  async function runIntro(){
+  
+  // Rideau laser : révèle uniquement #site-layer (le fond reste visible)
+  async function runCurtain(duration=1000){
+    // prépare le reveal
+    document.body.classList.add("curtain-running");
+
+    // laser line
+    const line = document.createElement("div");
+    line.id = "laser-line";
+    document.body.appendChild(line);
+
+    const h = window.innerHeight || 800;
+    const a = line.animate(
+      [{ transform:"translateY(0)", opacity: 1 },
+       { transform:`translateY(${h}px)`, opacity: 0.9 }],
+      { duration, easing:"cubic-bezier(.2,.9,.2,1)", fill:"forwards" }
+    );
+
+    // attend fin anim
+    await a.finished.catch(()=>{});
+
+    // cleanup
+    line.remove();
+    document.body.classList.remove("curtain-running");
+  }
+
+async function runIntro(){
     ensureOverlay();
     lockScroll();
 
@@ -207,13 +243,13 @@
         );
       });
       // pendant l’explosion, les motifs reculent de 20% chacun
-      const pull = Math.round(window.innerWidth * 0.20 * 0.5); // 20% au total → 10% chacun, ajusté
+      const pull = Math.round(window.innerWidth * 0.20); // 20% du viewport POUR CHAQUE motif
       const aL = left.animate(
-        [{ transform:"translateX(0)" }, { transform:`translateX(${pull}px)` }],
+        [{ transform:`translateX(${getTranslateX(left)}px)` }, { transform:`translateX(${getTranslateX(left)+pull}px)` }],
         { duration:T.motifsPullBack, easing:"ease-in-out", fill:"forwards" }
       );
       const aR = right.animate(
-        [{ transform:"translateX(0)" }, { transform:`translateX(${-pull}px)` }],
+        [{ transform:`translateX(${getTranslateX(right)}px)` }, { transform:`translateX(${getTranslateX(right)-pull}px)` }],
         { duration:T.motifsPullBack, easing:"ease-in-out", fill:"forwards" }
       );
       await Promise.all([aL.finished, aR.finished, sleep(T.explode)]);
@@ -221,14 +257,20 @@
 
     // Réunion motifs (bord à bord)
     {
-      // on repart de la position atteinte et on les rapproche jusqu’à effleurement
-      const move = Math.round(window.innerWidth * 0.10); // reviens de 10% chacun vers le centre
+      const rL = left.getBoundingClientRect();
+      const rR = right.getBoundingClientRect();
+      const gap = rR.left - rL.right;      // espace entre les deux (px)
+      const half = gap / 2;
+
+      const curL = getTranslateX(left);
+      const curR = getTranslateX(right);
+
       const mL = left.animate(
-        [{ transform:getComputedStyle(left).transform }, { transform:`translateX(${move}px)` }],
+        [{ transform:`translateX(${curL}px)` }, { transform:`translateX(${curL + half}px)` }],
         { duration:T.motifsMerge, easing:"ease-in-out", fill:"forwards" }
       );
       const mR = right.animate(
-        [{ transform:getComputedStyle(right).transform }, { transform:`translateX(${-move}px)` }],
+        [{ transform:`translateX(${curR}px)` }, { transform:`translateX(${curR - half}px)` }],
         { duration:T.motifsMerge, easing:"ease-in-out", fill:"forwards" }
       );
       await Promise.all([mL.finished, mR.finished]);
@@ -260,11 +302,9 @@
     overlay.remove();
     unlockScroll();
 
-    // (optionnel) rideau/reveal :
-    // const curtain = qs("#intro-curtain");
-    // curtain && curtain.classList.add("is-on");
-    // await sleep(T.curtain);
-    // curtain && curtain.remove();
+    // Rideau laser (1s après la fin intro)
+    await sleep(1000);
+    await runCurtain(T.curtain);
 
     // signal fin
     window.dispatchEvent(new CustomEvent("intro:done"));
