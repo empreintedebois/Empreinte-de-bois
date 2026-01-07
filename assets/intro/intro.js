@@ -45,8 +45,22 @@ if (siteRoot) siteRoot.setAttribute("aria-hidden", "true");
   }
 
   // Verrouillage scroll
-  function lockScroll(){ document.documentElement.classList.add("intro-lock"); document.body.classList.add("intro-lock"); document.body.classList.add("intro-active"); }
-  function unlockScroll(){ document.documentElement.classList.remove("intro-lock"); document.body.classList.remove("intro-lock"); document.body.classList.remove("intro-active"); }
+  let __scrollY = 0;
+
+function lockScrollIntro(){
+  __scrollY = window.scrollY || 0;
+  document.documentElement.classList.add("intro-active");
+  document.body.classList.add("intro-active");
+  document.body.style.top = `-${__scrollY}px`;
+}
+
+function unlockScrollIntro(){
+  document.documentElement.classList.remove("intro-active");
+  document.body.classList.remove("intro-active");
+  const y = __scrollY;
+  document.body.style.top = "";
+  window.scrollTo(0, y);
+}
 
   // Preload image
   function preload(src){
