@@ -13,17 +13,36 @@ html.intro-lock, body.intro-lock{
   overflow: hidden !important;
   touch-action: none;
 }
+/* Le site ne doit jamais apparaître sous l’intro */
+html.intro-active #site-root{
+  visibility: hidden;       /* invisible sans casser le layout */
+}
 
-/* Overlay plein écran hermétique */
+/* Optionnel : évite qu’un élément “fixed” passe devant */
+html.intro-active #site-root *{
+  pointer-events: none;
+}
+html.intro-active, body.intro-active{
+  overflow: hidden;
+  height: 100%;
+}
+/* OVERLAY INTRO : plein écran, au-dessus de tout */
 #intro-overlay{
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 999999;              /* au-dessus de tout */
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   display: grid;
   place-items: center;
-  background: var(--overlayBg);
+  background: rgba(0,0,0,.80);  /* ton overlay noir 80% */
   opacity: 1;
-  transition: opacity 600ms ease;
+}
+
+/* IMPORTANT : empêche le “débordement” mobile */
+#intro-overlay, #intro-overlay *{
+  -webkit-tap-highlight-color: transparent;
 }
 #intro-overlay.is-hidden{
   opacity: 0;
