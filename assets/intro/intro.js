@@ -185,25 +185,29 @@ if (siteRoot) siteRoot.removeAttribute("aria-hidden");
   
   // Rideau laser : révèle uniquement #site-layer (le fond reste visible)
   async function runCurtain(duration=1000){
-    // prépare le reveal
-    document.body.classList.add("curtain-running");
+    // Nouveau : scan laser + particules, uniquement sur les éléments (pas le fond)
+    // (les images sont masquées par leur alpha => pas de laser dans les zones transparentes)
+    if (typeof window.runLaserReveal === "function") {
+      await window.runLaserReveal({
+        duration,
+        root: "#site-layer",
+        exclude: ".hero__bg, #background-canvas"
+      });
+      return;
+    }
 
-    // laser line
+    // Fallback minimal (si le script n'est pas chargé)
+    document.body.classList.add("curtain-running");
     const line = document.createElement("div");
     line.id = "laser-line";
     document.body.appendChild(line);
-
     const h = window.innerHeight || 800;
     const a = line.animate(
-      [{ transform:"translateY(0)", opacity: 1 },
-       { transform:`translateY(${h}px)`, opacity: 0.9 }],
-      { duration, easing:"cubic-bezier(.2,.9,.2,1)", fill:"forwards" }
+      [{ transform: "translateY(0)", opacity: 1 },
+       { transform: `translateY(${h}px)`, opacity: 0.9 }],
+      { duration, easing: "cubic-bezier(.2,.9,.2,1)", fill: "forwards" }
     );
-
-    // attend fin anim
     await a.finished.catch(()=>{});
-
-    // cleanup
     line.remove();
     document.body.classList.remove("curtain-running");
   }
