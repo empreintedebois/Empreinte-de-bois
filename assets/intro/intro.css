@@ -1,8 +1,5 @@
-/* Intro video (luma-key on canvas) — Empreinte de Bois */
+/* Intro video (MP4) — Empreinte de Bois */
 :root{
-  /* Key parameters (tweak if you want to remove light grays) */
-  --intro-key-threshold: 190;   /* 0-255 : higher => only pure whites remain */
-  --intro-key-softness:  26;    /* 0-255 : edge feathering */
   /* Durée de transition (ms) entre l'overlay noir de l'intro et le site */
   --intro-fade-ms: 3000;
   /* Optionnel : dissocier le fondu du site si besoin */
@@ -40,25 +37,17 @@ html.intro-active, body.intro-active{
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  background: #000;
 }
+
 
 #intro-video{
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* fullscreen, no letterbox */
-  opacity: 0; /* hidden, drawn to canvas */
+  object-fit: cover; /* plein écran */
+  display: block;
 }
 
-#intro-canvas{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
+
 
 /* Révélation douce du site : le site est présent mais transparent durant l'intro */
 #site-layer{
