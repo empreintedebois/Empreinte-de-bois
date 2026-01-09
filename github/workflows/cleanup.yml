@@ -1,0 +1,84 @@
+name: Cleanup assets (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show cleanup list
+        run: |
+          echo "=== tools/cleanup-list.yml ==="
+          sed -n '1,200p' tools/cleanup-list.yml || true
+
+      - name: Apply cleanup (delete files + empty dirs)
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob globstar
+
+          LIST_FILE="tools/cleanup-list.yml"
+          if [[ ! -f "$LIST_FILE" ]]; then
+            echo "ERROR: $LIST_FILE not found."
+            exit 1
+          fi
+
+          # Extract remove list lines (simple YAML: remove: then "- item")
+          # (No external YAML parser needed)
+          mapfile -t ITEMS < <(
+            awk '
+              BEGIN{inremove=0}
+              /^remove:\s*$/ {inremove=1; next}
+              inremove && /^[[:space:]]*-[[:space:]]*/ {
+                line=$0
+                sub(/^[[:space:]]*-[[:space:]]*/, "", line)
+                sub(/[[:space:]]+#.*$/, "", line)  # strip trailing comments
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+                if (length(line)>0) print line
+              }
+            ' "$LIST_FILE"
+          )
+
+          echo "Will process ${#ITEMS[@]} patterns/paths"
+          echo "----"
+
+          deleted=0
+          for p in "${ITEMS[@]}"; do
+            # Allow patterns like "*_w2000.webp"
+            matches=( $p )
+            if (( ${#matches[@]} == 0 )); then
+              echo "No match: $p"
+              continue
+            fi
+            for m in "${matches[@]}"; do
+              if [[ -e "$m" ]]; then
+                echo "DELETE: $m"
+                rm -rf -- "$m"
+                ((deleted++)) || true
+              fi
+            done
+          done
+
+          echo "----"
+          echo "Deleted entries: $deleted"
+
+          # Remove empty dirs (excluding .git)
+          echo "Removing empty directories..."
+          find . -type d -empty -not -path "./.git/*" -not -path "./.git" -delete
+
+          echo "Done."
+
+      - name: Build cleaned zip artifact
+        run: |
+          set -euo pipefail
+          zip -qr Empreinte-de-bois-cleaned.zip .
+
+      - name: Upload cleaned zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: Empreinte-de-bois-cleaned
+          path: Empreinte-de-bois-cleaned.zip
