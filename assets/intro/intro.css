@@ -1,186 +1,71 @@
-
+/* Intro video (luma-key on canvas) — Empreinte de Bois */
 :root{
-  --overlayBg: rgba(0,0,0,.80);
-  --centerW: 60vw;                 /* largeur du bloc central (logo-texte + shards) */
-  --groupGap: clamp(12px, 2.4vw, 28px);
-  --logoH: 180px;                  /* sera recalé par JS = hauteur commune */
-  --loaderOpacity: .9;
-}
-/* ===== SCROLL LOCK (béton, mobile inclus) ===== */
-html.intro-active,
-body.intro-active{
-  height: 100%;
-  overflow: hidden !important;
-  position: fixed;          /* empêche le scroll iOS/Android */
-  width: 100%;
-  overscroll-behavior: none; /* empêche bounce */
-  touch-action: none;
+  /* Key parameters (tweak if you want to remove light grays) */
+  --intro-key-threshold: 190;   /* 0-255 : higher => only pure whites remain */
+  --intro-key-softness:  26;    /* 0-255 : edge feathering */
+  --intro-fade-ms: 650;
 }
 
-/* site invisible sous l’intro */
-html.intro-active #site-root{
+html.intro-active, body.intro-active{
+  overflow: hidden !important;
+  height: 100%;
+}
+
+#intro-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: block;
+  background: #000; /* pure black behind keyed video */
+  opacity: 1;
+  transition: opacity var(--intro-fade-ms) ease;
+  pointer-events: none; /* no interaction */
+}
+
+#intro-overlay.intro-hidden{
+  opacity: 0;
+}
+
+#intro-stage{
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+#intro-video-wrap{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+#intro-video{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* fullscreen, no letterbox */
+  opacity: 0; /* hidden, drawn to canvas */
+}
+
+#intro-canvas{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Optional: smooth reveal of site after intro */
+html.intro-active #site-layer{
   visibility: hidden;
 }
-
-/* overlay full screen */
-#intro-overlay{
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  width: 100vw;
-  height: 100svh;            /* IMPORTANT mobile */
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  background: rgba(0,0,0,.80);
-}
-/* Le site ne doit jamais apparaître sous l’intro */
-html.intro-active #site-root{
-  visibility: hidden;       /* invisible sans casser le layout */
+html.intro-done #site-layer{
+  visibility: visible;
 }
 
-/* Optionnel : évite qu’un élément “fixed” passe devant */
-html.intro-active #site-root *{
-  pointer-events: none;
-}
-html.intro-active, body.intro-active{
-  overflow: hidden;
-  height: 100%;
-}
-/* OVERLAY INTRO : plein écran, au-dessus de tout */
-#intro-overlay{
-  position: fixed;
-  inset: 0;
-  z-index: 999999;              /* au-dessus de tout */
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  background: rgba(0,0,0,.80);  /* ton overlay noir 80% */
-  opacity: 1;
-}
-
-/* IMPORTANT : empêche le “débordement” mobile */
-#intro-overlay, #intro-overlay *{
-  -webkit-tap-highlight-color: transparent;
-}
-#intro-overlay.is-hidden{
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Stage = conteneur de l’ensemble */
-#intro-stage{
-  width: min(92vw, 1280px);
-  display: grid;
-  justify-items: center;
-  position: relative;
-}
-
-/* Groupe : [left]  [center (texte+shards)]  [right] */
-#intro-row{
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  justify-items: center;
-  column-gap: var(--groupGap);
-  position: relative;
-}
-
-/* Motifs latéraux : même hauteur que le logo-texte */
-.intro-motif{
-  height: var(--logoH);
-  width: auto;
-  object-fit: contain;
-  display: block;
-  transform-origin: center center;
-  will-change: transform, opacity;
-}
-
-/* Bloc central = conteneur dimensionné au ratio du logo-texte (fixé par JS) */
-#intro-center{
-  width: var(--centerW);
-  position: relative;
-}
-
-/* L’image du logo-texte (sous les shards) */
-#intro-logo-text{
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  opacity: 1;
-  will-change: opacity, transform;
-}
-
-/* Pile des shards exactement par-dessus le logo-texte */
-#intro-shards{
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-#intro-shards .shard{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;  /* même cadrage que le logo-texte */
-  opacity: 0;           /* elles apparaissent pendant la transition */
-  transform: translate(0,0) rotate(0deg) scale(1);
-  will-change: transform, opacity;
-}
-
-/* Loader 4 points (vague) en bas */
-#intro-loader{
-  position: fixed;
-  left: 0; right: 0; bottom: 18px;
-  display: flex; justify-content: center; gap: 10px;
-  z-index: 10000; pointer-events: none; opacity: var(--loaderOpacity);
-}
-#intro-loader .dot{
-  width: 8px; height: 8px; border-radius: 999px;
-  background: rgba(255,255,255,.55);
-  animation: introWave 1.2s infinite ease-in-out;
-}
-#intro-loader .dot:nth-child(2){ animation-delay: .12s; }
-#intro-loader .dot:nth-child(3){ animation-delay: .24s; }
-#intro-loader .dot:nth-child(4){ animation-delay: .36s; }
-@keyframes introWave{
-  0%,100%{ transform: translateY(0); opacity:.45; }
-  50%   { transform: translateY(-8px); opacity:1; }
-}
-
-/* Tremblements contrôlés (léger / fort) */
-@keyframes tremble-soft{
-  0%{ transform: translate(0,0) rotate(0deg); }
-  25%{ transform: translate(-0.6px, 0.4px) rotate(-.1deg); }
-  50%{ transform: translate(0.8px, -0.5px) rotate(.12deg); }
-  75%{ transform: translate(-0.5px, -0.3px) rotate(-.08deg); }
-  100%{ transform: translate(0,0) rotate(0deg); }
-}
-@keyframes tremble-strong{
-  0%{ transform: translate(0,0) rotate(0deg); }
-  25%{ transform: translate(-1.8px, 1.2px) rotate(-.35deg); }
-  50%{ transform: translate(2.0px, -1.4px) rotate(.40deg); }
-  75%{ transform: translate(-1.4px, -1.0px) rotate(-.30deg); }
-  100%{ transform: translate(0,0) rotate(0deg); }
-}
-.is-tremble-soft{ animation: tremble-soft .6s infinite; }
-.is-tremble-strong{ animation: tremble-strong .45s infinite; }
-
-/* Rideau (si tu déclenches un reveal ensuite) */
-#intro-curtain{
-  position: fixed;
-  inset: 0;
-  z-index: 9998;
-  pointer-events: none;
-  opacity: 0;
-}
-#intro-curtain.is-on{ opacity: 1; }
-
-/* Mobile : on borne la hauteur commune si minuscule */
-@media (max-width: 420px){
-  :root{ --logoH: 140px; }
+/* Safety: if user prefers reduced motion, still show video but shorter fade */
+@media (prefers-reduced-motion: reduce){
+  :root{ --intro-fade-ms: 350; }
 }
