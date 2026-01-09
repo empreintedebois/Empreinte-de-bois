@@ -1,9 +1,12 @@
 /* Intro video (luma-key on canvas) — Empreinte de Bois */
 :root{
   /* Key parameters (tweak if you want to remove light grays) */
-  --intro-key-threshold: 240;   /* 0-255 : higher => only pure whites remain */
-  --intro-key-softness:  30;    /* 0-255 : edge feathering */
-  --intro-fade-ms: 650;
+  --intro-key-threshold: 190;   /* 0-255 : higher => only pure whites remain */
+  --intro-key-softness:  26;    /* 0-255 : edge feathering */
+  /* Durée de transition (ms) entre l'overlay noir de l'intro et le site */
+  --intro-fade-ms: 3000;
+  /* Optionnel : dissocier le fondu du site si besoin */
+  --intro-sitefade-ms: 3000;
 }
 
 html.intro-active, body.intro-active{
@@ -57,15 +60,18 @@ html.intro-active, body.intro-active{
   height: 100%;
 }
 
-/* Optional: smooth reveal of site after intro */
-html.intro-active #site-layer{
-  visibility: hidden;
+/* Révélation douce du site : le site est présent mais transparent durant l'intro */
+#site-layer{
+  opacity: 1;
+  transition: opacity var(--intro-sitefade-ms) ease;
+  will-change: opacity;
 }
-html.intro-done #site-layer{
-  visibility: visible;
+html.intro-active #site-layer{
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Safety: if user prefers reduced motion, still show video but shorter fade */
 @media (prefers-reduced-motion: reduce){
-  :root{ --intro-fade-ms: 350; }
+  :root{ --intro-fade-ms: 350; --intro-sitefade-ms: 350; }
 }
