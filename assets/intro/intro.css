@@ -1,7 +1,7 @@
 /* Intro video (luma-key on canvas) — Empreinte de Bois */
 :root{
   /* Key parameters (tweak if you want to remove light grays) */
-  --intro-key-threshold: 200;   /* 0-255 : higher => only pure whites remain */
+  --intro-key-threshold: 240;   /* 0-255 : higher => only pure whites remain */
   --intro-key-softness:  30;    /* 0-255 : edge feathering */
   --intro-fade-ms: 650;
 }
