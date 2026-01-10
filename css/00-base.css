@@ -1,0 +1,15 @@
+/* css/00-base.css
+   Base global styles (tokens, reset, typography, layout primitives).
+   Règles:
+   - ici: :root, body, typography, utilities génériques.
+   - pas de styles spécifiques à une section.
+*/
+
+/* Utilities */
+.sr-only{
+  position:absolute;
+  width:1px;height:1px;
+  padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);
+  white-space:nowrap;border:0;
+}

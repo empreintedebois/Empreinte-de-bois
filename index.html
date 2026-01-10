@@ -6,27 +6,24 @@
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Empreinte de Bois – Portfolio</title>
 <meta content="Portfolio 3D et gravure numérique : sélection de projets, démarche, matériaux et contact." name="description"/>
-<link href="styles.css" rel="stylesheet"/>
 <link href="assets/intro/intro.css" rel="stylesheet"/>
 </head>
 <body>
-<canvas aria-hidden="true" id="background-canvas"></canvas><div id="intro-overlay" aria-hidden="false">
-  <div id="intro-stage">
-    <div id="intro-row">
-      <img src="assets/intro/logo-motif-left.webp" alt="" id="intro-logo-left" class="intro-motif" />
-      <div id="intro-center">
-        <img src="assets/intro/logo-texte.webp" alt="Empreinte de bois" id="intro-logo-text" />
-        <div id="intro-shards" aria-hidden="true"></div>
-      </div>
-      <img src="assets/intro/logo-motif-right.webp" alt="" id="intro-logo-right" class="intro-motif" />
-    </div>
-  </div>
-
-  <div id="intro-loader" aria-hidden="true">
-    <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-  </div>
+<canvas aria-hidden="true" id="background-canvas"></canvas><div aria-hidden="false" id="intro-overlay">
+<div id="intro-stage">
+<div id="intro-row">
+<img alt="" class="intro-motif" id="intro-logo-left" src="assets/intro/logo-motif-left.webp"/>
+<div id="intro-center">
+<img alt="Empreinte de bois" id="intro-logo-text" src="assets/intro/logo-texte.webp"/>
+<div aria-hidden="true" id="intro-shards"></div>
 </div>
-
+<img alt="" class="intro-motif" id="intro-logo-right" src="assets/intro/logo-motif-right.webp"/>
+</div>
+</div>
+<div aria-hidden="true" id="intro-loader">
+<span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+</div>
+</div>
 <div id="site-layer">
 <header class="site-header" id="site-header">
 <div class="shell shell--row">
@@ -162,215 +159,11 @@
 <button aria-label="Fermer la vue détaillée" class="lightbox__close" data-close="1">×</button>
 </figure>
 </div><div aria-hidden="true" class="lightbox lightbox--more" id="galleryMore"><button aria-label="Fermer" class="lightbox__backdrop" data-close="1"></button><figure class="lightbox__body"><button aria-label="Fermer" class="lightbox__close" data-close="1">×</button><figcaption class="lightbox__caption">Galerie</figcaption><div class="gallery-more-grid"></div></figure></div>
-<script src="assets/intro/intro.js"></script>
-<script defer="" src="page.js"></script>
+<script defer="" src="assets/intro/intro.js"></script><script src="js/app.js" type="module"></script>
+
 <!-- SCRIPT FOND ANIMÉ (cover, non répété, fixe) -->
-<script>
-  // ===============================
-  // PARAMÈTRES (à modifier)
-  // ===============================
-  const IMG_GREY_V = "assets/fond/fond-gris-v.webp";
-  const IMG_GOLD_V = "assets/fond/fond-dore-v.webp";
 
-  const IMG_GREY_H = "assets/fond/fond-gris-h.webp";
-  const IMG_GOLD_H = "assets/fond/fond-dore-h.webp";
-
-  const MAX_COVER_SCALE = 1.15;
-
-  // Halos en ratio (relatifs à l'écran)
-  const MIN_DIAMETER_RATIO = 0.06;
-  const MAX_DIAMETER_RATIO = 0.32;
-
-  // Timings (ms)
-  const FADE_IN  = 3800;
-  const FADE_OUT = 800;
-  const SPAWN_DELAY = 800;
-
-  // Profil du halo (0.35 = bord plus net / 0.75 = très diffus)
-  const SOFT_EDGE = 0.65;
-
-  // Densité / perf
-  const MAX_PULSES = 20;
-  const MAX_PULSES_PER_SPAWN = 3;
-
-  // Perf (mobile)
-  const MAX_DPR = 1.5;
-
-  // Anti "micro-zoom" Android/Chrome
-  const VIEWPORT_HYSTERESIS_PX = 80;
-  // ===============================
-
-  const canvas = document.getElementById("background-canvas");
-  const ctx = canvas.getContext("2d");
-
-  const maskCanvas = document.createElement("canvas");
-  const maskCtx = maskCanvas.getContext("2d");
-
-  const goldCanvas = document.createElement("canvas");
-  const goldCtx = goldCanvas.getContext("2d");
-
-  let w = 0, h = 0, dpr = 1;
-  let pulses = [];
-  let lastSpawn = 0;
-
-  function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-
-    const newW = window.innerWidth;
-    const newH = window.innerHeight;
-
-    // Android/Chrome : la barre d’adresse fait varier innerHeight au scroll
-    // -> on ignore si c’est un petit delta, pour éviter le “zoom”
-    if (w && newW === w && Math.abs(newH - h) < VIEWPORT_HYSTERESIS_PX) return;
-
-    w = newW;
-    h = newH;
-
-    for (const c of [canvas, maskCanvas, goldCanvas]) {
-      c.width = Math.floor(w * dpr);
-      c.height = Math.floor(h * dpr);
-    }
-
-    canvas.style.width = w + "px";
-    canvas.style.height = h + "px";
-
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    maskCtx.setTransform(dpr,0,0,dpr,0,0);
-    goldCtx.setTransform(dpr,0,0,dpr,0,0);
-  }
-
-  function load(src) {
-    return new Promise((resolve, reject) => {
-      const i = new Image();
-      i.onload = () => resolve(i);
-      i.onerror = () => reject(new Error("Image introuvable: " + src));
-      i.src = src;
-    });
-  }
-
-  function pickBackgroundByOrientation() {
-    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-    return isPortrait
-      ? { grey: IMG_GREY_V, gold: IMG_GOLD_V }
-      : { grey: IMG_GREY_H, gold: IMG_GOLD_H };
-  }
-
-  function drawCover(ctx2d, img) {
-    const iw = img.width, ih = img.height;
-    const rawScale = Math.max(w / iw, h / ih);
-    const scale = Math.min(rawScale, MAX_COVER_SCALE);
-    const dw = iw * scale;
-    const dh = ih * scale;
-    const dx = (w - dw) / 2;
-    const dy = (h - dh) / 2;
-    ctx2d.drawImage(img, dx, dy, dw, dh);
-  }
-
-  function spawn(now) {
-    if (pulses.length >= MAX_PULSES) return;
-
-    // 1 → MAX_PULSES_PER_SPAWN halos (apparitions groupées)
-    const count = 1 + Math.floor(Math.random() * MAX_PULSES_PER_SPAWN);
-
-    const base = Math.min(w, h);
-    const minD = base * MIN_DIAMETER_RATIO;
-    const maxD = base * MAX_DIAMETER_RATIO;
-
-    for (let i = 0; i < count; i++) {
-      if (pulses.length >= MAX_PULSES) break;
-
-      const d = minD + Math.random() * (maxD - minD);
-
-      pulses.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        r: d / 2,
-        born: now + Math.random() * 250,                 // désynchronise un peu le cluster
-        die:  now + FADE_IN + FADE_OUT + 250
-      });
-    }
-  }
-
-  function opacity(p, now) {
-    const t = now - p.born;
-    if (t < 0) return 0;
-    if (t < FADE_IN) return t / FADE_IN;
-    if (t < FADE_IN + FADE_OUT) return 1 - (t - FADE_IN) / FADE_OUT;
-    return 0;
-  }
-
-  (async function () {
-    let grey, gold;
-
-    try {
-      const picked = pickBackgroundByOrientation();
-      [grey, gold] = await Promise.all([load(picked.grey), load(picked.gold)]);
-    } catch (e) {
-      console.error("[Fond animé]", e);
-      return;
-    }
-
-    resize();
-    window.addEventListener("resize", resize, { passive: true });
-
-    window.addEventListener("orientationchange", async () => {
-      try {
-        const picked = pickBackgroundByOrientation();
-        [grey, gold] = await Promise.all([load(picked.grey), load(picked.gold)]);
-        resize();
-      } catch (e) {
-        console.error("[Fond animé] reload orientation", e);
-      }
-    }, { passive: true });
-
-    function frame(now) {
-      if (now - lastSpawn > SPAWN_DELAY) {
-        spawn(now);
-        lastSpawn = now;
-      }
-
-      pulses = pulses.filter(p => now < p.die);
-
-      // base gris
-      ctx.clearRect(0,0,w,h);
-      drawCover(ctx, grey);
-
-      // couche dorée
-      goldCtx.clearRect(0,0,w,h);
-      drawCover(goldCtx, gold);
-
-      // masque radial
-      maskCtx.clearRect(0,0,w,h);
-      for (const p of pulses) {
-        const a = opacity(p, now);
-        if (!a) continue;
-
-        const g = maskCtx.createRadialGradient(
-          p.x, p.y, p.r * (1 - SOFT_EDGE),
-          p.x, p.y, p.r
-        );
-        g.addColorStop(0, `rgba(255,255,255,${a})`);
-        g.addColorStop(1, "rgba(255,255,255,0)");
-
-        maskCtx.fillStyle = g;
-        maskCtx.beginPath();
-        maskCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        maskCtx.fill();
-      }
-
-      goldCtx.globalCompositeOperation = "destination-in";
-      goldCtx.drawImage(maskCanvas, 0, 0, w, h);
-      goldCtx.globalCompositeOperation = "source-over";
-
-      ctx.drawImage(goldCanvas, 0, 0, w, h);
-
-      requestAnimationFrame(frame);
-    }
-
-    requestAnimationFrame(frame);
-  })();
-  </script>
-<script defer="True" src="gallery.js"></script></div>
+</div>
 <div class="modelbox" hidden="" id="modelbox">
 <div id="modelbox-content">
 <button aria-label="Fermer" class="modelbox-close" type="button">×</button>
@@ -379,6 +172,16 @@
 </div>
 </div>
 
+
+<div id="overlay-root" class="overlay" aria-hidden="true">
+  <div class="overlay-backdrop"></div>
+  <div class="overlay-panel" role="dialog" aria-modal="true">
+    <button type="button" class="overlay-close" data-overlay-close aria-label="Fermer">×</button>
+    <div class="overlay-content"></div>
+  </div>
 </div>
+
+<!-- Lien conservé (non affiché) -->
+<a aria-hidden="true" class="sr-only" href="matrice/matrice.html" tabindex="-1">Matrice</a>
 </body>
 </html>

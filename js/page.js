@@ -7,6 +7,9 @@
    - Un seul matériau sélectionné à la fois : la sélection remplace la précédente
    ============================================================ */
 
+import { fetchJSON } from "./utils.js";
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const modelsGrid = document.getElementById("modelsGrid");
   const modelbox = document.getElementById("modelbox");
@@ -296,9 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadModels() {
     try {
-      const res = await fetch("data/models.json", { cache: "no-store" });
-      if (!res.ok) throw new Error(String(res.status));
-      const data = await res.json();
+      const data = await fetchJSON("data/models.json");
       manifest = data && Array.isArray(data.models) ? data : { models: [] };
       renderGrid();
     } catch (e) {

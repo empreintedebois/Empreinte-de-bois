@@ -10,6 +10,9 @@
    - Clic dans "Voir plus" -> ouvre la lightbox image normale
    ============================================================ */
 
+import { fetchJSON } from "./utils.js";
+
+
 (async function () {
   const portfolio = document.querySelector("#portfolio");
   const grid = document.querySelector("#portfolio .gallery-grid");
@@ -218,9 +221,7 @@
 
   // Load manifest
   try {
-    const res = await fetch("data/gallery.json", { cache: "no-store" });
-    if (!res.ok) return;
-    const data = await res.json();
+    const data = await fetchJSON("data/gallery.json");
     items = Array.isArray(data.items) ? data.items : [];
   } catch (e) {
     return;

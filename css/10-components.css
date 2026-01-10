@@ -1,0 +1,13 @@
+/* css/10-components.css
+   Components réutilisables (btn, card, modal, badges, forms).
+   Règles:
+   - ici: composants génériques réutilisés par plusieurs sections.
+   - pas de layout de section.
+*/
+
+/* Overlay (future unified modal system) */
+.overlay{position:fixed;inset:0;display:none;z-index:9999}
+.overlay.is-open{display:block}
+.overlay-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.75)}
+.overlay-panel{position:relative;max-width:1100px;margin:5vh auto;max-height:90vh;overflow:auto;background:#111;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px}
+.overlay-close{position:absolute;top:10px;right:10px}
