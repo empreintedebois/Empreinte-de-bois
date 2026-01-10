@@ -1,0 +1,122 @@
+name: Replace site from named ZIP (PURGE + SYNC)
+
+on:
+  push:
+    paths:
+      - "deploy/REPLACE_SITE__*.zip"
+  workflow_dispatch:
+    inputs:
+      zip_path:
+        description: "ZIP path in repo (e.g. deploy/REPLACE_SITE__sane_v3.zip)"
+        required: true
+        default: "deploy/REPLACE_SITE__sane_v3.zip"
+      keep_workflows:
+        description: "Keep .github/workflows (recommended)"
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect ZIP path from push (or use manual input)
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ZIP="${{ inputs.zip_path }}"
+          else
+            ZIP="$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -E '^deploy/REPLACE_SITE__.*\.zip$' | head -n 1 || true)"
+          fi
+
+          if [ -z "${ZIP:-}" ]; then
+            echo "Could not detect the zip path. Run workflow_dispatch and set zip_path."
+            exit 1
+          fi
+
+          if [ ! -f "$ZIP" ]; then
+            echo "ZIP not found: $ZIP"
+            exit 1
+          fi
+
+          echo "ZIP=$ZIP" >> $GITHUB_ENV
+          echo "Using ZIP: $ZIP"
+
+      - name: Extract ZIP
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/site_zip_extract
+          mkdir -p /tmp/site_zip_extract
+          unzip -q "$ZIP" -d /tmp/site_zip_extract
+
+          ROOT_COUNT="$(find /tmp/site_zip_extract -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')"
+          FILE_COUNT="$(find /tmp/site_zip_extract -mindepth 1 -maxdepth 1 -type f | wc -l | tr -d ' ')"
+
+          if [ "$ROOT_COUNT" -eq 1 ] && [ "$FILE_COUNT" -eq 0 ]; then
+            ROOT_DIR="$(find /tmp/site_zip_extract -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+            echo "ROOT_DIR=$ROOT_DIR" >> $GITHUB_ENV
+            echo "Detected single root folder inside zip: $ROOT_DIR"
+          else
+            echo "ROOT_DIR=/tmp/site_zip_extract" >> $GITHUB_ENV
+            echo "Zip contains files at top-level; using extract root."
+          fi
+
+      - name: Safety checks
+        run: |
+          set -euo pipefail
+
+          if [ -z "$(ls -A "$ROOT_DIR")" ]; then
+            echo "Refusing to sync: extracted root is empty ($ROOT_DIR)."
+            exit 1
+          fi
+
+          if [ ! -f "$ROOT_DIR/index.html" ]; then
+            echo "Refusing to sync: index.html not found at root of extracted content."
+            echo "Your zip must contain the site root with index.html."
+            exit 1
+          fi
+
+      - name: Purge repo + replace from ZIP (rsync --delete)
+        run: |
+          set -euo pipefail
+
+          EXCLUDES=(
+            --exclude ".git/"
+            --exclude "deploy/"
+          )
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            KEEP_WORKFLOWS="${{ inputs.keep_workflows }}"
+          else
+            KEEP_WORKFLOWS="true"
+          fi
+
+          if [ "$KEEP_WORKFLOWS" = "true" ]; then
+            EXCLUDES+=( --exclude ".github/workflows/" )
+          fi
+
+          rsync -a --delete "${EXCLUDES[@]}" "$ROOT_DIR"/ ./
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Replace site from $ZIP (purge + sync)"
+          git push
