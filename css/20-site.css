@@ -30,6 +30,16 @@
   font-display: swap;
 }
 
+/* Gothic variable font (user-provided) */
+@font-face {
+  font-family: 'GrenzeGotischVar';
+  src: url('assets/fonts/GrenzeGotisch-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 /* Apply on highlighted headings (safe defaults) */
 .hero h1,
 .section-title,
@@ -1100,3 +1110,211 @@ h1,h2,h3{ color: #fff; }
   line-height: 1.4;
   opacity: 0.9;
 }
+
+
+/* ==========================================================
+   2026-01 — HEADER + HERO (brief demandé)
+   - Header noir pur + dégradé vers transparence en bas
+   - Logo centré avec lignes blanches gauche/droite
+   - Pulse léger + reflet doré “acier”
+   - Hero : watermark logo au centre + mots-clés avec motifs
+   - CTA unique “Contact” en patte de chat (colonne droite)
+   ========================================================== */
+
+.site-header.site-header--brand{
+  top: 0;
+  z-index: 40;
+  background: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.92) 62%, rgba(0,0,0,0) 100%) !important;
+  border-bottom: none !important;
+  backdrop-filter: none !important;
+}
+
+.site-header--brand .header-brand{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 0.9rem 1rem 1.1rem;
+}
+
+.site-header--brand .header-line{
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.38);
+  max-width: 520px;
+}
+
+.site-header--brand .header-logo-wrap{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.site-header--brand .header-logo{
+  display: block;
+  height: clamp(44px, 5.2vw, 66px);
+  width: auto;
+  transform-origin: center;
+  filter: drop-shadow(0 18px 60px rgba(0,0,0,0.85));
+  animation: headerLogoPulse 4.6s ease-in-out infinite;
+}
+
+@keyframes headerLogoPulse{
+  0%,100%{ transform: scale(1); }
+  50%{ transform: scale(1.018); }
+}
+
+/* Reflet doré (sweep) */
+.site-header--brand .header-shine{
+  position: absolute;
+  inset: -18px -40px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.site-header--brand .header-shine::before{
+  content: "";
+  position: absolute;
+  top: -70%;
+  left: -140%;
+  width: 62%;
+  height: 240%;
+  transform: rotate(12deg);
+  background: linear-gradient(120deg,
+    transparent 0%,
+    rgba(184,138,59,0.00) 34%,
+    rgba(184,138,59,0.38) 50%,
+    rgba(255,255,255,0.16) 56%,
+    transparent 72%
+  );
+  filter: blur(0.7px);
+  mix-blend-mode: screen;
+  animation: headerShineSweep 6.4s ease-in-out infinite;
+  opacity: 0;
+}
+
+@keyframes headerShineSweep{
+  0%   { left: -140%; opacity: 0; }
+  14%  { opacity: 1; }
+  52%  { left: 180%; opacity: 1; }
+  100% { left: 180%; opacity: 0; }
+}
+
+/* Police : plus “gothique” pour le branding et les titres */
+.site-header--brand,
+.hero h1,
+.section__hdr h2{
+  font-family: 'GrenzeGotischVar', 'WildBreath', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* HERO watermark */
+.hero__bg{
+  background: url('assets/intro/logo-texte.webp') center 36% / min(820px, 86vw) no-repeat;
+  opacity: 0.085;
+}
+
+/* HERO layout : texte + CTA patte (desktop), une colonne sur mobile */
+.hero__content{
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr) !important;
+  align-items: center !important;
+}
+
+@media (max-width: 960px){
+  .hero__content{
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 2rem;
+  }
+  .hero__preview{
+    justify-content: flex-start;
+  }
+}
+
+/* Mots-clés */
+.hero-keywords{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0.9rem 0 1.2rem;
+  font-family: 'GrenzeGotischVar', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.88);
+}
+
+.hero-keywords .hero-motif{
+  height: 26px;
+  width: auto;
+  opacity: 0.92;
+  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.75));
+}
+
+.hero-keywords .kw{
+  white-space: nowrap;
+}
+
+.hero-keywords .sep{
+  color: rgba(184,138,59,0.9);
+  padding-inline: 0.1rem;
+}
+
+/* CTA patte de chat */
+.hero__preview{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.paw-cta{
+  width: min(240px, 74vw);
+  aspect-ratio: 1 / 1;
+  border-radius: 1.6rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 22px 70px rgba(0,0,0,0.72);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), filter var(--transition-fast);
+}
+
+.paw-cta:hover{
+  transform: translateY(-2px);
+  border-color: rgba(184,138,59,0.65);
+  filter: brightness(1.05);
+}
+
+.paw-cta__label{
+  font-family: 'GrenzeGotischVar', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.92);
+  font-size: 0.95rem;
+}
+
+.paw-cta__icon{
+  width: 110px;
+  height: 110px;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 28% 28%, rgba(184,138,59,0.95) 0 12px, transparent 13px),
+    radial-gradient(circle at 50% 18%, rgba(184,138,59,0.95) 0 12px, transparent 13px),
+    radial-gradient(circle at 72% 28%, rgba(184,138,59,0.95) 0 12px, transparent 13px),
+    radial-gradient(circle at 82% 52%, rgba(184,138,59,0.95) 0 11px, transparent 12px),
+    radial-gradient(ellipse at 52% 72%, rgba(184,138,59,0.95) 0 28px, transparent 29px);
+  filter: drop-shadow(0 10px 26px rgba(0,0,0,0.65));
+  opacity: 0.92;
+}
+
+/* On supprime l’ancien menu du header (si présent ailleurs) */
+.site-header--brand .shell,
+.site-header--brand .site-nav,
+.site-header--brand .site-logo{
+  display: none !important;
+}
+
