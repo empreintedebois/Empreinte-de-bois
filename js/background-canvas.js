@@ -1,4 +1,4 @@
-// js/background-canvas.js
+// background-canvas.js (extracted from inline script)
 
 // ===============================
   // PARAMÈTRES (à modifier)
