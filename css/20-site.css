@@ -1128,13 +1128,12 @@ h1,h2,h3{ color: #fff; }
     linear-gradient(
       to bottom,
       rgba(0,0,0,1) 0%,
-      rgba(0,0,0,1) calc(100% - 20px),
+      rgba(0,0,0,1) calc(100% - 60px),
       rgba(0,0,0,0) 100%
     ) !important;
   border-bottom: none !important;
   backdrop-filter: none !important;
 }
-
 .site-header--brand .header-brand{
   display: flex;
   align-items: center;
@@ -1178,6 +1177,16 @@ h1,h2,h3{ color: #fff; }
   inset: -18px -40px;
   pointer-events: none;
   overflow: hidden;
+
+  /* IMPORTANT : le reflet n'agit QUE sur la forme du logo */
+  -webkit-mask-image: url('assets/branding/logo-empreinte-alpha.webp');
+  mask-image: url('assets/branding/logo-empreinte-alpha.webp');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
 .site-header--brand .header-shine::before{
