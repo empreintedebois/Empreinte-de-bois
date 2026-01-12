@@ -67,35 +67,31 @@
   }
 
   function renderCaption(figcaptionEl, rawCaption) {
-    if (!figcaptionEl) return;
-    figcaptionEl.innerHTML = "";
-    const parsed = parseStructuredCaption(rawCaption);
-
-    const title = document.createElement("div");
-    title.className = "lb-title";
-    title.textContent = parsed.title || "";
-    figcaptionEl.appendChild(title);
-
-    const sep = document.createElement("div");
-    sep.className = "lb-sep";
-    figcaptionEl.appendChild(sep);
-
-    const order = ["Matières", "Technique", "Dimensions", "Finitions"];
-    for (const k of order) {
-      if (!parsed.fields[k]) continue;
-      const row = document.createElement("div");
-      row.className = "lb-row";
-      row.innerHTML = `<span class="lb-k">${escapeHtml(k)}</span><span class="lb-v">${escapeHtml(parsed.fields[k])}</span>`;
-      figcaptionEl.appendChild(row);
-    }
-
-    if (parsed.notes) {
-      const notes = document.createElement("div");
-      notes.className = "lb-notes";
-      notes.textContent = parsed.notes;
-      figcaptionEl.appendChild(notes);
-    }
+// Lightbox caption = <h3> + <p> (no table, no extras)
+if (!container) return;
+const parsed = parseStructuredCaption(raw || "");
+const title = parsed.title || "";
+// Body: prefer notes, else flatten fields, else remaining text
+let body = "";
+if (parsed.notes) body = parsed.notes;
+else {
+  const order = ["Matières","Technique","Dimensions","Finitions"];
+  const parts = [];
+  for (const k of order) {
+    if (parsed.fields && parsed.fields[k]) parts.push(`${k} : ${parsed.fields[k]}`);
   }
+  body = parts.join(" — ");
+}
+container.innerHTML = "";
+const h3 = document.createElement("h3");
+h3.textContent = title;
+const p = document.createElement("p");
+p.textContent = body || "";
+container.appendChild(h3);
+container.appendChild(p);
+
+}
+
 
   function openLightbox(fullSrc, captionRaw) {
     if (!lightbox || !lbImg || !lbCaption) return;

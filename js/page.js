@@ -103,38 +103,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const v = getVariant(currentModel, currentVariantIndex);
     if (!v) return;
 
-    // Image
-    const imgSrc = v.full || currentModel.full || v.thumb || currentModel.thumb || "";
-    modelboxImg.src = imgSrc;
-    modelboxImg.alt = v.name ? `${currentModel.title} — ${v.name}` : (currentModel.title || "");
-
-    // Content
+    // Reset content
     if (modelboxContent) modelboxContent.innerHTML = "";
 
-    // Header
-    const h2 = document.createElement("h2");
-    h2.textContent = currentModel.title || currentModel.id || "Modèle";
-    const h3 = document.createElement("h3");
-    h3.textContent = v.name ? v.name : "Déclinaison";
-    const p = document.createElement("p");
-    p.textContent = "";
-    modelboxContent.appendChild(h2);
-    modelboxContent.appendChild(h3);
-    modelboxContent.appendChild(p);
-    getVariantDescription(currentModel, v).then((t) => {
-      if (t) p.textContent = t;
-    });
+    // Image (full width, contained)
+    const imgSrc = v.full || currentModel.full || v.thumb || currentModel.thumb || "";
+    modelboxImg.src = imgSrc;
+    modelboxImg.alt = v.name ? `${currentModel.title || currentModel.id} — ${v.name}` : (currentModel.title || currentModel.id || "");
 
-// Choix des déclinaisons
-    const decla = document.createElement("div");
-    decla.className = "modelbox__section";
-    decla.innerHTML = `<div class="modelbox__sectionTitle">Choix des déclinaisons</div>`;
+    // Variants strip (max 6 displayed, left-aligned, no placeholders)
+    const stripWrap = document.createElement("div");
+    stripWrap.className = "modelbox__section";
     const strip = document.createElement("div");
     strip.className = "variant-strip";
-    (currentModel.variants || []).forEach((vv, idx) => {
+    const variants = (currentModel.variants || []).slice(0, 6);
+    variants.forEach((vv, idx) => {
       const b = document.createElement("button");
       b.type = "button";
-      if (idx === currentVariantIndex) b.classList.add("is-active");
       b.className = `variant-chip ${idx === currentVariantIndex ? "is-active" : ""}`;
       const im = document.createElement("img");
       im.loading = "lazy";
@@ -143,106 +128,70 @@ document.addEventListener("DOMContentLoaded", () => {
       im.alt = vv.name || `Variante ${idx + 1}`;
       b.appendChild(im);
       b.addEventListener("click", () => {
-        // Changement de matière => reset options
         currentVariantIndex = idx;
-        resetOptions();
         renderModelbox();
       });
       strip.appendChild(b);
     });
-    decla.appendChild(strip);
-    modelboxContent.appendChild(decla);
+    stripWrap.appendChild(strip);
 
-    // Finitions optionnelles
-    const fin = document.createElement("div");
-    fin.className = "modelbox__section";
-    fin.innerHTML = `<div class="modelbox__sectionTitle">Finitions (optionnel)</div>`;
-    const pills = document.createElement("div");
-    pills.className = "pills";
-    if (finList.length) {
-      finList.forEach((f) => {
-        const p = document.createElement("button");
-        p.type = "button";
-        p.className = `pill ${selectedFinition === f ? "is-active" : ""}`;
-        p.textContent = f;
-        p.addEventListener("click", () => {
-          selectedFinition = (selectedFinition === f) ? null : f;
-          renderModelbox();
-        });
-        pills.appendChild(p);
-      });
-    } else {
-      const empty = document.createElement("div");
-      empty.className = "lb-notes";
-      empty.textContent = "Aucune finition définie pour cette matière.";
-      fin.appendChild(empty);
-    }
-    fin.appendChild(pills);
-    modelboxContent.appendChild(fin);
+    // Caption (h3 + 4 lines, no scroll)
+    const h3 = document.createElement("h3");
+    h3.textContent = (v.name || currentModel.title || currentModel.id || "Modèle");
+    const p = document.createElement("p");
+    p.textContent = "";
 
-    // Quantité + série
-    const qty = document.createElement("div");
-    qty.className = "modelbox__section";
-    qty.innerHTML = `<div class="modelbox__sectionTitle">Quantité (optionnel)</div>`;
+    // Copy button (models only)
+    const copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.className = "btn btn--primary modelbox__copy";
+    copyBtn.textContent = "Copier dans le formulaire de contact";
 
-    const row = document.createElement("div");
-    row.className = "qty-row";
-    const lab = document.createElement("span");
-    lab.className = "qty-label";
-    lab.textContent = "Quantité";
-
-    const input = document.createElement("input");
-    input.className = "qty-input";
-    input.type = "number";
-    input.min = "1";
-    input.step = "1";
-    input.placeholder = "—";
-    input.value = quantityValue;
-    input.addEventListener("input", () => {
-      quantityValue = input.value;
+    // Load txt (can contain <h3>...</h3><p>...</p>)
+    getVariantDescription(currentModel, v).then((t) => {
+      if (!t) return;
+      // If it looks like HTML with tags, inject as HTML but keep only h3/p inside modal text area
+      const looksHtml = /<\s*h3|<\s*p/i.test(t);
+      if (looksHtml){
+        const tmp = document.createElement("div");
+        tmp.innerHTML = t;
+        const hh = tmp.querySelector("h3");
+        const pp = tmp.querySelector("p");
+        if (hh) h3.textContent = hh.textContent.trim();
+        if (pp) p.textContent = pp.textContent.trim();
+        else p.textContent = tmp.textContent.trim();
+      } else {
+        // otherwise use plain text: first line = title, rest = body
+        const lines = String(t).replace(/\r/g,"").split("\n").map(s=>s.trim()).filter(Boolean);
+        if (lines.length){
+          h3.textContent = lines[0];
+          p.textContent = lines.slice(1).join(" ");
+        }
+      }
     });
 
-    const serieWrap = document.createElement("div");
-    serieWrap.className = "serie-wrap";
-    const ck = document.createElement("input");
-    ck.type = "checkbox";
-    ck.checked = !!isSerie;
-    ck.addEventListener("change", () => { isSerie = ck.checked; });
-    const ckLab = document.createElement("label");
-    ckLab.textContent = "Série";
-    serieWrap.appendChild(ck);
-    serieWrap.appendChild(ckLab);
-
-    row.appendChild(lab);
-    row.appendChild(input);
-    row.appendChild(serieWrap);
-    qty.appendChild(row);
-    modelboxContent.appendChild(qty);
-
-    // Bouton final
-    const choose = document.createElement("button");
-    choose.type = "button";
-    choose.className = "btn btn--primary modelbox__choose";
-    choose.textContent = "Je choisis ce model";
-    choose.addEventListener("click", () => {
-      // Un seul matériau dans le formulaire : on remplace
+    copyBtn.addEventListener("click", async () => {
+      // compose
       const parts = [];
       parts.push(`${currentModel.title || currentModel.id}`);
-      if (v.name) parts.push(`Matière : ${v.name}`);
-      if (fields.Technique || fields["Technique"]) parts.push(`Technique : ${fields.Technique || fields["Technique"]}`);
-      if (fields.Dimensions || fields["Dimensions"]) parts.push(`Dimensions : ${fields.Dimensions || fields["Dimensions"]}`);
-      if (selectedFinition) parts.push(`Finition : ${selectedFinition}`);
-      if (quantityValue) parts.push(`Quantité : ${quantityValue}`);
-      if (isSerie) parts.push(`Série : oui`);
-      selectionSummary.value = parts.join("\n");
-
-      closeModal();
-      // Amène l'utilisateur vers le contact
+      if (h3.textContent) parts.push(h3.textContent);
+      if (p.textContent) parts.push(p.textContent);
+      const msg = parts.join("\n\n");
+      const ta = document.querySelector('textarea[name="message"]');
+      if (ta) ta.value = msg;
       const contact = document.getElementById("contact");
       if (contact) contact.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-    modelboxContent.appendChild(choose);
+
+    // Assemble order: image already in DOM, then strip, then text + button
+    if (modelboxContent){
+      modelboxContent.appendChild(stripWrap);
+      modelboxContent.appendChild(h3);
+      modelboxContent.appendChild(p);
+      modelboxContent.appendChild(copyBtn);
+    }
   }
+
 
   function openModel(model) {
     currentModel = model;
@@ -274,6 +223,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadModels() {
     try {
+      const fromFolders = await loadModelsFromBandeaux();
+      if (fromFolders && Array.isArray(fromFolders.models) && fromFolders.models.length){
+        manifest = fromFolders;
+        renderGrid();
+        return;
+      }
       const res = await fetch("data/models.json", { cache: "no-store" });
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
@@ -296,3 +251,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadModels();
 });
+async function loadModelsFromBandeaux() {
+  // Folder convention:
+  // /bandeaux/M01/Image.webp + description.txt
+  // /bandeaux/M01/Image01.webp + description01.txt ... (variants)
+  const candidates = [];
+  // probe M01..M30
+  for (let i=1;i<=30;i++){
+    const id = "M" + String(i).padStart(2,"0");
+    const baseImg = `bandeaux/${id}/Image.webp`;
+    const baseTxt = `bandeaux/${id}/description.txt`;
+    try{
+      const r = await fetch(baseImg, {method:"HEAD", cache:"no-store"});
+      if(!r.ok) continue;
+    }catch(e){ continue; }
+    // base exists
+    const model = { id, title: id, thumb: baseImg, full: baseImg, variants: [] };
+    // base description if exists
+    model.descriptionTxt = baseTxt;
+    // variants 01..20
+    for (let v=1; v<=20; v++){
+      const vv = String(v).padStart(2,"0");
+      const img = `bandeaux/${id}/Image${vv}.webp`;
+      try{
+        const rr = await fetch(img, {method:"HEAD", cache:"no-store"});
+        if(!rr.ok) break;
+      }catch(e){ break; }
+      model.variants.push({
+        name: `Déclinaison ${v}`,
+        thumb: img,
+        full: img,
+        descriptionTxt: `bandeaux/${id}/description${vv}.txt`
+      });
+    }
+    // If no numbered variants, still create 1 variant = base
+    if(!model.variants.length){
+      model.variants.push({ name: "Déclinaison", thumb: baseImg, full: baseImg, descriptionTxt: baseTxt });
+    }
+    candidates.push(model);
+  }
+  return { models: candidates };
+}
+

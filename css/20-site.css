@@ -1292,3 +1292,72 @@ h3, #lightbox-caption h3{
   display: block;
 }
 
+
+/* PATCH V4 — Gallery lightbox & Modelbox requirements */
+#lightbox .lightbox__body{
+  max-height: 92vh;
+  display:flex;
+  flex-direction:column;
+}
+#lightbox-img{
+  width:100%;
+  height:auto;
+  max-height: 68vh; /* shrink to keep caption visible */
+  object-fit: contain;
+  display:block;
+}
+#lightbox-caption{
+  width:100%;
+  overflow: hidden; /* NO SCROLL */
+  padding: 0.9rem 1rem 1.1rem;
+  max-height: 24vh;
+}
+#lightbox-caption p{
+  max-width:none;
+  display:-webkit-box;
+  -webkit-line-clamp:4;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* Models grid: 3 cols mobile, 4 cols desktop */
+@media (max-width: 800px){
+  #modelsGrid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+@media (min-width: 801px){
+  #modelsGrid{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+}
+
+/* Modelbox variants strip: ALWAYS 6 columns, left-aligned (no placeholders) */
+.variant-strip{
+  display:grid;
+  grid-template-columns: repeat(6, minmax(0,1fr));
+  gap: 0.6rem;
+  justify-content:start;
+}
+.variant-chip img{
+  width:100%;
+  height:56px;
+  object-fit:cover;
+  border-radius:10px;
+  display:block;
+}
+
+/* Modelbox caption: h3 + 4 lines, NO SCROLL */
+.modelbox-meta{
+  overflow:hidden;
+}
+.modelbox-meta p{
+  max-width:none;
+  display:-webkit-box;
+  -webkit-line-clamp:4;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* Copy button */
+.modelbox__copy{
+  margin-top: 0.8rem;
+  width: fit-content;
+}
+
