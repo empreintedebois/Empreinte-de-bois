@@ -1115,28 +1115,169 @@ h1,h2,h3{ color: #fff; }
 }
 
 
-/* ============================================================
-   FORCE black inner-stroke for Veteran titles (override)
-   ============================================================ */
-.hero h1, .section-title, h2, h3{
+/* === PATCH TYPO/LIGHTBOX/MODELBOX (Jan 2026) — END PATCH === */
+/* === PATCH TYPO/LIGHTBOX/MODELBOX (Jan 2026) === */
+
+/* Typography base */
+body{
+  font-family: 'FreePixel', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.88);
+  text-align: left;
+}
+p{ max-width: 68ch; }
+
+/* Titles: fill slightly transparent, stroke pure black (visible) */
+.hero h1, h1{
+  font-family: 'VeteranTypewriter', serif;
+  color: rgba(255,255,255,0.95);
   paint-order: fill stroke !important;
+  -webkit-text-stroke: 0.25px rgba(0,0,0,1) !important;
 }
-
-/* h1 (hero) */
-.hero h1{
-  -webkit-text-stroke: 0.5px rgba(0,0,0,0.75) !important;
-  text-stroke: 0.5px rgba(0,0,0,0.75) !important;
-}
-
-/* h2 / section titles */
 .section-title, h2{
-  -webkit-text-stroke: 0.4px rgba(0,0,0,0.75) !important;
-  text-stroke: 0.4px rgba(0,0,0,0.75) !important;
+  font-family: 'VeteranTypewriter', serif;
+  color: rgba(255,255,255,0.92);
+  text-transform: uppercase;
+  paint-order: fill stroke !important;
+  -webkit-text-stroke: 0.20px rgba(0,0,0,1) !important;
+}
+h3{
+  font-family: 'VeteranTypewriter', serif;
+  color: rgba(214,162,74,0.96);
+  paint-order: fill stroke !important;
+  -webkit-text-stroke: 0.15px rgba(0,0,0,1) !important;
 }
 
-/* h3 (lightbox title) */
-h3{
-  -webkit-text-stroke: 0.3px rgba(0,0,0,0.75) !important;
-  text-stroke: 0.3px rgba(0,0,0,0.75) !important;
+/* Gallery grid: 2 cols mobile, 3 cols desktop */
+.gallery-grid{
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+@media (min-width: 900px){
+  .gallery-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Models grid: 3 cols mobile, 4 cols desktop */
+#modelsGrid{
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (min-width: 900px){
+  #modelsGrid{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Lightbox: image full width + caption always visible (h3 + 4 lines) */
+.lightbox__body{
+  width: min(1200px, 92vw);
+  max-height: 92vh;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#lightbox-img{
+  width: 100%;
+  height: auto;
+  max-height: 58vh;
+  object-fit: contain;
+  display: block;
+}
+#lightbox-caption{
+  padding: 14px 16px 18px;
+  overflow: auto;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+}
+#lightbox-caption h3{ margin: 0 0 6px; }
+#lightbox-caption p{
+  margin: 0;
+  max-width: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Mobile tighten: reserve more room for caption */
+@media (max-width: 700px){
+  #lightbox-img{ max-height: 46vh; }
+  #lightbox-caption{ max-height: 44vh; }
+}
+
+/* Modelbox modal styles (ids used in HTML) */
+#modelbox{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  z-index: 1200;
+  display: grid;
+  place-items: start center;
+  padding: 14px;
+}
+#modelbox[hidden]{ display:none !important; }
+
+#modelbox-content{
+  width: min(1100px, 94vw);
+  max-height: 92vh;
+  overflow: hidden;
+  background: rgba(0,0,0,0.86);
+  border: 1px solid rgba(184, 138, 59, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 1rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+.modelbox-close{
+  position:absolute;
+  top: 10px; right: 12px;
+  width: 38px; height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.35);
+  color:#fff;
+  cursor:pointer;
+  font-size: 22px;
+  line-height: 1;
+}
+#modelbox-img{
+  width: 100%;
+  height: auto;
+  max-height: 52vh;
+  object-fit: contain;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+}
+.modelbox-meta{
+  overflow: auto;
+  padding-top: 6px;
+}
+.variant-strip{
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+.variant-chip{
+  border: 1px solid rgba(184, 138, 59, 0.25);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.35);
+  padding: 0;
+}
+.variant-chip.is-active{
+  border-color: rgba(214,162,74,0.85);
+  box-shadow: 0 0 0 1px rgba(214,162,74,0.25);
+}
+.variant-chip img{ width:100%; height: 100%; aspect-ratio: 1 / 1; object-fit: cover; display:block; }
+.lb-notes{
+  color: rgba(255,255,255,0.80);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* === PATCH TYPO/LIGHTBOX/MODELBOX (Jan 2026) — END PATCH === */
 

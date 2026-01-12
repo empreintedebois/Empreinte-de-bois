@@ -1,9 +1,9 @@
 /* Intro video (MP4) — Empreinte de Bois */
 :root{
   /* Durée de transition (ms) entre l'overlay noir de l'intro et le site */
-  --intro-fade-ms: 3000;
+  --intro-fade-ms: 1000;
   /* Optionnel : dissocier le fondu du site si besoin */
-  --intro-sitefade-ms: 3000;
+  --intro-sitefade-ms: 1000;
 }
 
 html.intro-active, body.intro-active{
@@ -62,5 +62,5 @@ html.intro-active #site-layer{
 
 /* Safety: if user prefers reduced motion, still show video but shorter fade */
 @media (prefers-reduced-motion: reduce){
-  :root{ --intro-fade-ms: 350; --intro-sitefade-ms: 350; }
+  :root{ --intro-fade-ms: 1000; --intro-sitefade-ms: 1000; }
 }

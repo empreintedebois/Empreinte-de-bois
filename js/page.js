@@ -111,15 +111,21 @@ document.addEventListener("DOMContentLoaded", () => {
     modelboxContent.innerHTML = "";
 
     // Header
-    const title = document.createElement("div");
-    title.className = "lb-title";
-    title.textContent = currentModel.title || currentModel.id || "Modèle";
-    modelboxContent.appendChild(title);
+    const h2 = document.createElement("h2");
+    h2.className = "lb-title";
+    h2.textContent = currentModel.title || currentModel.id || "Modèle";
+    modelboxContent.appendChild(h2);
+
+    const h3 = document.createElement("h3");
+    h3.className = "lb-variant";
+    h3.textContent = v.name || "Déclinaison";
+    modelboxContent.appendChild(h3);
+
     const sep = document.createElement("div");
     sep.className = "lb-sep";
     modelboxContent.appendChild(sep);
 
-    // Bloc infos
+// Bloc infos
     const fields = v.fields || {};
     const rows = [];
     // Matière affichée = nom de variante si dispo
@@ -138,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
       modelboxContent.appendChild(row);
     }
     // Description (txt) — modèle + déclinaison
-    const notes = document.createElement("div");
+    const notes = document.createElement("p");
     notes.className = "lb-notes";
     notes.textContent = "";
     modelboxContent.appendChild(notes);

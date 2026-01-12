@@ -42,12 +42,9 @@
 
     const fadeMs = getFadeMs();
     window.setTimeout(() => {
-      overlay.style.display = "none";
-      document.documentElement.classList.remove("intro-active");
-      document.body.classList.remove("intro-active", "intro-running");
       document.documentElement.classList.add("intro-done");
       if (siteRoot) siteRoot.removeAttribute("aria-hidden");
-    }, Math.max(200, fadeMs + 30));
+    }, fadeMs);
   }
 
   // Best-effort autoplay
