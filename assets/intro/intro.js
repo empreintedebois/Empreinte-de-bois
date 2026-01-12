@@ -45,14 +45,19 @@
       overlay.style.display = "none";
       document.documentElement.classList.remove("intro-active");
       document.body.classList.remove("intro-active", "intro-running");
-      document.documentElement.classList.remove("intro-active");
-      document.body.classList.remove("intro-active");
-      document.body.classList.remove("intro-running");
       document.documentElement.classList.add("intro-done");
+      /* force-show-site */
+      const siteLayer = qs("#site-layer");
+      if (siteLayer){
+        siteLayer.style.opacity = "1";
+        siteLayer.style.visibility = "visible";
+        siteLayer.style.pointerEvents = "auto";
+        siteLayer.style.clipPath = "none";
+        siteLayer.style.webkitClipPath = "none";
+      }
+
       if (siteRoot) siteRoot.removeAttribute("aria-hidden");
-    
-      overlay.style.display = "none";
-}, Math.max(200, fadeMs + 30));
+    }, Math.max(200, fadeMs + 30));
   }
 
   // Best-effort autoplay
@@ -62,7 +67,7 @@
     // Autoplay ok: reset safety timer based on duration
     clearTimeout(hardTimer);
     const durMs = (video.duration || 0) * 1000;
-    hardTimer = window.setTimeout(endIntro, Math.max(CFG.hardTimeoutMs, durMs + 1500));
+    hardTimer = window.setTimeout(endIntro, Math.max(CFG.hardTimeoutMs, durMs + 50));
   }).catch(() => {
     // Autoplay blocked: we will still exit after hardTimeoutMs
   });
@@ -81,3 +86,20 @@
   window.addEventListener("pointerdown", retry, { once: true });
   window.addEventListener("touchstart", retry, { once: true });
 })();
+
+  /* watchdog-force-exit */
+  window.addEventListener("load", () => {
+    window.setTimeout(() => {
+      if (document.documentElement.classList.contains("intro-active")) {
+        try { endIntro(); } catch(_e){}
+      }
+      const sl = document.querySelector("#site-layer");
+      if (sl){
+        sl.style.opacity = "1";
+        sl.style.visibility = "visible";
+        sl.style.pointerEvents = "auto";
+        sl.style.clipPath = "none";
+        sl.style.webkitClipPath = "none";
+      }
+    }, 18000);
+  });

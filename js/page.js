@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const modelsGrid = document.getElementById("modelsGrid");
   const modelbox = document.getElementById("modelbox");
   const modelboxImg = document.getElementById("modelbox-img");
-  const modelboxContent = document.getElementById("modelbox-content");
+  const modelboxContent = document.querySelector("#modelbox .modelbox-meta") || document.getElementById("modelbox-content");
   const selectionSummary = document.getElementById("selection-summary");
 
   if (!modelsGrid || !modelbox || !modelboxImg || !modelboxContent || !selectionSummary) {
@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function openModal() {
+    modelbox.hidden = false;
     modelbox.classList.add("is-open");
     modelbox.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
@@ -79,10 +80,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeModal() {
     modelbox.classList.remove("is-open");
     modelbox.setAttribute("aria-hidden", "true");
-    // Décharger l'image grande pour libérer mémoire
     modelboxImg.removeAttribute("src");
     modelboxImg.removeAttribute("alt");
-    modelboxContent.innerHTML = "";
+    if (modelboxContent) if (modelboxContent) modelboxContent.innerHTML = "";
+    modelbox.hidden = true;
     document.body.style.overflow = "";
   }
 
@@ -108,46 +109,23 @@ document.addEventListener("DOMContentLoaded", () => {
     modelboxImg.alt = v.name ? `${currentModel.title} — ${v.name}` : (currentModel.title || "");
 
     // Content
-    modelboxContent.innerHTML = "";
+    if (modelboxContent) modelboxContent.innerHTML = "";
 
     // Header
-    const title = document.createElement("div");
-    title.className = "lb-title";
-    title.textContent = currentModel.title || currentModel.id || "Modèle";
-    modelboxContent.appendChild(title);
-    const sep = document.createElement("div");
-    sep.className = "lb-sep";
-    modelboxContent.appendChild(sep);
-
-    // Bloc infos
-    const fields = v.fields || {};
-    const rows = [];
-    // Matière affichée = nom de variante si dispo
-    if (v.name) rows.push(["Matières", v.name]);
-    if (fields.Technique || fields["Technique"]) rows.push(["Technique", fields.Technique || fields["Technique"]]);
-    if (fields.Dimensions || fields["Dimensions"]) rows.push(["Dimensions", fields.Dimensions || fields["Dimensions"]]);
-
-    // Finitions (liste possible)
-    const finList = Array.isArray(v.finitions) ? v.finitions : [];
-    if (finList.length) rows.push(["Finitions", finList.join(", ")]);
-
-    for (const [k, val] of rows) {
-      const row = document.createElement("div");
-      row.className = "lb-row";
-      row.innerHTML = `<span class="lb-k">${escapeHtml(k)}</span><span class="lb-v">${escapeHtml(val)}</span>`;
-      modelboxContent.appendChild(row);
-    }
-    // Description (txt) — modèle + déclinaison
-    const notes = document.createElement("div");
-    notes.className = "lb-notes";
-    notes.textContent = "";
-    modelboxContent.appendChild(notes);
+    const h2 = document.createElement("h2");
+    h2.textContent = currentModel.title || currentModel.id || "Modèle";
+    const h3 = document.createElement("h3");
+    h3.textContent = v.name ? v.name : "Déclinaison";
+    const p = document.createElement("p");
+    p.textContent = "";
+    modelboxContent.appendChild(h2);
+    modelboxContent.appendChild(h3);
+    modelboxContent.appendChild(p);
     getVariantDescription(currentModel, v).then((t) => {
-      if (t) notes.textContent = t;
+      if (t) p.textContent = t;
     });
 
-
-    // Choix des déclinaisons
+// Choix des déclinaisons
     const decla = document.createElement("div");
     decla.className = "modelbox__section";
     decla.innerHTML = `<div class="modelbox__sectionTitle">Choix des déclinaisons</div>`;
@@ -309,7 +287,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Close handlers
   modelbox.addEventListener("click", (evt) => {
-    if (evt.target.closest("[data-close]")) closeModal();
+    if (evt.target === modelbox) closeModal();
+    if (evt.target.closest("[data-close], .modelbox-close")) closeModal();
   });
   document.addEventListener("keydown", (evt) => {
     if (evt.key === "Escape" && modelbox.classList.contains("is-open")) closeModal();
