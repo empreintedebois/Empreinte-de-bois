@@ -47,7 +47,7 @@ h2 {
   font-family: 'VeteranTypewriter', 'FreePixel', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   letter-spacing: 0.02em;
   paint-order: fill stroke;
-  -webkit-text-stroke: 0.5px rgba(0,0,0,0.45);
+  -webkit-text-stroke: 0.5px #000;
 }
 
 
