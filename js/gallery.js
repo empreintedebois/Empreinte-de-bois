@@ -166,6 +166,7 @@ container.appendChild(p);
     btn.type = "button";
     btn.dataset.full = full;
     btn.dataset.caption = captionRaw;
+    btn.addEventListener("click", () => openLightbox(full, captionRaw));
 
     const media = document.createElement("div");
     media.className = "gallery-item__media";

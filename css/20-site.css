@@ -1462,22 +1462,32 @@ h3, #lightbox-caption h3{
 }
 
 /* Motif: black -> transparent via mask (use image as alpha mask) */
+
 .hero__motif{
+  position: relative;
   width: 100%;
   height: min(420px, 48vh);
   justify-self: stretch;
   align-self: center;
   --motif-opacity: 1;
+  --motif-opacity-mobile: .30;
+  background: transparent !important;
+  opacity: 1;
+}
+.hero__motif::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background: url("../assets/about/logo-motif.webp") no-repeat right center / contain;
   opacity: var(--motif-opacity);
-  background: rgba(255,255,255,1);
-  -webkit-mask-image: url("../assets/about/logo-motif.webp");
-  mask-image: url("../assets/about/logo-motif.webp");
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: right center;
-  mask-position: right center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
+  mix-blend-mode: screen; /* noir -> transparent sur fond sombre */
+  pointer-events:none;
+}
+@media (max-width:800px){
+  .hero__motif::before{
+    background-position: center center;
+    opacity: var(--motif-opacity-mobile);
+  }
 }
 
 /* Mobile: motif centered behind text, opacity variable (currently 1) */
