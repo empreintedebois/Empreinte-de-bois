@@ -166,7 +166,6 @@ container.appendChild(p);
     btn.type = "button";
     btn.dataset.full = full;
     btn.dataset.caption = captionRaw;
-    btn.addEventListener("click", () => openLightbox(full, captionRaw));
 
     const media = document.createElement("div");
     media.className = "gallery-item__media";
@@ -314,3 +313,17 @@ document.addEventListener("click", (evt) => {
     openLightbox(btn.dataset.full || "", btn.dataset.caption || "");
   }
 });
+
+/* GALLERY LIGHTBOX DELEGATION V8 */
+document.addEventListener("click", (e) => {
+  const tile = e.target.closest(".gallery-tile, .gallery-item, .gallery-card, .gallery-grid figure, .gallery-grid .card");
+  if (!tile) return;
+  const img = tile.querySelector("img");
+  if (!img) return;
+  // avoid clicks on filter buttons etc
+  if (e.target.closest("button, a") && !e.target.closest(".gallery-tile, figure, .gallery-item, .gallery-card")) return;
+  e.preventDefault();
+  const src = img.dataset.full || img.getAttribute("data-full") || img.src;
+  const caption = tile.dataset.caption || img.dataset.caption || tile.getAttribute("data-caption") || "";
+  openLightbox({ src, caption });
+}, { passive: false });
