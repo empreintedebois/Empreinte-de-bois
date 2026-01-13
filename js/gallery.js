@@ -67,30 +67,38 @@
   }
 
   function renderCaption(figcaptionEl, rawCaption) {
-// Lightbox caption = <h3> + <p> (no table, no extras)
+
 if (!container) return;
-const parsed = parseStructuredCaption(raw || "");
-const title = parsed.title || "";
-// Body: prefer notes, else flatten fields, else remaining text
+const txt = String(raw || "").trim();
+container.innerHTML = "";
+// If txt already contains h3/p tags, trust it (from .txt files)
+if (/<\s*h3|<\s*p/i.test(txt)) {
+  container.innerHTML = txt;
+  return;
+}
+const parsed = parseStructuredCaption(txt);
+const h3 = document.createElement("h3");
+h3.textContent = parsed.title || txt.split(/\n/)[0] || "";
+const p = document.createElement("p");
+
+// Build body from remaining lines or structured fields
 let body = "";
 if (parsed.notes) body = parsed.notes;
 else {
-  const order = ["Matières","Technique","Dimensions","Finitions"];
-  const parts = [];
-  for (const k of order) {
-    if (parsed.fields && parsed.fields[k]) parts.push(`${k} : ${parsed.fields[k]}`);
+  const lines = txt.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  body = lines.slice(1).join(" ");
+  if (!body && parsed.fields){
+    const parts = [];
+    for (const k of Object.keys(parsed.fields)) parts.push(`${k} : ${parsed.fields[k]}`);
+    body = parts.join(" — ");
   }
-  body = parts.join(" — ");
 }
-container.innerHTML = "";
-const h3 = document.createElement("h3");
-h3.textContent = title;
-const p = document.createElement("p");
 p.textContent = body || "";
 container.appendChild(h3);
 container.appendChild(p);
 
 }
+
 
 
   function openLightbox(fullSrc, captionRaw) {
@@ -293,5 +301,15 @@ document.addEventListener("click", (e)=>{
       src: img.dataset.full || img.src,
       caption: card.dataset.caption || ""
     });
+  }
+});
+
+// DEFENSIVE_GALLERY_LB
+
+document.addEventListener("click", (evt) => {
+  const btn = evt.target.closest(".gallery-item__btn");
+  if (!btn) return;
+  if (typeof openLightbox === "function") {
+    openLightbox(btn.dataset.full || "", btn.dataset.caption || "");
   }
 });

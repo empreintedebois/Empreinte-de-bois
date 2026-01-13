@@ -1408,3 +1408,125 @@ h3, #lightbox-caption h3{
 @media (max-width:800px){
   .hero{ --motif-opacity: .3; }
 }
+
+
+/* PATCH V5 — Header / Hero layout / Motif alpha / Gallery lightbox */
+
+/* Header: no gold border, bottom fade to transparent */
+.site-header{
+  border: none !important;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.92) calc(100% - 20px), rgba(0,0,0,0) 100%) !important;
+}
+.site-header .shell{ align-items: center; }
+.site-logo{ justify-self: start; }
+.site-logo__text{ text-align:left; }
+.site-nav{ display:none !important; }
+
+.share-btn{
+  margin-left:auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:44px;
+  border:none;
+  background: transparent;
+  color: rgba(255,255,255,0.92);
+}
+.share-btn:active{ transform: scale(0.98); }
+.share-icon{ width:26px; height:26px; }
+
+/* HERO: desktop 2 columns */
+.hero__content{
+  display:grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 2rem !important;
+}
+.hero__text{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+}
+.hero__text h1, .hero__text h2{ text-align:center; }
+.hero__text p{ text-align:left; }
+
+.hero__actions--single{
+  display:flex;
+  justify-content:center;
+}
+.hero__actions--single .btn{ min-width: 220px; }
+
+/* Remove any card background behind slogan */
+.hero__content, .hero__text, .hero__preview{
+  background: transparent !important;
+}
+
+/* Motif: black -> transparent via mask (use image as alpha mask) */
+.hero__motif{
+  width: 100%;
+  height: min(420px, 48vh);
+  justify-self: stretch;
+  align-self: center;
+  --motif-opacity: 1;
+  opacity: var(--motif-opacity);
+  background: rgba(255,255,255,1);
+  -webkit-mask-image: url("../assets/about/logo-motif.webp");
+  mask-image: url("../assets/about/logo-motif.webp");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: right center;
+  mask-position: right center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* Mobile: motif centered behind text, opacity variable (currently 1) */
+@media (max-width: 800px){
+  .hero__content{
+    grid-template-columns: 1fr !important;
+  }
+  .hero__preview{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+  }
+  .hero__text{
+    position:relative;
+    z-index:1;
+  }
+  .hero__motif{
+    height: 100%;
+    -webkit-mask-position: center center;
+    mask-position: center center;
+    --motif-opacity: 1; /* réglable */
+  }
+}
+
+/* Gallery lightbox: fit in viewport, caption h3+p 4 lines, no scroll */
+.lightbox.is-open{ display:flex; }
+#lightbox .lightbox__body{
+  max-width: min(92vw, 1200px);
+  max-height: 92vh;
+  display:flex;
+  flex-direction:column;
+}
+#lightbox-img{
+  width:100%;
+  height:auto;
+  max-height: 68vh;
+  object-fit: contain;
+  display:block;
+}
+#lightbox-caption{
+  padding: 0.9rem 1rem 1.1rem;
+  overflow: hidden;
+}
+#lightbox-caption p{
+  max-width:none;
+  display:-webkit-box;
+  -webkit-line-clamp:4;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
