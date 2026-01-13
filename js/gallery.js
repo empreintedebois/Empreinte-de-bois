@@ -290,31 +290,6 @@ container.appendChild(p);
   applyFilter("all");
 })();
 
-/* DEFENSIVE LIGHTBOX BIND */
-document.addEventListener("click", (e)=>{
-  const card = e.target.closest(".gallery-item, figure, .gallery-card");
-  if(!card) return;
-  const img = card.querySelector("img");
-  if(!img) return;
-  if(typeof openLightbox === "function"){
-    openLightbox({
-      src: img.dataset.full || img.src,
-      caption: card.dataset.caption || ""
-    });
-  }
-});
-
-// DEFENSIVE_GALLERY_LB
-
-document.addEventListener("click", (evt) => {
-  const btn = evt.target.closest(".gallery-item__btn");
-  if (!btn) return;
-  if (typeof openLightbox === "function") {
-    openLightbox(btn.dataset.full || "", btn.dataset.caption || "");
-  }
-});
-
-/* GALLERY LIGHTBOX DELEGATION V8 */
 document.addEventListener("click", (e) => {
   const tile = e.target.closest(".gallery-tile, .gallery-item, .gallery-card, .gallery-grid figure, .gallery-grid .card");
   if (!tile) return;
