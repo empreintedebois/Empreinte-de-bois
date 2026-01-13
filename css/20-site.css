@@ -1361,3 +1361,24 @@ h3, #lightbox-caption h3{
   width: fit-content;
 }
 
+
+/* Hero background motif responsive */
+.hero{
+  background-image: url('../assets/about/logo-motif.webp');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: contain;
+  position: relative;
+}
+.hero::after{
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(circle at right, rgba(0,0,0,.35), rgba(0,0,0,.75));
+  pointer-events:none;
+}
+@media (max-width:800px){
+  .hero{
+    background-position: center center;
+    background-size: cover;
+  }
+}

@@ -111,7 +111,8 @@ container.appendChild(p);
       };
     }
 
-    lightbox.classList.add("is-open");
+    lightbox.hidden = false;
+  lightbox.classList.add("is-open");
     lightbox.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
   }
@@ -119,6 +120,7 @@ container.appendChild(p);
   function closeLightbox() {
     if (!lightbox || !lbImg || !lbCaption) return;
     lightbox.classList.remove("is-open");
+  lightbox.hidden = true;
     lightbox.setAttribute("aria-hidden", "true");
     lbImg.removeAttribute("src");
     lbCaption.innerHTML = "";
