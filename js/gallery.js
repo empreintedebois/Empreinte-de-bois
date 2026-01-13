@@ -281,3 +281,17 @@ container.appendChild(p);
   // Init
   applyFilter("all");
 })();
+
+/* DEFENSIVE LIGHTBOX BIND */
+document.addEventListener("click", (e)=>{
+  const card = e.target.closest(".gallery-item, figure, .gallery-card");
+  if(!card) return;
+  const img = card.querySelector("img");
+  if(!img) return;
+  if(typeof openLightbox === "function"){
+    openLightbox({
+      src: img.dataset.full || img.src,
+      caption: card.dataset.caption || ""
+    });
+  }
+});

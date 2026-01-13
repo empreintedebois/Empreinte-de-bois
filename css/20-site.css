@@ -1382,3 +1382,29 @@ h3, #lightbox-caption h3{
     background-size: cover;
   }
 }
+
+/* Hero content fully transparent */
+.hero .container,
+.hero .hero__content{
+  background: transparent !important;
+}
+
+/* Motif alpha mask: black -> transparent */
+.hero{
+  --motif-opacity: 1;
+}
+.hero::before{
+  content:'';
+  position:absolute; inset:0;
+  background-image: inherit;
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: contain;
+  opacity: var(--motif-opacity);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0), rgba(0,0,0,1) 35%, rgba(0,0,0,1));
+  mask-image: linear-gradient(to left, rgba(0,0,0,0), rgba(0,0,0,1) 35%, rgba(0,0,0,1));
+  pointer-events:none;
+}
+@media (max-width:800px){
+  .hero{ --motif-opacity: .3; }
+}
