@@ -68,36 +68,30 @@
 
   function renderCaption(figcaptionEl, rawCaption) {
 
-if (!container) return;
-const txt = String(raw || "").trim();
-container.innerHTML = "";
-// If txt already contains h3/p tags, trust it (from .txt files)
-if (/<\s*h3|<\s*p/i.test(txt)) {
-  container.innerHTML = txt;
-  return;
-}
-const parsed = parseStructuredCaption(txt);
-const h3 = document.createElement("h3");
-h3.textContent = parsed.title || txt.split(/\n/)[0] || "";
-const p = document.createElement("p");
+    // NOTE: this function was previously broken (container/raw were undefined)
+    // which caused the gallery click to do nothing.
+    if (!figcaptionEl) return;
+    const txt = String(rawCaption || "").replace(/\r/g, "").trim();
+    figcaptionEl.innerHTML = "";
 
-// Build body from remaining lines or structured fields
-let body = "";
-if (parsed.notes) body = parsed.notes;
-else {
-  const lines = txt.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  body = lines.slice(1).join(" ");
-  if (!body && parsed.fields){
-    const parts = [];
-    for (const k of Object.keys(parsed.fields)) parts.push(`${k} : ${parsed.fields[k]}`);
-    body = parts.join(" — ");
+    // If txt already contains tags, trust it
+    if (/<\s*h3|<\s*p/i.test(txt)) {
+      figcaptionEl.innerHTML = txt;
+      return;
+    }
+
+    const lines = txt.split("\n").map(s => s.trim()).filter(Boolean);
+    const titleLine = lines[0] || "";
+    const bodyText = lines.slice(1).join(" ").trim();
+
+    const h3 = document.createElement("h3");
+    h3.textContent = titleLine;
+    const p = document.createElement("p");
+    p.textContent = bodyText;
+
+    figcaptionEl.appendChild(h3);
+    figcaptionEl.appendChild(p);
   }
-}
-p.textContent = body || "";
-container.appendChild(h3);
-container.appendChild(p);
-
-}
 
 
 
