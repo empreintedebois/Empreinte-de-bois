@@ -594,25 +594,44 @@ body {
 .lightbox__body {
   position: relative;
   z-index: 1;
-  max-width: min(960px, 100% - 2rem);
-  max-height: min(80vh, 520px);
+  width: min(960px, 100% - 2rem);
+  max-height: 88vh; /* keep everything visible without scroll */
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid rgba(148, 163, 184, 0.5);
   background: radial-gradient(circle at top left, #1f2937, #020617);
   box-shadow: var(--shadow-soft);
+
+  display: flex;
+  flex-direction: column;
 }
 .lightbox__body img {
   display: block;
   width: 100%;
   height: auto;
-  max-height: calc(80vh - 3rem);
+  max-height: 72vh; /* leave room for caption + close btn */
   object-fit: contain;
+  flex: 1 1 auto;
 }
 .lightbox__body figcaption {
-  padding: 0.6rem 0.9rem;
-  font-size: 0.8rem;
-  color: var(--muted);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.85rem;
+  color: var(--text);
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(0,0,0,0.20);
+}
+.lightbox__body figcaption h3{
+  margin: 0 0 .35rem 0;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.92);
+}
+.lightbox__body figcaption p{
+  margin: 0;
+  color: rgba(255,255,255,0.72);
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* 3 lines max */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .lightbox__close {
   position: absolute;
@@ -1377,14 +1396,21 @@ h3, #lightbox-caption h3{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  width:44px;
-  height:44px;
+  gap: .5rem;
+  padding: 0.55rem 0.75rem;
+  min-height:44px;
   border:none;
   background: transparent;
   color: rgba(255,255,255,0.92);
+  cursor: pointer;
+  font: inherit;
 }
 .share-btn:active{ transform: scale(0.98); }
-.share-icon{ width:26px; height:26px; }
+.share-btn__label{
+  font-size: 0.9rem;
+  letter-spacing: .02em;
+}
+.share-icon{ width:22px; height:22px; }
 
 /* HERO: desktop 2 columns */
 .hero__content{
@@ -1449,110 +1475,7 @@ h3, #lightbox-caption h3{
     height: 100%;
     -webkit-mask-position: center center;
     mask-position: center center;
-    --motif-opacity: 1; /* réglable */
+    --motif-opacity: 0.8; /* mobile watermark */
   }
 }
 
-/* Gallery lightbox: fit in viewport, caption h3+p 4 lines, no scroll */
-.lightbox.is-open{ display:flex; }
-#lightbox .lightbox__body{
-  max-width: min(92vw, 1200px);
-  max-height: 92vh;
-  display:flex;
-  flex-direction:column;
-}
-#lightbox-img{
-  width:100%;
-  height:auto;
-  max-height: 68vh;
-  object-fit: contain;
-  display:block;
-}
-#lightbox-caption{
-  padding: 0.9rem 1rem 1.1rem;
-  overflow: hidden;
-}
-#lightbox-caption p{
-  max-width:none;
-  display:-webkit-box;
-  -webkit-line-clamp:4;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-}
-
-
-
-/* ============================================================
-   PATCH V8 — HERO motif (single), transparent container, 2-col desktop
-   ============================================================ */
-
-:root{
-  --hero-motif-opacity-desktop: 0.85; /* réglable */
-  --hero-motif-opacity-mobile: 0.30;  /* réglable */
-}
-
-/* Hero layout */
-.hero{
-  position: relative;
-  overflow: hidden;
-}
-
-/* container must be 100% transparent */
-.hero .container,
-.hero .hero__content,
-.hero .hero__inner{
-  background: transparent !important;
-}
-
-/* Desktop two columns (text left, motif right) */
-@media (min-width: 801px){
-  .hero .hero__content{
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    align-items: center !important;
-    gap: 2rem !important;
-  }
-  .hero .hero__content > *{
-    position: relative;
-    z-index: 2;
-  }
-}
-
-/* Single motif layer */
-.hero__motif{
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: url('../assets/hero/logo-motif-alpha.webp') no-repeat right center;
-  background-size: min(520px, 42vw);
-  opacity: var(--hero-motif-opacity-desktop);
-  filter: saturate(1.02) contrast(1.05);
-}
-
-/* Mobile: motif centered behind content */
-@media (max-width: 800px){
-  .hero__motif{
-    background-position: center center;
-    background-size: min(520px, 78vw);
-    opacity: var(--hero-motif-opacity-mobile);
-  }
-}
-
-/* Titles alignment (left column) */
-@media (min-width: 801px){
-  .hero .hero__left h1,
-  .hero .hero__left h2,
-  .hero .hero__left h3{
-    text-align: center;
-  }
-  .hero .hero__left p{
-    text-align: left;
-  }
-}
-
-/* Remove any previous pseudo-layer shadow that could create a "second image" */
-.hero::before,
-.hero::after{
-  content: none !important;
-}
