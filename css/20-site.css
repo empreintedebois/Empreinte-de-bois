@@ -1479,3 +1479,24 @@ h3, #lightbox-caption h3{
   }
 }
 
+
+/* HERO motif alpha replacement */
+.hero-motif-alpha {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: transparent;
+  display: block;
+}
+
+.hero-motif-alpha,
+.hero-motif-alpha * {
+  pointer-events: none;
+}
+
+/* Ensure hero visual container has no background */
+.hero-visual,
+.hero-right,
+.hero-media {
+  background: transparent !important;
+}
