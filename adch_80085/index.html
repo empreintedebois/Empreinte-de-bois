@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Stock & Flux – Atelier (adch_80085)</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__title">
+      <div class="badge">adch_80085</div>
+      <h1>Stock & Flux – Atelier</h1>
+    </div>
+
+    <nav class="topbar__nav" aria-label="Navigation">
+      <button class="tab" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="produits">Produits</button>
+      <button class="tab" data-tab="journal">Journal & Injection</button>
+      <button class="tab" data-tab="aide">Aide</button>
+
+      <span class="spacer"></span>
+
+      <button class="btn" data-action="export">Exporter</button>
+      <button class="btn" data-action="import">Importer</button>
+      <button class="btn danger" data-action="reset">Reset</button>
+    </nav>
+  </header>
+
+  <main id="app" class="container" aria-live="polite"></main>
+
+  <footer class="footer">
+    <div class="muted">Outil interne – pas de synchronisation automatique multi-appareils : Export/Import JSON.</div>
+  </footer>
+
+  <script src="state.js"></script>
+  <script src="storage.js"></script>
+  <script src="calc.js"></script>
+  <script src="ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
