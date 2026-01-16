@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Atelier — Stock & Flux</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <div class="title">Atelier — Stock &amp; Flux</div>
+        <div class="subtitle">Journal immuable • export/import JSON • mobile-first</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="btnExport" class="btn">Exporter</button>
+      <button id="btnImport" class="btn">Importer</button>
+      <button id="btnReset" class="btn btnDanger">Reset</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Navigation">
+    <button class="tab is-active" data-tab="dash">Dashboard</button>
+    <button class="tab" data-tab="products">Produits</button>
+    <button class="tab" data-tab="journal">Journal &amp; Injection</button>
+    <button class="tab" data-tab="help">Aide</button>
+  </nav>
+
+  <main class="container">
+    <section id="view-dash" class="view is-active">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="cardTitle">Stock</div>
+          <div class="kpis">
+            <div class="kpi">
+              <div class="kpiLabel">Produits</div>
+              <div id="kpiProducts" class="kpiValue">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpiLabel">Valeur stock</div>
+              <div id="kpiStockValue" class="kpiValue">—</div>
+            </div>
+          </div>
+          <div class="muted" id="dashStockNote"></div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitle">Période</div>
+          <div class="row">
+            <label class="field">
+              <span>Du</span>
+              <input id="periodFrom" type="date" />
+            </label>
+            <label class="field">
+              <span>Au</span>
+              <input id="periodTo" type="date" />
+            </label>
+          </div>
+          <div class="row">
+            <button class="btn" id="btnPeriod30">30j</button>
+            <button class="btn" id="btnPeriodMonth">Mois</button>
+            <button class="btn" id="btnPeriodAll">Tout</button>
+          </div>
+          <div class="muted">Utilisé pour dépenses / ventes / rentabilité ci‑dessous.</div>
+        </div>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="card">
+          <div class="cardTitle">Dépenses globales</div>
+          <div id="kpiGlobalSpend" class="bigValue">—</div>
+          <div class="muted" id="kpiGlobalSpendDetail"></div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitle">Ventes</div>
+          <div id="kpiSales" class="bigValue">—</div>
+          <div class="muted" id="kpiSalesDetail"></div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitle">Rentabilité</div>
+          <div id="kpiProfit" class="bigValue">—</div>
+          <div class="muted" id="kpiProfitDetail"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardTitle">Aperçu rapide</div>
+        <div class="row">
+          <input id="quickSearch" class="input" placeholder="Recherche produit (ID ou nom)…" />
+        </div>
+        <div class="tableWrap">
+          <table class="table" id="tableQuickProducts">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th class="num">Stock</th>
+                <th class="num">Prix moyen</th>
+                <th class="num">Valeur</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-products" class="view">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="cardTitle">Produits</div>
+          <div class="row">
+            <input id="productSearch" class="input" placeholder="Recherche (ID/nom)…" />
+            <button id="btnAddProduct" class="btn">+ Produit</button>
+          </div>
+          <div class="tableWrap">
+            <table class="table" id="tableProducts">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nom</th>
+                  <th class="num">Unités/lot</th>
+                  <th class="num">Stock</th>
+                  <th class="num">Prix moyen</th>
+                  <th class="num">Valeur</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="muted">Le stock et le prix moyen sont calculés à partir du journal (achats jusqu’à aujourd’hui).</div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitle">Tags (suggestions)</div>
+          <div class="muted">Les tags sont libres, mais l’app suggère ceux déjà utilisés.</div>
+          <div id="tagChips" class="chips"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-journal" class="view">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="cardTitle">Injection (brouillon)</div>
+          <div class="row">
+            <label class="field grow">
+              <span>Type</span>
+              <select id="draftType" class="input">
+                <option value="ACHAT">Achat (stock +)</option>
+                <option value="PERTE">Perte (stock -)</option>
+                <option value="DEPENSE">Dépense (global)</option>
+                <option value="COMMANDE">Commande (vente multi‑lignes)</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Date</span>
+              <input id="draftDate" type="date" class="input" />
+            </label>
+          </div>
+
+          <div id="draftForm"></div>
+
+          <div class="row">
+            <button id="btnAddDraftLine" class="btn">+ Ligne</button>
+            <button id="btnClearDraft" class="btn">Vider</button>
+            <button id="btnInject" class="btn btnPrimary">Injecter</button>
+          </div>
+
+          <div id="draftWarnings" class="warnings"></div>
+          <div class="muted">À l’injection : journal immuable + auto‑export JSON + sauvegarde locale.</div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitle">Journal (mouvements)</div>
+          <div class="row">
+            <input id="journalSearch" class="input" placeholder="Filtre (ID, type, tag, note)…" />
+            <button id="btnExportCsv" class="btn">CSV</button>
+          </div>
+          <div class="tableWrap">
+            <table class="table" id="tableJournal">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>ID</th>
+                  <th>Type</th>
+                  <th class="num">Δ unités</th>
+                  <th class="num">€</th>
+                  <th>Tags</th>
+                  <th>Note</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="muted">Annulation = contre‑écriture (on exclut le mouvement d’origine des calculs).</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardTitle">Commandes (ventes)</div>
+        <div class="tableWrap">
+          <table class="table" id="tableOrders">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Commande</th>
+                <th class="num">Total vente</th>
+                <th class="num">Coût matière</th>
+                <th class="num">Marge</th>
+                <th>Lignes</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-help" class="view">
+      <div class="card">
+        <div class="cardTitle">Aide (V1)</div>
+        <ul class="list">
+          <li><b>Produits</b> : crée d’abord les IDs, et une valeur “unités/lot” par défaut si tu achètes par lots.</li>
+          <li><b>Achat</b> : saisis soit des unités, soit un lot + unités/lot + prix du lot. Le prix moyen est recalculé par historique jusqu’à la date.</li>
+          <li><b>Perte</b> : retire des unités. Le coût de la perte est figé à la date (prix moyen à cet instant).</li>
+          <li><b>Dépense</b> : dépense globale taggable (huile, laser, maintenance…).</li>
+          <li><b>Commande</b> : vente multi‑lignes. Tu saisis le <b>prix total</b> par ligne (ou 0 si non vendu).</li>
+          <li><b>Multi‑appareil</b> : utilise <b>Exporter</b> puis <b>Importer</b> sur l’autre appareil (pas de synchro automatique sans backend).</li>
+          <li><b>Annuler</b> : dans le journal, clique “Annuler”. Puis ré‑injecte la version corrigée.</li>
+        </ul>
+        <div class="muted">⚠️ Cette page est « cachée » (pas sécurisée). N’y stocke pas de données sensibles clients.</div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="dlgProduct">
+    <form method="dialog" class="dialog">
+      <h3 id="dlgProductTitle">Produit</h3>
+      <label class="field">
+        <span>ID (unique)</span>
+        <input id="pId" class="input" placeholder="CP23X3" required />
+      </label>
+      <label class="field">
+        <span>Nom</span>
+        <input id="pName" class="input" placeholder="Contreplaqué 3mm" required />
+      </label>
+      <label class="field">
+        <span>Descriptions (séparées par |)</span>
+        <input id="pDesc" class="input" placeholder="épaisseur 3mm|format 300x400" />
+      </label>
+      <label class="field">
+        <span>Unités par lot (défaut)</span>
+        <input id="pUpl" type="number" min="0" step="1" class="input" placeholder="16" />
+      </label>
+
+      <div class="row right">
+        <button value="cancel" class="btn">Annuler</button>
+        <button id="btnProductSave" value="ok" class="btn btnPrimary">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlgImport">
+    <form method="dialog" class="dialog">
+      <h3>Importer JSON</h3>
+      <input id="importFile" type="file" accept="application/json" />
+      <div class="muted">Import remplace les données locales de cet appareil.</div>
+      <div class="row right">
+        <button value="cancel" class="btn">Annuler</button>
+        <button id="btnImportGo" value="ok" class="btn btnPrimary">Importer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
