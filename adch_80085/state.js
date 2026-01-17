@@ -5,6 +5,9 @@ window.STATE = {
     app: "adch_80085",
     createdAt: null,
     updatedAt: null,
+    lastExportAt: null,
+    lastExportFile: "",
+    lastInjectAt: null,
   },
   counters: {
     mid: 0,
@@ -29,5 +32,6 @@ window.STATE = {
   },
   settings: {
     autoExportAfterInject: true,
+    exportReminderDays: 7,
   }
 };

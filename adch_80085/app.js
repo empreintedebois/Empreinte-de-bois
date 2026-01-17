@@ -29,10 +29,21 @@ document.addEventListener("DOMContentLoaded", () => {
   importBtn.addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "application/json";
+    // Filtre UI (ce n'est pas une sécurité) : on vise un JSON d'export de l'outil
+    input.accept = ".json,application/json";
     input.onchange = (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
+
+       // Règle demandée : importer si (et seulement si) le nom contient "atelier_stockflux" et se termine par ".json"
+       const name = String(file.name || "").toLowerCase();
+       const okName = name.includes("atelier_stockflux") && name.endsWith(".json");
+       if (!okName) {
+         STATE.ui.lastMessage = "Import refusé : le fichier doit contenir 'atelier_stockflux' et finir par .json";
+         render();
+         return;
+       }
+
       importStateFromFile(file, (ok, err) => {
         if (!ok) {
           STATE.ui.lastMessage = `Import échoué : ${err}`;

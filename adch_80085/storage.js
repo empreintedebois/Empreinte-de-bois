@@ -26,15 +26,23 @@ function loadState() {
     // Merge shallow (préserve le schéma)
     Object.assign(STATE, parsed);
     // Sécu champs manquants
-    STATE.meta ||= { version: 1, app: "adch_80085", createdAt: nowISO(), updatedAt: nowISO() };
+    STATE.meta ||= { version: 1, app: "adch_80085", createdAt: nowISO(), updatedAt: nowISO(), lastExportAt: null, lastExportFile: "", lastInjectAt: null };
+    STATE.meta.lastExportAt ??= null;
+    STATE.meta.lastExportFile ??= "";
+    STATE.meta.lastInjectAt ??= null;
     STATE.counters ||= { mid: 0, sid: 0 };
     STATE.produits ||= [];
     STATE.mouvements ||= [];
-    STATE.ui ||= { tab: "dashboard", period: "30j", dateFrom: "", dateTo: "", searchProduit: "", draft: { items: [], cmdDate: "", cmdLines: [] }, lastMessage: "" };
-    STATE.settings ||= { autoExportAfterInject: true };
-    STATE.ui.draft ||= { items: [], cmdDate: "", cmdLines: [] };
+    STATE.ui ||= { tab: "dashboard", period: "30j", dateFrom: "", dateTo: "", searchProduit: "", journalSearch: "", journalCategory: "", draft: { items: [], cmdDate: "", cmdLines: [] }, lastMessage: "" };
+    STATE.settings ||= { autoExportAfterInject: true, exportReminderDays: 7 };
+    STATE.settings.exportReminderDays ??= 7;
+    STATE.ui.draft ||= { items: [], cmdDate: "", cmdLines: [], cmdSaleTotal: "", cmdLabel: "" };
     STATE.ui.draft.items ||= [];
     STATE.ui.draft.cmdLines ||= [];
+    STATE.ui.draft.cmdSaleTotal ??= "";
+    STATE.ui.draft.cmdLabel ??= "";
+    STATE.ui.journalSearch ??= "";
+    STATE.ui.journalCategory ??= "";
   } catch (e) {
     console.warn("loadState failed", e);
   }
@@ -53,7 +61,16 @@ function downloadJSON(filename, dataObj) {
 }
 
 function exportState() {
-  downloadJSON("atelier_stockflux.json", STATE);
+  // Nom demandé : atelier_stockflux_"AAAA-MM-JJ".json (date locale de l'appareil)
+  const d = new Date();
+  const yyyy = String(d.getFullYear());
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const filename = `atelier_stockflux_${yyyy}-${mm}-${dd}.json`;
+  STATE.meta.lastExportAt = nowISO();
+  STATE.meta.lastExportFile = filename;
+  saveState();
+  downloadJSON(filename, STATE);
 }
 
 function importStateFromFile(file, onDone) {
@@ -65,15 +82,23 @@ function importStateFromFile(file, onDone) {
       // Remplace l'état mais garde schema minimum
       Object.assign(STATE, parsed);
       // Normalisation
-      STATE.meta ||= { version: 1, app: "adch_80085", createdAt: nowISO(), updatedAt: nowISO() };
+      STATE.meta ||= { version: 1, app: "adch_80085", createdAt: nowISO(), updatedAt: nowISO(), lastExportAt: null, lastExportFile: "", lastInjectAt: null };
+      STATE.meta.lastExportAt ??= null;
+      STATE.meta.lastExportFile ??= "";
+      STATE.meta.lastInjectAt ??= null;
       STATE.counters ||= { mid: 0, sid: 0 };
       STATE.produits ||= [];
       STATE.mouvements ||= [];
-      STATE.ui ||= { tab: "dashboard", period: "30j", dateFrom: "", dateTo: "", searchProduit: "", draft: { items: [], cmdDate: "", cmdLines: [] }, lastMessage: "" };
-      STATE.settings ||= { autoExportAfterInject: true };
-      STATE.ui.draft ||= { items: [], cmdDate: "", cmdLines: [] };
+      STATE.ui ||= { tab: "dashboard", period: "30j", dateFrom: "", dateTo: "", searchProduit: "", journalSearch: "", journalCategory: "", draft: { items: [], cmdDate: "", cmdLines: [] }, lastMessage: "" };
+      STATE.settings ||= { autoExportAfterInject: true, exportReminderDays: 7 };
+      STATE.settings.exportReminderDays ??= 7;
+      STATE.ui.draft ||= { items: [], cmdDate: "", cmdLines: [], cmdSaleTotal: "", cmdLabel: "" };
       STATE.ui.draft.items ||= [];
       STATE.ui.draft.cmdLines ||= [];
+      STATE.ui.draft.cmdSaleTotal ??= "";
+      STATE.ui.draft.cmdLabel ??= "";
+      STATE.ui.journalSearch ??= "";
+      STATE.ui.journalCategory ??= "";
       saveState();
       onDone?.(true);
     } catch (err) {

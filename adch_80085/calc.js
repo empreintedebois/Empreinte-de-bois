@@ -75,17 +75,20 @@ function withinRangeISO(iso, fromISO, toISO) {
 function getPeriodRangeISO() {
   // returns {fromISO,toISO} for filtering dashboard metrics
   const p = STATE.ui.period;
-  const today = new Date();
-  const toISO = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0).toISOString();
+  const now = new Date();
+  // bornes inclusives : début/fin de journée en local
+  const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  const toISO = endOfToday.toISOString();
 
   if (p === "tout") return { fromISO: "", toISO: "" };
   if (p === "mois") {
-    const from = new Date(today.getFullYear(), today.getMonth(), 1, 12, 0, 0);
+    const from = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
     return { fromISO: from.toISOString(), toISO };
   }
   // default 30j
-  const from = new Date(today.getTime() - 30 * 24 * 3600 * 1000);
-  from.setHours(12, 0, 0, 0);
+  // 30 jours inclusifs : aujourd'hui + 29 jours précédents
+  const from = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  from.setDate(from.getDate() - 29);
   return { fromISO: from.toISOString(), toISO };
 }
 
@@ -115,10 +118,15 @@ function avgPriceAtDate(productId, isoAt) {
 function currentStock(productId) {
   let s = 0;
   for (const m of effectiveMovements()) {
-    if (!m.productId || m.productId !== productId) continue;
-    if (m.type === "ACHAT" || m.type === "VENTE" || m.type === "PERTE") {
-      s += Number(m.qtyUnits || 0);
+    if (m.type === "VENTE_CMD") {
+      const lines = Array.isArray(m.lines) ? m.lines : [];
+      for (const ln of lines) {
+        if (ln?.productId === productId) s += Number(ln.qtyUnits || 0) * -1;
+      }
+      continue;
     }
+    if (!m.productId || m.productId !== productId) continue;
+    if (m.type === "ACHAT" || m.type === "VENTE" || m.type === "PERTE") s += Number(m.qtyUnits || 0);
   }
   return s;
 }
@@ -174,6 +182,11 @@ function sumDashboardMetrics() {
       ventes += Number(m.saleTotal || 0);
       coutMatiereVendu += Number(m.costMatiere || 0);
     }
+
+    if (m.type === "VENTE_CMD") {
+      ventes += Number(m.saleTotal || 0);
+      coutMatiereVendu += Number(m.costMatiere || 0);
+    }
   }
 
   const rentabilite = ventes - depensesGlobales - depensesStock;
@@ -188,6 +201,50 @@ function sumDashboardMetrics() {
     coutMatiereVendu,
     marge,
   };
+}
+
+function dailySeries() {
+  // Série journalière (ventes, dépenses, rentabilité) sur la période dashboard
+  const { fromISO, toISO } = getPeriodRangeISO();
+  const from = fromISO ? new Date(fromISO) : null;
+  const to = toISO ? new Date(toISO) : null;
+  if (!from || !to) return { labels: [], ventes: [], depenses: [], rentabilite: [] };
+
+  const days = [];
+  const cur = new Date(from.getTime());
+  cur.setHours(0, 0, 0, 0);
+  const end = new Date(to.getTime());
+  end.setHours(0, 0, 0, 0);
+  while (cur.getTime() <= end.getTime()) {
+    const y = cur.getFullYear();
+    const m = String(cur.getMonth() + 1).padStart(2, "0");
+    const d = String(cur.getDate()).padStart(2, "0");
+    days.push(`${y}-${m}-${d}`);
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  const ventesBy = Object.create(null);
+  const depBy = Object.create(null);
+
+  for (const key of days) { ventesBy[key] = 0; depBy[key] = 0; }
+
+  for (const m of effectiveMovements()) {
+    const iso = movementDateISO(m);
+    if (!withinRangeISO(iso, fromISO, toISO)) continue;
+    const key = String(m.date || "");
+    if (!key || !(key in ventesBy)) continue;
+
+    if (m.type === "ACHAT") depBy[key] += Number(m.totalCost || 0);
+    if (m.type === "DEPENSE") depBy[key] += Number(m.amount || 0);
+    if (m.type === "PERTE") depBy[key] += Number(m.perteCost || 0);
+    if (m.type === "VENTE" || m.type === "VENTE_CMD") ventesBy[key] += Number(m.saleTotal || 0);
+  }
+
+  const ventes = days.map(k => ventesBy[k] || 0);
+  const depenses = days.map(k => depBy[k] || 0);
+  const rentabilite = days.map((_, i) => ventes[i] - depenses[i]);
+
+  return { labels: days, ventes, depenses, rentabilite };
 }
 
 function uniqueTags() {

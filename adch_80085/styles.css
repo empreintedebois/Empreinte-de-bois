@@ -153,3 +153,26 @@ textarea{min-height:70px; resize:vertical}
   background:transparent;
   border:1px dashed var(--border);
 }
+
+.banner{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px 14px;
+  margin-bottom:12px;
+}
+.banner .actions{flex:0 0 auto}
+.banner.ok{border-color:rgba(46,125,50,0.55)}
+.banner.warn{border-color:rgba(245,124,0,0.55); background:rgba(245,124,0,0.06)}
+
+.chart{
+  width:100%;
+  max-width:100%;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:14px;
+}
