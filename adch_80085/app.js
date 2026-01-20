@@ -1,8 +1,8 @@
 // adch_80085 - bootstrap
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   console.log("adch_80085 init");
-  loadState();
+  await loadState();
 
   // Nav tabs
   document.querySelectorAll("button[data-tab]").forEach(btn => {
@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Actions
   const exportBtn = document.querySelector("button[data-action='export']");
   const importBtn = document.querySelector("button[data-action='import']");
-  const resetBtn = document.querySelector("button[data-action='reset']");
 
   exportBtn.addEventListener("click", () => {
     setMessage("Export JSON généré");
@@ -56,11 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     input.click();
   });
 
-  resetBtn.addEventListener("click", () => {
-    const ok = confirm("Reset total ? (efface l'état local)\nPense à exporter avant.");
-    if (!ok) return;
-    hardReset();
-  });
+  // Reset est dans l'onglet Aide (pas dans la topbar)
 
   // Default tab
   STATE.ui.tab ||= "dashboard";

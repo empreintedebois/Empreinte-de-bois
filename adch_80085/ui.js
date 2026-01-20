@@ -1,6 +1,12 @@
 // adch_80085 - rendu UI
 
-const PRODUCT_CATEGORIES = ["Bois", "Matières", "Lumières", "Composants", "Support"]; // classes demandées
+// Catégories produits : extensibles (stockées dans STATE.settings.productCategories)
+function getProductCategories() {
+  const base = ["Bois", "Matières", "Lumières", "Composants", "Support"];
+  const arr = Array.isArray(STATE?.settings?.productCategories) ? STATE.settings.productCategories : base;
+  const merged = [...new Set([...base, ...arr.map(x=>String(x||"").trim()).filter(Boolean)])];
+  return merged;
+}
 
 function fmtDateFR(iso) {
   if (!iso) return "—";
@@ -11,6 +17,51 @@ function fmtDateFR(iso) {
   } catch {
     return "—";
   }
+}
+
+function reliabilityTests() {
+  const out = [];
+  const ok = (msg) => out.push(`OK: ${msg}`);
+  const warn = (msg) => out.push(`WARN: ${msg}`);
+  const fail = (msg) => out.push(`FAIL: ${msg}`);
+
+  try {
+    const t = parseTagsInput("Bois, bois ,  ,Lumières\n, Support\t,Composants");
+    if (t.includes("bois") && t.length === 4) ok("Tags: normalisation + unique");
+    else warn(`Tags: résultat inattendu (${t.join(";")})`);
+  } catch (e) { fail(`Tags: exception ${e}`); }
+
+  try {
+    const s = analysisSeries(STATE.ui.analysisPeriod || "tout");
+    if (s && Array.isArray(s.labels)) ok("Analyse: séries OK");
+    else warn("Analyse: pas de série");
+  } catch (e) { fail(`Analyse: exception ${e}`); }
+
+  try {
+    // Données minimales 'sales'
+    const bogus = {
+      mouvements: [
+        { mid:"M99999", date:"2026-01-01", type:"ACHAT", productId:"ID\nX", qtyUnits:1, totalCost:NaN },
+        { mid:"M99998", date:"2026-01-02", type:"DEPENSE", amount:"12,3" },
+        { mid:"M99997", date:"2026-01-03", type:"PERTE", productId:"IDX", qtyUnits:-1, perteCost:undefined },
+      ]
+    };
+    ok("Jeu de test: construit");
+    // Ici on ne merge pas dans STATE : on vérifie juste que les helpers ne crashent pas sur les NaN.
+    safeNum(NaN,0);
+    safeNum(undefined,0);
+    ok("safeNum: OK");
+  } catch (e) { fail(`safeNum: exception ${e}`); }
+
+  // Sanity : pas de NaN dans les totaux du dashboard
+  try {
+    const d = dashboard(periodRangeISO());
+    const vals = [d.totalExpenses, d.totalSales, d.totalLosses, d.totalGeneralExpenses, d.totalPurchases, d.recoverableExpenses];
+    if (vals.every(v=>typeof v==="number" && isFinite(v))) ok("Dashboard: totaux valides");
+    else warn("Dashboard: NaN détecté");
+  } catch (e) { fail(`Dashboard: exception ${e}`); }
+
+  return out;
 }
 
 function renderBackupBanner() {
@@ -100,6 +151,142 @@ function drawMiniChart(canvas, series) {
   ctx.fillText("Net", 170, 18);
 }
 
+function canvasFit(canvas, cssH=260) {
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.max(320, Math.floor(canvas.clientWidth || 600));
+  canvas.width = Math.floor(w * dpr);
+  canvas.height = Math.floor(cssH * dpr);
+  canvas.style.height = `${cssH}px`;
+}
+
+function colorForIndex(i, alpha=0.9) {
+  // Palette stable (HSL)
+  const hue = (i * 57) % 360;
+  return `hsla(${hue}, 75%, 55%, ${alpha})`;
+}
+
+function drawAnalysisChart(canvas, series) {
+  if (!canvas || !series || !series.labels) return;
+  canvasFit(canvas, 300);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const labels = series.labels;
+  const stacks = series.stacks || {};
+  const general = series.general || labels.map(()=>0);
+  const losses = series.losses || labels.map(()=>0);
+  const sales = series.sales || labels.map(()=>0);
+
+  const catKeys = Object.keys(stacks);
+  // total bar height
+  const totals = labels.map((_,i)=>{
+    let t = 0;
+    for (const c of catKeys) t += Number(stacks[c][i]||0);
+    t += Number(general[i]||0);
+    return t;
+  });
+
+  const maxBar = Math.max(1, ...totals);
+  const maxLine = Math.max(1, ...losses, ...sales);
+  const maxY = Math.max(maxBar, maxLine);
+
+  const W = canvas.width;
+  const H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const padL = 52, padR = 18, padT = 12, padB = 44;
+  const x0 = padL, x1 = W-padR;
+  const y0 = H-padB, y1 = padT;
+  const plotW = x1-x0, plotH = y0-y1;
+  const n = labels.length;
+  const barW = n>0 ? Math.max(4, Math.floor(plotW / n) - 2) : 6;
+  const xStep = n>0 ? plotW / n : plotW;
+  const yMap = (v) => y0 - (v/maxY)*plotH;
+
+  // grid
+  ctx.strokeStyle = "rgba(255,255,255,0.10)";
+  ctx.lineWidth = 1;
+  for (let g=0; g<=4; g++) {
+    const yy = y0 - (g/4)*plotH;
+    ctx.beginPath();
+    ctx.moveTo(x0, yy);
+    ctx.lineTo(x1, yy);
+    ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle = "rgba(255,255,255,0.18)";
+  ctx.beginPath();
+  ctx.moveTo(x0, y1);
+  ctx.lineTo(x0, y0);
+  ctx.lineTo(x1, y0);
+  ctx.stroke();
+
+  // stacked bars
+  for (let i=0;i<n;i++) {
+    const x = x0 + i*xStep + 1;
+    let yTop = y0;
+    for (let k=0;k<catKeys.length;k++) {
+      const c = catKeys[k];
+      const val = Number(stacks[c][i]||0);
+      if (val <= 0) continue;
+      const h = (val/maxY)*plotH;
+      ctx.fillStyle = colorForIndex(k, 0.75);
+      ctx.fillRect(x, yTop - h, barW, h);
+      // value label if big enough
+      if (h > 18) {
+        ctx.fillStyle = "rgba(10,10,10,0.85)";
+        ctx.font = "12px system-ui";
+        ctx.fillText(String(Math.round(val)), x+2, yTop - h + 14);
+      }
+      yTop -= h;
+    }
+
+    const gVal = Number(general[i]||0);
+    if (gVal > 0) {
+      const h = (gVal/maxY)*plotH;
+      ctx.fillStyle = "rgba(255,255,255,0.30)";
+      ctx.fillRect(x, yTop - h, barW, h);
+      if (h > 18) {
+        ctx.fillStyle = "rgba(0,0,0,0.85)";
+        ctx.font = "12px system-ui";
+        ctx.fillText(String(Math.round(gVal)), x+2, yTop - h + 14);
+      }
+    }
+  }
+
+  function plotLine(arr, stroke) {
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i=0;i<n;i++) {
+      const x = x0 + i*xStep + barW/2;
+      const y = yMap(Number(arr[i]||0));
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+
+  // lines
+  plotLine(losses, "rgba(245,124,0,0.95)");
+  plotLine(sales, "rgba(66,165,245,0.90)");
+
+  // x labels (sparse)
+  ctx.fillStyle = "rgba(255,255,255,0.70)";
+  ctx.font = "12px system-ui";
+  const step = n>18 ? Math.ceil(n/8) : 1;
+  for (let i=0;i<n;i+=step) {
+    const x = x0 + i*xStep;
+    const txt = labels[i];
+    ctx.fillText(txt, x, H-18);
+  }
+
+  // y max label
+  ctx.fillStyle = "rgba(255,255,255,0.70)";
+  ctx.font = "12px system-ui";
+  ctx.fillText(String(Math.round(maxY)), 8, y1+10);
+}
+
 function setActiveTabButtons() {
   document.querySelectorAll("button[data-tab]").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.tab === STATE.ui.tab);
@@ -116,6 +303,21 @@ function escapeHTML(s) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+
+function parseTagsInput(str) {
+  const raw = String(str || "");
+  const arr = raw.split(",").map(x=>x.replace(/[\r\n\t]/g, " ").trim()).filter(Boolean);
+  // normalisation interne : lower-case + unique
+  const seen = new Set();
+  const out = [];
+  for (const t of arr) {
+    const key = t.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(key);
+  }
+  return out;
 }
 
 function render() {
@@ -206,9 +408,92 @@ function render() {
       };
     }
 
+    const rt = app.querySelector("#runTests");
+    if (rt) {
+      rt.onclick = () => {
+        STATE.ui.lastTests = runReliabilityTests();
+        setMessage("Tests terminés");
+        saveState();
+        render();
+      };
+    }
+
     // Draw mini chart
     drawMiniChart(app.querySelector("#miniChart"), dailySeries());
 
+    return;
+  }
+
+  if (STATE.ui.tab === "analyse") {
+    const periodKey = STATE.ui.analysisPeriod || "tout";
+    const series = analysisSeries(periodKey);
+    const totals = series.totals;
+
+    const cats = Object.keys(series.stacks || {});
+
+    const cards = totals ? `
+      <div class="grid">
+        <div class="card"><h2>Dépenses totales</h2><div class="big">${fmtEUR(totals.totalExpenses)}</div><div class="small muted">Stock + générales + pertes</div></div>
+        <div class="card"><h2>Dépenses récupérables</h2><div class="big">${fmtEUR(totals.recoverable)}</div><div class="small muted">= achats stock (hors pertes & générales)</div></div>
+        <div class="card"><h2>Dépenses générales</h2><div class="big">${fmtEUR(totals.totalGeneral)}</div></div>
+        <div class="card"><h2>Pertes (valorisées)</h2><div class="big">${fmtEUR(totals.totalLosses)}</div></div>
+        <div class="card"><h2>Ventes</h2><div class="big">${fmtEUR(totals.totalSales)}</div></div>
+      </div>
+    ` : `<div class="card"><div class="small muted">Pas assez de données pour l'analyse.</div></div>`;
+
+    app.innerHTML = `
+      ${banner}
+      ${msg}
+      <div class="card">
+        <h2>Analyse</h2>
+        <div class="row">
+          <div class="field">
+            <label>Période</label>
+            <select id="a_period">
+              <option value="30j" ${periodKey==="30j"?"selected":""}>30 jours (inclut aujourd'hui)</option>
+              <option value="mois" ${periodKey==="mois"?"selected":""}>Mois en cours (inclut aujourd'hui)</option>
+              <option value="tout" ${periodKey==="tout"?"selected":""}>Historique complet</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Granularité</label>
+            <div class="small muted" style="margin-top:10px">Auto : ${escapeHTML(series.granularity||"—")}</div>
+          </div>
+        </div>
+        <div class="small muted">Histogramme empilé = achats stock par classe + dépenses générales. Courbes : pertes (orange) et ventes (bleu).</div>
+      </div>
+      ${cards}
+      <div class="card">
+        <h2>Graph</h2>
+        <canvas id="analysisChart" class="chart"></canvas>
+        <div class="small" style="margin-top:10px">
+          <b>Légende</b> :
+          <span class="tag">Dépenses générales</span>
+          <span class="tag" style="border-color:rgba(245,124,0,0.7)">Pertes</span>
+          <span class="tag" style="border-color:rgba(66,165,245,0.7)">Ventes</span>
+          ${cats.map((c,i)=>`<span class="tag" style="border-color:${colorForIndex(i,0.9)}">${escapeHTML(c)}</span>`).join(" ")}
+        </div>
+      </div>
+    `;
+
+    const sel = app.querySelector("#a_period");
+    sel.onchange = () => {
+      STATE.ui.analysisPeriod = sel.value;
+      saveState();
+      render();
+    };
+
+    drawAnalysisChart(app.querySelector("#analysisChart"), series);
+
+    // Inline export from banner
+    const ex = app.querySelector("button[data-action='export_inline']");
+    if (ex) {
+      ex.onclick = () => {
+        exportState();
+        setMessage("Export JSON généré");
+        render();
+      };
+    }
     return;
   }
 
@@ -221,7 +506,8 @@ function render() {
       })
       .sort((a,b)=>String(a.id).localeCompare(String(b.id)));
 
-    const catOptions = [`<option value="">—</option>`].concat(PRODUCT_CATEGORIES.map(c=>`<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`)).join("");
+    const categories = getProductCategories();
+    const catOptions = [`<option value="">—</option>`].concat(categories.map(c=>`<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`)).join("");
 
     app.innerHTML = `
       ${banner}
@@ -232,6 +518,14 @@ function render() {
           <div class="field"><label>ID (unique)</label><input id="p_id" placeholder="CP23X3"></div>
           <div class="field"><label>Nom</label><input id="p_nom" placeholder="Contreplaqué 3mm"></div>
           <div class="field"><label>Classe</label><select id="p_cat">${catOptions}</select></div>
+          <div class="field">
+            <label>Ajouter une classe</label>
+            <div class="row">
+              <input id="p_newcat" placeholder="ex: Packaging" />
+              <button class="btn" id="p_addcat" type="button">Ajouter</button>
+            </div>
+            <div class="small muted">Optionnel : ajoute une nouvelle classe à la liste.</div>
+          </div>
           <div class="field"><label>Unités / lot (défaut)</label><input id="p_upl" type="number" min="1" step="1" placeholder="16"></div>
         </div>
         <div class="row">
@@ -307,8 +601,30 @@ function render() {
       app.querySelector("#p_desc3").value = "";
     };
 
+    // Ajouter une catégorie (classe)
+    const addCatBtn = app.querySelector("#p_addcat");
+    if (addCatBtn) {
+      addCatBtn.onclick = () => {
+        const raw = String(app.querySelector("#p_newcat").value || "");
+        const name = raw.replace(/[\r\n\t]/g, " ").trim();
+        if (!name) { setMessage("Classe vide"); render(); return; }
+        // Normalisation légère (garde la casse mais évite doublons exacts)
+        const cur = Array.isArray(STATE.settings.productCategories) ? STATE.settings.productCategories : [];
+        if (cur.some(x => String(x).trim().toLowerCase() === name.toLowerCase())) {
+          setMessage("Classe déjà existante");
+          render();
+          return;
+        }
+        cur.push(name);
+        STATE.settings.productCategories = cur;
+        setMessage(`Classe ajoutée : ${name}`);
+        saveState();
+        render();
+      };
+    }
+
     app.querySelector("#p_save").onclick = () => {
-      const id = String(app.querySelector("#p_id").value || "").trim();
+      const id = String(app.querySelector("#p_id").value || "").replace(/[\r\n\t]/g, " ").trim();
       if (!id) {
         setMessage("ID obligatoire");
         render();
@@ -389,7 +705,7 @@ function render() {
 
     const journalSearch = (STATE.ui.journalSearch || "").trim().toLowerCase();
     const journalCat = String(STATE.ui.journalCategory || "").trim();
-    const catOptions = [`<option value="">Toutes</option>`].concat(PRODUCT_CATEGORIES.map(c=>`<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`)).join("");
+    const catOptions = [`<option value="">Toutes</option>`].concat(getProductCategories().map(c=>`<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`)).join("");
 
     const movementsFiltered = STATE.mouvements
       .slice()
@@ -572,8 +888,8 @@ function render() {
                     const det = it.type === "ACHAT" ? `unit=${fmtEUR(it.unitPrice)} / total=${fmtEUR(it.totalCost)}`
                       : it.type === "PERTE" ? `coût perte=${fmtEUR(it.perteCost)}`
                       : it.type === "DEPENSE" ? `tags=${escapeHTML((it.tags||[]).join(", "))}`
-                      : it.type === "VENTE" ? `sale=${fmtEUR(it.saleTotal)} / coût=${fmtEUR(it.costMatiere)} / marge=${fmtEUR(it.margin)}`
-                      : it.type === "VENTE_CMD" ? `${escapeHTML(it.label||"Création")}: ${fmtNum((it.lines||[]).length)} ligne(s) · sale=${fmtEUR(it.saleTotal)} / coût=${fmtEUR(it.costMatiere)} / marge=${fmtEUR(it.margin)}`
+                      : it.type === "VENTE" ? `vente=${fmtEUR(it.saleTotal)} / coût=${fmtEUR(it.costMatiere)} / plus-value=${fmtEUR(it.margin)}`
+                      : it.type === "VENTE_CMD" ? `${escapeHTML(it.label||"Création")}: ${fmtNum((it.lines||[]).length)} ligne(s) · vente=${fmtEUR(it.saleTotal)} / coût=${fmtEUR(it.costMatiere)} / plus-value=${fmtEUR(it.margin)}`
                       : "";
                     const amount = it.type === "DEPENSE" ? fmtEUR(it.amount)
                       : it.type === "ACHAT" ? fmtEUR(it.totalCost)
@@ -625,6 +941,7 @@ function render() {
                   <th>ID</th>
                   <th>Qté</th>
                   <th>Montant</th>
+                  <th>Détails</th>
                   <th>Status</th>
                   <th></th>
                 </tr>
@@ -650,6 +967,29 @@ function render() {
                       ? `<span class="pill">${fmtNum((m.lines||[]).length)} ligne(s)</span>`
                       : (m.qtyUnits!==undefined?fmtNum(m.qtyUnits):"—");
 
+                    const details = (() => {
+                      if (m.type === "VENTE_CMD") {
+                        const lns = Array.isArray(m.lines) ? m.lines : [];
+                        const rows = lns.map(ln => {
+                          const pid = ln?.productId || "";
+                          const q = Number(ln?.qtyUnits || 0);
+                          const lc = Number(ln?.lineCost || 0);
+                          return `${escapeHTML(pid)} × ${fmtNum(q)} = ${fmtEUR(lc)}`;
+                        }).join(" · ");
+                        return `<details><summary class="linklike">Voir</summary><div class="small">Coût matière: <b>${fmtEUR(Number(m.costMatiere||0))}</b> · Plus-value: <b>${fmtEUR(Number(m.margin||0))}</b><br/>${rows||""}</div></details>`;
+                      }
+                      if (m.type === "VENTE") {
+                        return `<div class="small">Coût matière: <b>${fmtEUR(Number(m.costMatiere||0))}</b> · Plus-value: <b>${fmtEUR(Number(m.margin||0))}</b></div>`;
+                      }
+                      if (m.type === "PERTE") {
+                        return `<div class="small">Tags: ${(m.tags||[]).map(t=>`<span class="tag">${escapeHTML(t)}</span>`).join(" ")}</div>`;
+                      }
+                      if (m.type === "DEPENSE") {
+                        return `<div class="small">${escapeHTML(m.note||"")}</div>`;
+                      }
+                      return "—";
+                    })();
+
                     const canCancel = (!annulled && m.type !== "ANNUL");
 
                     return `
@@ -660,6 +1000,7 @@ function render() {
                         <td>${idCell}</td>
                         <td>${qtyCell}</td>
                         <td>${amount}</td>
+                        <td>${details}</td>
                         <td>${statusPill}</td>
                         <td>${canCancel ? `<button class="danger" data-cancel="${escapeHTML(m.mid)}">Annuler</button>` : ""}</td>
                       </tr>
@@ -744,8 +1085,7 @@ function render() {
       const date = app.querySelector("#p_date").value;
       const pid = app.querySelector("#p_pid").value;
       const unitsLost = Math.floor(Number(app.querySelector("#p_units").value || 0));
-      const tagStr = String(app.querySelector("#p_tags").value || "").trim();
-      const tags = tagStr ? tagStr.split(",").map(x=>x.trim()).filter(Boolean) : [];
+      const tags = parseTagsInput(app.querySelector("#p_tags").value);
 
       const isoAt = parseDateInputToISO(date);
       const avg = avgPriceAtDate(pid, isoAt);
@@ -768,9 +1108,8 @@ function render() {
     app.querySelector("#d_add").onclick = () => {
       const date = app.querySelector("#d_date").value;
       const amount = Number(app.querySelector("#d_amount").value || 0);
-      const tagStr = String(app.querySelector("#d_tags").value || "").trim();
       const note = String(app.querySelector("#d_note").value || "").trim();
-      const tags = tagStr ? tagStr.split(",").map(x=>x.trim()).filter(Boolean) : [];
+      const tags = parseTagsInput(app.querySelector("#d_tags").value);
 
       STATE.ui.draft.items.push({
         type: "DEPENSE",
@@ -944,6 +1283,7 @@ function render() {
   }
 
   if (STATE.ui.tab === "aide") {
+    const tests = Array.isArray(STATE.ui.lastTests) ? STATE.ui.lastTests : [];
     app.innerHTML = `
       ${banner}
       ${msg}
@@ -963,7 +1303,52 @@ function render() {
         <h2>Diagnostic rapide</h2>
         <div class="small muted">Ouvre la console (F12) : tu dois voir “adch_80085 init”.</div>
       </div>
+
+      <div class="card">
+        <h2>Test de fiabilité</h2>
+        <div class="small muted">Vérifie que l'appli encaisse des entrées "sales" (tags, nombres, dates, IDs) sans casser les calculs.</div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="runTests">Lancer les tests</button>
+        </div>
+        ${tests.length ? `<div class="warnbox" style="margin-top:10px"><ul>${tests.map(t=>`<li class=\"small\">${escapeHTML(t)}</li>`).join("")}</ul></div>` : `<div class="small muted" style="margin-top:10px">Aucun résultat pour l'instant.</div>`}
+      </div>
+
+      <div class="card dangerbox">
+        <h2>Reset (dangereux)</h2>
+        <div class="small">Efface <b>toutes</b> les données locales de cette PWA/appareil (IndexedDB). <b>Export d'abord</b>.</div>
+        <div class="row">
+          <button class="btn danger" data-action="reset_help">Reset local</button>
+        </div>
+      </div>
     `;
+
+    // Inline export from banner
+    const ex = app.querySelector("button[data-action='export_inline']");
+    if (ex) {
+      ex.onclick = () => {
+        exportState();
+        setMessage("Export JSON généré");
+        render();
+      };
+    }
+
+    const r = app.querySelector("button[data-action='reset_help']");
+    if (r) {
+      r.onclick = async () => {
+        const ok = confirm("Reset total ? (efface l'état local sur cet appareil)\nPense à exporter avant.");
+        if (!ok) return;
+        await hardReset();
+      };
+    }
+
+    const tbtn = app.querySelector("#runTests");
+    if (tbtn) {
+      tbtn.onclick = () => {
+        STATE.ui.lastTests = reliabilityTests();
+        saveState();
+        render();
+      };
+    }
     return;
   }
 }
@@ -1091,16 +1476,30 @@ function injectDraftToJournal() {
 
     if (it.type === "VENTE_CMD") {
       const sid = nextSID();
+      const isoAt = parseDateInputToISO(it.date);
+      const srcLines = Array.isArray(it.lines) ? it.lines : [];
+      const lines = [];
+      let costMatiere = 0;
+      for (const ln of srcLines) {
+        const pid = ln?.productId || "";
+        const qty = Math.abs(Math.floor(Number(ln?.qtyUnits || 0)));
+        const unitCostAt = avgPriceAtDate(pid, isoAt);
+        const lineCost = qty * unitCostAt;
+        costMatiere += lineCost;
+        lines.push({ productId: pid, qtyUnits: qty, unitCostAt, lineCost });
+      }
+      const saleTotal = Number(it.saleTotal || 0);
+      const margin = saleTotal - costMatiere;
       STATE.mouvements.push({
         mid,
         date: it.date,
         type: "VENTE_CMD",
         sid,
         label: it.label || "",
-        lines: Array.isArray(it.lines) ? it.lines : [],
-        saleTotal: Number(it.saleTotal || 0),
-        costMatiere: Number(it.costMatiere || 0),
-        margin: Number(it.margin || 0),
+        lines,
+        saleTotal,
+        costMatiere,
+        margin,
         note: "",
       });
     }

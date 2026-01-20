@@ -66,6 +66,7 @@ button.danger{background:rgba(176,0,32,0.2); border-color:rgba(176,0,32,0.6)}
   border-radius:16px;
   padding:14px;
 }
+.dangerbox{border:1px solid rgba(255,80,80,0.45)}
 .card h2{margin:0 0 10px; font-size:14px}
 
 .kpi{display:flex; justify-content:space-between; align-items:baseline}
@@ -153,6 +154,16 @@ textarea{min-height:70px; resize:vertical}
   background:transparent;
   border:1px dashed var(--border);
 }
+
+.linklike{
+  cursor:pointer;
+  color:var(--text);
+  text-decoration:underline;
+  opacity:0.9;
+}
+
+details summary{list-style:none}
+details summary::-webkit-details-marker{display:none}
 
 .banner{
   display:flex;
