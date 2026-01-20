@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Stock & Flux – Atelier (adch_80085)</title>
   <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#111111">
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -39,5 +41,12 @@
   <script src="calc.js"></script>
   <script src="ui.js"></script>
   <script src="app.js"></script>
+
+  <script>
+    // PWA offline cache
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(console.error);
+    }
+  </script>
 </body>
 </html>
