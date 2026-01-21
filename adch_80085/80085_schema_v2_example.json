@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "version": 2,
+    "app": "adch_80085"
+  },
+  "produits": [
+    {
+      "pid": "PXXXXXXXXXX",
+      "id": "CP22X3",
+      "nom": "...",
+      "category": "Bois",
+      "unitsPerLotRef": 1,
+      "descriptions": []
+    }
+  ],
+  "mouvements": [
+    {
+      "mid": "M000001",
+      "active": true,
+      "date": "2026-01-01",
+      "type": "ACHAT",
+      "pid": "PXXXXXXXXXX",
+      "qtyUnits": null,
+      "lots": 2,
+      "unitsPerLotUsed": 10,
+      "priceLot": 13.0,
+      "unitPriceSale": null,
+      "note": "",
+      "tags": []
+    }
+  ]
+}

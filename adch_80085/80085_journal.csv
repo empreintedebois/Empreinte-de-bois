@@ -1,0 +1,9 @@
+﻿mid,active,date,type,productId,pid,qtyUnits,unitPrice,totalCost,amount,qtyLots,unitsPerLotUsed,priceLot,tags,note
+M000001,True,2025-08-20,DEPENSE,,,,,,277.9,,,,"[""laser""]",Longer Ray5 20w
+M000002,True,2025-08-20,DEPENSE,,,,,,27.01,,,,"[""laser""]",Pompe à air
+M000003,True,2025-10-14,DEPENSE,,,,,,33.5,,,,"[""laser""]",Table nid d'abeille
+M000004,True,2025-09-11,ACHAT,CP22X3,,12,1.1658333333333333,13.989999999999998,,0,0,13.99,[],
+M000005,True,2025-10-29,ACHAT,CP22X2,,20,1.4289999999999998,28.58,,0,0,28.58,[],
+M000006,True,2026-01-11,ACHAT,CP23X3,,16,1.18625,18.98,,0,0,18.98,[],
+M000007,True,2026-01-11,ACHAT,CP22X3,,24,0.9579166666666666,22.99,,0,0,22.99,[],
+M000008,True,2025-11-16,ACHAT,CP22X3,,8,1.02375,8.19,,0,0,8.19,[],
